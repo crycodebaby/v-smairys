@@ -1,7 +1,17 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Füge diesen Block hinzu
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "tailwindui.com",
+        port: "",
+        pathname: "/img/logos/**",
+      },
+    ],
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
