@@ -1,58 +1,68 @@
 // src/components/Header.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Shield, Menu, X } from "lucide-react";
-import { useTheme } from "next-themes";
-import { ThemeToggle } from "./ThemeToggle";
+import { Menu, X, User, Shield } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle"; // alias: robust, egal wo diese Datei liegt
 
 const navLinks = [
-  { name: "Leistungen", href: "/leistungen" },
-  { name: "Unser Prozess", href: "/prozess" },
-  { name: "Kontakt", href: "/kontakt" },
+  { name: "Leistungen", href: "#leistungen" },
+  { name: "Prozess", href: "#prozess" },
+  // Kontakt ist als Primary-CTA separat
 ];
 
-const Header = () => {
+const Header: React.FC = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
-
-  const logoSrc =
-    mounted && theme === "light"
-      ? "/logo/smairys-black.png"
-      : "/logo/smairys.png";
+  // Body scroll lock + ESC zum Schließen
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      const onKey = (e: KeyboardEvent) =>
+        e.key === "Escape" && setMobileMenuOpen(false);
+      window.addEventListener("keydown", onKey);
+      return () => {
+        document.body.style.overflow = original;
+        window.removeEventListener("keydown", onKey);
+      };
+    }
+  }, [isMobileMenuOpen]);
 
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-background/80 backdrop-blur-lg dark:border-white/10">
         <div className="container flex items-center justify-between h-24 mx-auto">
+          {/* Flicker-freies Logo */}
           <Link href="/" aria-label="Zurück zur Startseite">
             <motion.div
               whileHover={{ scale: 1.05, rotate: -1 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              {mounted ? (
+              <div className="relative w-48 h-16">
                 <Image
-                  src={logoSrc}
-                  alt="Smairys Netz-Manufaktur Logo"
-                  width={500}
-                  height={500}
-                  className="w-auto h-16"
+                  src="/logo/smairys-black.png"
+                  alt="Smairys Logo (helles Theme)"
+                  fill
                   priority
-                  key={logoSrc}
+                  className="object-contain dark:hidden"
                 />
-              ) : (
-                <div className="w-48 h-16 rounded-md bg-white/10 animate-pulse" />
-              )}
+                <Image
+                  src="/logo/smairys.png"
+                  alt="Smairys Logo (dunkles Theme)"
+                  fill
+                  priority
+                  className="hidden object-contain dark:block"
+                />
+              </div>
             </motion.div>
           </Link>
 
-          <nav className="items-center hidden md:flex gap-x-8">
+          {/* Desktop-Navigation */}
+          <nav className="items-center hidden gap-x-8 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -64,13 +74,15 @@ const Header = () => {
             ))}
           </nav>
 
+          {/* Right cluster */}
           <div className="flex items-center gap-x-2 sm:gap-x-4">
-            <div className="items-center hidden sm:flex gap-x-4">
+            {/* Optional: dezente Utility-Links ab sm */}
+            <div className="items-center hidden gap-x-4 sm:flex">
               <a
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center px-4 py-2 text-sm transition-all border rounded-full group gap-x-2 border-primary/50 text-primary hover:bg-primary/10 hover:border-primary"
+                className="inline-flex items-center px-4 py-2 text-sm transition-all border rounded-full group gap-x-2 border-primary/50 text-primary hover:border-primary hover:bg-primary/10"
               >
                 <User size={16} />
                 <span>Kunden-Login</span>
@@ -86,12 +98,23 @@ const Header = () => {
               </a>
             </div>
 
+            {/* Primary CTA */}
+            <Link
+              href="#kontakt"
+              className="items-center justify-center hidden px-4 py-2 text-sm font-semibold transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 md:inline-flex"
+            >
+              Kontakt
+            </Link>
+
             <ThemeToggle />
 
+            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
-                onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+                onClick={() => setMobileMenuOpen((v) => !v)}
                 aria-label="Menü öffnen"
+                aria-controls="mobile-menu"
+                aria-expanded={isMobileMenuOpen}
               >
                 <Menu size={24} />
               </button>
@@ -104,19 +127,23 @@ const Header = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            id="mobile-menu"
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-x-0 top-0 z-40 p-4 shadow-lg bg-background pt-28 md:hidden"
+            exit={{ opacity: 0, y: -10 }}
+            className="fixed inset-0 z-40 bg-background/95 backdrop-blur-lg md:hidden"
           >
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="absolute top-9 right-5"
-              aria-label="Menü schließen"
-            >
-              <X size={24} />
-            </button>
-            <nav className="flex flex-col items-center space-y-8">
+            <div className="container flex items-center justify-end h-24 mx-auto">
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Menü schließen"
+                className="p-2 rounded"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <nav className="flex flex-col items-center mt-6 space-y-8">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -127,24 +154,45 @@ const Header = () => {
                   {link.name}
                 </Link>
               ))}
+
               <div className="w-full my-6 border-t border-white/10" />
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center text-xl gap-x-2"
+
+              <Link
+                href="#kontakt"
+                className="inline-flex items-center justify-center px-8 py-3 text-xl font-semibold transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={() => setMobileMenuOpen(false)}
               >
-                <User size={22} />
-                <span>Kunden-Login</span>
-              </a>
-              <div className="pt-6">
+                Kontakt
+              </Link>
+
+              {/* Utility-Links auch mobil verfügbar */}
+              <div className="flex flex-col items-center gap-6 mt-4">
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-lg gap-x-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <User size={20} />
+                  <span>Kunden-Login</span>
+                </a>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Admin Dashboard"
+                  className="text-foreground/60"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Shield size={22} />
+                </a>
                 <ThemeToggle />
               </div>
             </nav>
           </motion.div>
         )}
       </AnimatePresence>
-      {/* HIER WAR DER TIPPFEHLER: Ich habe 'AnPresence' zu 'AnimatePresence' korrigiert. */}
     </>
   );
 };

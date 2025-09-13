@@ -1,6 +1,6 @@
 // src/components/ProcessSection.tsx
-import { ClipboardList, Code, Rocket, TrendingUp } from "lucide-react";
 import React from "react";
+import { ClipboardList, Code, Rocket, TrendingUp } from "lucide-react";
 import FadeIn from "./FadeIn";
 
 const processSteps = [
@@ -36,7 +36,7 @@ const processSteps = [
 
 const ProcessSection = () => {
   return (
-    <section className="container py-24 sm:py-32">
+    <section id="prozess" className="container py-24 scroll-mt-28 sm:py-32">
       <FadeIn>
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl">
@@ -51,8 +51,11 @@ const ProcessSection = () => {
       </FadeIn>
 
       <div className="relative max-w-3xl mx-auto mt-16">
-        {/* Die vertikale Linie im Hintergrund */}
-        <div className="absolute w-px h-full left-8 top-8 bg-primary/20" />
+        {/* Dekorative vertikale Linie */}
+        <div
+          aria-hidden="true"
+          className="absolute w-px h-full left-8 top-8 bg-primary/20"
+        />
 
         <ul className="space-y-12">
           {processSteps.map((item, index) => (
