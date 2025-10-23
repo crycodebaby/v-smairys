@@ -2,67 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ====== BRAND TOKENS – EINMAL FESTLEGEN ====== */
+/* Wir definieren NUR hier die echten Farben. Alles andere referenziert diese Tokens. */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
+    /* Brand-Basis */
+    --brand-blue: 217 91% 60%; /* #3b82f6 */
+    --brand-black: 0 0% 3%; /* fast schwarz für Text auf weiß */
+    --brand-white: 0 0% 100%;
+
+    /* Oberfläche (Light) */
+    --background: var(--brand-white);
+    --foreground: var(--brand-black);
+
+    /* Komponententokens (Light) – alles aus den drei Brandfarben abgeleitet */
+    --card: var(--brand-white);
+    --card-foreground: var(--brand-black);
+
+    --popover: var(--brand-white);
+    --popover-foreground: var(--brand-black);
+
+    --primary: var(--brand-blue);
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96%; /* helles Grau für Flächenchips */
+    --secondary-foreground: var(--brand-black);
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 0 0% 96%;
+    --accent-foreground: var(--brand-black);
+
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
+
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --ring: var(--brand-blue);
+
     --radius: 0.5rem;
+
+    /* Gradient-Stopps (für einheitliche Hero/CTA-Hintergründe) */
+    --gradient-from: hsl(var(--brand-blue));
+    --gradient-via: hsl(217 91% 55%); /* etwas dunkler für Tiefe */
+    --gradient-to: hsl(217 91% 45%);
   }
+
   .dark {
-    /* HIER ERSETZEN WIR DIE WERTE */
-    --background: 240 10% 3.9%; /* Ersetzt durch unsere dunkle Farbe (fast schwarz) */
-    --foreground: 0 0% 98%; /* Ersetzt durch unser helles Weiß für Text */
+    /* Oberfläche (Dark) – Schwarz/Weiß + dein Blau */
+    --background: 0 0% 4%; /* nahezu schwarz */
+    --foreground: 0 0% 98%;
 
-    --primary: 217.2 91.2% 59.8%; /* Unser Premium-Blau */
-    --primary-foreground: 210 40% 98%; /* Text auf dem blauen Button */
-
-    /* Die restlichen Werte können wir vorerst so belassen */
-    --card: 240 10% 3.9%;
+    --card: 0 0% 6%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
 
-    --secondary: 240 3.7% 15.9%;
+    --primary: var(--brand-blue); /* Blau bleibt gleich – konsistente Marke */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 14%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 240 3.7% 15.9%;
+    --accent: 0 0% 14%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 217.2 91.2% 59.8%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: var(--brand-blue);
+
+    /* Dark-Variante des Gradients */
+    --gradient-from: hsl(217 91% 40%);
+    --gradient-via: hsl(217 91% 50%);
+    --gradient-to: hsl(217 91% 60%);
   }
 }
 
+/* Basalelemente */
 @layer base {
   * {
     @apply border-border;
@@ -70,4 +94,14 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ====== EINHEITLICHER MARKEN-GRADIENT ====== */
+.bg-gradient-primary {
+  background-image: linear-gradient(
+    135deg,
+    var(--gradient-from) 0%,
+    var(--gradient-via) 50%,
+    var(--gradient-to) 100%
+  );
 }

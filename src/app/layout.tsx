@@ -3,10 +3,13 @@ import type { Metadata } from "next";
 import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 
+// 1. Analytics-Komponente importieren
+import { Analytics } from "@vercel/analytics/next";
+
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ScrollCompanion from "@/components/ui/ScrollCompanion"; // Optionaler Begleiter
+import ScrollCompanion from "@/components/ui/ScrollCompanion";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,7 +34,6 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${inter.variable} bg-background text-foreground antialiased`}
       >
-        {/* Der ScrollCompanion bleibt als optionales, globales Element */}
         <ScrollCompanion />
 
         <ThemeProvider
@@ -44,6 +46,9 @@ export default function RootLayout({
           <main className="relative">{children}</main>
           <Footer />
         </ThemeProvider>
+
+        {/* 2. Analytics-Komponente hier einfügen */}
+        <Analytics />
       </body>
     </html>
   );

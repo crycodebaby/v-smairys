@@ -8,7 +8,7 @@ export const faqData: FaqItem[] = [
   {
     question: "Passt die Netz-Manufaktur zu jedem Unternehmen?",
     answer:
-      "Nein. Wir sehen uns als strategische Partner auf Augenhöhe. Unsere besten Ergebnisse erzielen wir mit motivierten Unternehmern, die eine klare Vision haben und bereit sind, in nachhaltige Qualität zu investieren. Wenn Sie die schnellste und billigste Lösung suchen, sind wir wahrscheinlich nicht der richtige Partner für Sie.",
+      "Nein. Wenn Sie die schnellste und billigste Lösung suchen, sind wir wahrscheinlich nicht der richtige Partner für Sie.Wir sehen uns als strategische Partner auf Augenhöhe. Unsere besten Ergebnisse erzielen wir mit motivierten Unternehmern, die eine klare Vision haben und bereit sind, in nachhaltige Qualität zu investieren.",
   },
   {
     question: "Worin genau investiere ich bei der Netz-Manufaktur?",
