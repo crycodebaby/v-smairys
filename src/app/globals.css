@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 /* ====== BRAND TOKENS – EINMAL FESTLEGEN ====== */
-/* Wir definieren NUR hier die echten Farben. Alles andere referenziert diese Tokens. */
 @layer base {
   :root {
     /* Brand-Basis */

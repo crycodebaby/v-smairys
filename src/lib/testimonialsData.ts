@@ -3,12 +3,16 @@ export interface Testimonial {
   name: string;
   title: string;
   company: string;
-  // logoPath: string; // Ersetzen wir durch ein prominenteres Bild
-  imagePath: string; // Ein zentrales, großes Bild für jede Karte
+  // Logos: entweder ein einzelnes oder zwei Varianten (Light/Dark)
+  logoSingle?: string;
+  logoLight?: string;
+  logoDark?: string;
   quote: string;
   story: string;
-  url: string; // Die URL zum Live-Projekt
-  kpi: string; // Der wichtigste Key Performance Indicator
+  url: string;
+  kpi: string;
+  timeframe?: string;
+  services?: string[];
 }
 
 export const testimonialsData: Testimonial[] = [
@@ -16,35 +20,41 @@ export const testimonialsData: Testimonial[] = [
     name: "Alexander Ergart",
     title: "Geschäftsführer",
     company: "Ergart GmbH",
-    imagePath: "/testimonials/ergart-logo.png",
-    quote: "Von Platz 64 auf 1 bei Google, und 300 % mehr Traffic!",
+    // Nur ein blaues Logo, das in Light & Dark funktioniert
+    logoSingle: "/testimonials/ergart-logo.png",
+    quote: "Von Platz 64 auf 1 bei Google, 300 Prozent mehr Traffic.",
     story:
-      "Als Handwerksmeister hatte ich weder Zeit noch Ahnung von Webdesign. Die Netz-Manufaktur hat nicht nur unsere Website neu gebaut, sondern auch KI-Tools integriert. Nach nur 3 Monaten sind wir bei Top-Suchbegriffen auf Platz 1 gesprungen.",
+      "Als Handwerksmeister hatte ich weder Zeit noch Ahnung von Webdesign. Smairys hat Website, SEO und KI-Tools umgesetzt. Nach drei Monaten ranken wir bei wichtigen Suchbegriffen auf Platz 1.",
     url: "https://alexander-ergart.de",
-    kpi: "+300% mehr Website-Traffic",
+    kpi: "+300% Website-Traffic",
+    timeframe: "in 3 Monaten",
+    services: ["Webentwicklung", "SEO", "Backlinks", "Google Business Profil"],
   },
   {
     name: "Martin Sonsuz",
     title: "Inhaber",
     company: "Eppelstyle",
-    imagePath: "/testimonials/eppelstyle-logo.png", // Placeholder, ideal wäre ein Bild vom Salon oder der Website
+    logoLight: "/testimonials/eppelstyle-schwarz.png",
+    logoDark: "/testimonials/eppelstyle-weiß.png",
     quote:
-      "Endlich eine Website, die so stylish ist wie mein Salon, mit KI-Buchungstool für viermal so viele Termine.",
+      "Eine Website so stylish wie der Salon und viermal so viele Online-Termine.",
     story:
-      "Mein altes Design war veraltet. Die Netz-Manufaktur hat mir ein modernes, responsives Design und smarte Features wie einen KI-Chatbot und ein automatisches Buchungstool eingerichtet. Neue Kundinnen buchen jetzt direkt online.",
+      "Modernes Design mit sauberer Technik. Dazu ein KI-Chatbot und ein Buchungstool. Neukundinnen buchen jetzt direkt online und der Kalender ist voll.",
     url: "https://eppelstyle.de",
     kpi: "4x mehr Online-Buchungen",
+    services: ["Webentwicklung", "UX", "Buchungstool", "Automationen"],
   },
   {
     name: "Andreas Crncic",
-    title: "Gründer & Geschäftsführer",
+    title: "Gründer und Geschäftsführer",
     company: "Crncic Bausanierung GmbH",
-    imagePath: "/testimonials/crncic-logo.png", // Placeholder, ideal wäre ein Bild vom Team oder einem Projekt
-    quote:
-      "Eine Vision für meinen professionellen Auftritt SEO-Pro-Level, smarte Automationen und 140 % mehr Anfragen!",
+    logoLight: "/testimonials/crncic-schwarz.png",
+    logoDark: "/testimonials/crncic-weiß.png",
+    quote: "SEO auf Pro-Level, smarte Automationen, 140 Prozent mehr Anfragen.",
     story:
-      "Als Chef einer gewachsenen Bauunternehmung hatte ich nie Zeit für meine Außendarstellung. Die Netz-Manufaktur hat meine Website von Grund auf neu gestaltet: SEO bis Platz 1 und Performance-Boost. Meine Anfragen sind explodiert.",
+      "Kompletter Neuauftritt mit technischer SEO, klarer Content-Struktur und Performance-Boost. Sichtbarkeit gestiegen, Anfragen deutlich nach oben.",
     url: "https://bauunternehmen.saarland",
-    kpi: "+300% mehr Projektanfragen",
+    kpi: "+140% Projektanfragen",
+    services: ["Webentwicklung", "SEO", "Performance", "Automationen"],
   },
 ];
