@@ -1,4 +1,3 @@
-// src/app/page.tsx
 import SocialProof from "@/components/SocialProof";
 import BentoGridSection from "@/components/BentoGridSection";
 import CtaSection from "@/components/CtaSection";
@@ -7,18 +6,23 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import FaqSection from "@/components/FaqSection";
 import { ArrowDown } from "lucide-react";
 import BackgroundGrid from "@/components/ui/BackgroundGrid";
+import ClientHeroIntro from "@/components/ui/ClientHeroIntro";
 
 export default function Home() {
   return (
     <>
-      {/* 1) Hero mit lokalem Grid */}
-      <section className="relative isolate min-h-[90vh] overflow-hidden py-24 sm:py-32">
-        {/* Grid ist jetzt wieder lokal und garantiert HINTER dem Inhalt */}
-        <div className="absolute inset-0 pointer-events-none -z-10">
+      {/* 1) Hero */}
+      <section
+        id="hero"
+        className="relative isolate min-h-[90vh] overflow-hidden py-24 sm:py-32"
+      >
+        {/* dezentes Grid hinter dem Content */}
+        <div className="absolute inset-0 pointer-events-none -z-20">
           <BackgroundGrid />
         </div>
 
-        <div className="relative z-0">
+        {/* Client-gesteuertes Intro (3D-Canvas ist global fixed; hier nur der Content) */}
+        <ClientHeroIntro>
           <div className="container mx-auto text-center">
             <div className="max-w-3xl mx-auto">
               <h1 className="text-4xl font-bold tracking-tight font-heading sm:text-6xl">
@@ -53,18 +57,33 @@ export default function Home() {
               </div>
             </div>
           </div>
+
           <div className="container w-full mx-auto mt-16 sm:mt-24">
             <SocialProof />
           </div>
-        </div>
+        </ClientHeroIntro>
       </section>
 
-      {/* 2) Restliche Sektionen */}
-      <BentoGridSection />
-      <CtaSection />
-      <ProcessSection />
-      <TestimonialsSection />
-      <FaqSection />
+      {/* 2) Restliche Sektionen – mit IDs, damit wir später Section-Acts koppeln können */}
+      <section id="bento" className="relative">
+        <BentoGridSection />
+      </section>
+
+      <section id="cta" className="relative">
+        <CtaSection />
+      </section>
+
+      <section id="process" className="relative">
+        <ProcessSection />
+      </section>
+
+      <section id="testimonials" className="relative">
+        <TestimonialsSection />
+      </section>
+
+      <section id="faq" className="relative">
+        <FaqSection />
+      </section>
     </>
   );
 }
