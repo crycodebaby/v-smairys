@@ -32,11 +32,13 @@ export default function Home() {
                   Unsere Manufaktur-Methode für ambitionierte KMU.
                 </span>
               </h1>
+
               <p className="mt-6 text-lg leading-8 text-foreground/80">
                 Wir sind keine klassische Agentur. Wir sind Ihr strategischer
                 Partner, der handgefertigte Technologie mit bewährten
                 Wachstumsstrategien verbindet.
               </p>
+
               <div className="flex flex-col items-center justify-center gap-4 mt-10 sm:flex-row">
                 <a
                   href="#kontakt"
@@ -57,14 +59,18 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          <div className="container w-full mx-auto mt-16 sm:mt-24">
-            <SocialProof />
-          </div>
         </ClientHeroIntro>
       </section>
 
-      {/* 2) Restliche Sektionen – mit IDs, damit wir später Section-Acts koppeln können */}
+      {/* Abstand zwischen Hero/3D und SocialProof (atmet je Viewport) */}
+      <div className="mt-12 sm:mt-16 lg:mt-24" />
+
+      {/* 1.5) Social Proof – eigene Sektion */}
+      <section id="socialproof" className="relative">
+        <SocialProof />
+      </section>
+
+      {/* 2) Restliche Sektionen – IDs für Section-Acts */}
       <section id="bento" className="relative">
         <BentoGridSection />
       </section>

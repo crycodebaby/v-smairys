@@ -25,7 +25,6 @@ import type { GLTF } from "three-stdlib";
 import type { GLTFLoader } from "three-stdlib";
 import { MeshoptDecoder } from "three-stdlib";
 import type { SectionAct } from "@/lib/useSectionAct";
-// NEW import
 import { useTheme } from "next-themes";
 
 const REDUCED =
@@ -52,11 +51,30 @@ const attachMeshopt = (loader: GLTFLoader) => {
   );
 };
 
-// ---------- Farben & Tints ----------
-const DARK_BASE = new THREE.Color("#f5f7ff"); // hell, edel (Dark Mode)
-const LIGHT_BASE = new THREE.Color("#2b2f35"); // Graphit (Light Mode → Text bleibt lesbar)
+/* ============================
+   Patches: Park-Offsets & Pfad
+   ============================ */
 
-// dezente Section-Tints (werden 8–15% beigemischt)
+// weiter links parken (Desktop), Mobile etwas weniger
+const PARK_X_DESKTOP = -1.28;
+const PARK_X_MOBILE = -0.92;
+const PARK_Y = 0.02;
+
+// kleine Helper
+const isMobile = () => typeof window !== "undefined" && window.innerWidth < 768;
+
+// elliptische Scrollbahn (glatt, bleibt aus dem Zentrum)
+function ellipsePath(t: number, cx: number, rx = 0.5, cy = PARK_Y, ry = 0.1) {
+  const a = 2 * Math.PI * t;
+  return new THREE.Vector2(cx + rx * Math.cos(a), cy + ry * Math.sin(a * 1.25));
+}
+
+/* ============================
+   Farben & dezente Tints
+   ============================ */
+const DARK_BASE = new THREE.Color("#f5f7ff"); // hell, edel (Dark Mode)
+const LIGHT_BASE = new THREE.Color("#2b2f35"); // Graphit (Light Mode)
+
 const TINTS: Record<string, THREE.Color> = {
   hero: new THREE.Color("#ffffff"),
   bento: new THREE.Color("#ffffff"),
@@ -68,18 +86,17 @@ const TINTS: Record<string, THREE.Color> = {
   none: new THREE.Color("#ffffff"),
 };
 
-// ---------- kleine Utils ----------
+/* ============================
+   Easing / Utils
+   ============================ */
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeOutBack = (t: number, s = 1.70158) =>
   1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
 
-// elliptische Scrollbahn (glatt, geschlossene Schleife)
-function ellipsePath(t: number, cx = -0.8, rx = 0.7, cy = 0.02, ry = 0.12) {
-  const a = 2 * Math.PI * t; // 0..2π
-  return new THREE.Vector2(cx + rx * Math.cos(a), cy + ry * Math.sin(a * 1.3));
-}
-
+/* ============================
+   Model
+   ============================ */
 function LogoModel({
   phase,
   showcaseSeq = 0,
@@ -96,58 +113,91 @@ function LogoModel({
   ) as GLTFResult;
 
   const [mountedAt] = useState<number>(() => performance.now());
-  const { resolvedTheme } = useTheme(); // <-- NEW
+  const { resolvedTheme } = useTheme();
 
   const prepared = useMemo(() => {
     const root = gltf.scene.clone(true);
     root.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if (!mesh.isMesh) return;
-      const mat =
+
+      // Standardbasis – wird im Theme-Effect ggf. zu Physical getauscht
+      const base =
         mesh.material instanceof THREE.MeshStandardMaterial
           ? mesh.material.clone()
           : new THREE.MeshStandardMaterial({ color: "#f5f5f5" });
 
-      mat.metalness = 0.68;
-      mat.roughness = 0.28;
-      (mat as THREE.MeshStandardMaterial).envMapIntensity = 1.0;
-      // für Fade-Out am Ende / FAQ/Footer
-      mat.transparent = true;
-      mat.opacity = 1;
-      mesh.material = mat;
+      base.metalness = 0.68;
+      base.roughness = 0.28;
+      base.envMapIntensity = 1.0;
+      base.transparent = true; // für Fade
+      base.opacity = 1;
+
+      mesh.material = base;
     });
     return root;
   }, [gltf.scene]);
 
-  // Theme-Farbe & dezente Section-Tints mischen (max 15%)
+  // Theme-Farbe & dezente Section-Tints mischen (dezenter)
   useEffect(() => {
-    const base = (resolvedTheme === "light" ? LIGHT_BASE : DARK_BASE).clone();
+    const baseColor = (
+      resolvedTheme === "light" ? LIGHT_BASE : DARK_BASE
+    ).clone();
     const tint = (TINTS[act as string] ?? TINTS.hero).clone();
-    const tintAmount = act === "process" || act === "faq" ? 0.15 : 0.08;
+    const tintAmount = act === "process" || act === "faq" ? 0.12 : 0.06; // 6–12 %
 
     prepared.traverse((o) => {
-      const m = (o as THREE.Mesh).material as
-        | THREE.MeshStandardMaterial
-        | undefined;
-      if (!m) return;
-      const mixed = base.clone().lerp(tint, tintAmount);
-      m.color = mixed;
-      // im Light Mode etwas weniger Glanz, damit’s nicht blendet
-      m.metalness = resolvedTheme === "light" ? 0.55 : 0.7;
-      m.roughness = resolvedTheme === "light" ? 0.35 : 0.24;
-      m.envMapIntensity = resolvedTheme === "light" ? 0.85 : 1.0;
-      m.needsUpdate = true;
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+
+      const prevOpacity =
+        (mesh.material as THREE.Material & { opacity?: number }).opacity ?? 1;
+      const mixed = baseColor.clone().lerp(tint, tintAmount);
+
+      if (resolvedTheme === "light") {
+        // Light Mode → satin-metal mit Clearcoat/Sheen
+        const pm = new THREE.MeshPhysicalMaterial({
+          color: mixed,
+          metalness: 0.85,
+          roughness: 0.35, // satin
+          envMapIntensity: 0.9,
+          clearcoat: 0.6,
+          clearcoatRoughness: 0.25,
+          sheen: 0.3,
+          sheenRoughness: 0.75,
+          transmission: 0,
+          transparent: true,
+          opacity: prevOpacity,
+        });
+        mesh.material = pm;
+      } else {
+        // Dark Mode → hell/edel
+        const sm =
+          mesh.material instanceof THREE.MeshStandardMaterial
+            ? mesh.material
+            : new THREE.MeshStandardMaterial({ color: mixed });
+
+        sm.color = mixed;
+        sm.metalness = 0.75;
+        sm.roughness = 0.22;
+        sm.envMapIntensity = 1.1;
+        sm.transparent = true;
+        sm.opacity = prevOpacity;
+        mesh.material = sm;
+      }
+
+      (mesh.material as THREE.Material).needsUpdate = true;
     });
   }, [prepared, resolvedTheme, act]);
 
-  // --- INTRO CHOREO (sanfter Pop + Bogen nach links) ---
+  // Intro: sanfter Pop + kleiner Bogen nach links
   const intro = {
     popDur: 0.35,
     settleDur: 0.65,
     arcStart: 0.8,
     arcEnd: 1.6,
     arcHeight: 0.12,
-    arcLeft: -0.8,
+    arcLeft: PARK_X_DESKTOP, // später parken wir sowieso links; Arc geht dahin
   };
 
   // Showcase-Trigger
@@ -161,6 +211,9 @@ function LogoModel({
     }
   }, [showcaseSeq]);
 
+  // Park-X einmal pro Mount ermitteln
+  const parkXRef = useRef<number>(isMobile() ? PARK_X_MOBILE : PARK_X_DESKTOP);
+
   useFrame((state, delta) => {
     if (!group.current) return;
 
@@ -172,13 +225,16 @@ function LogoModel({
       !REDUCED;
     if (active) invalidate();
 
-    // ---------- Intro ----------
+    /* ---------- Act: sehr dezente Farbverschiebung wird bereits im Effect gesetzt ---------- */
+
+    /* ---------- Intro ---------- */
     const tPop = clamp01(elapsed / intro.popDur);
     const tSettle = clamp01((elapsed - intro.popDur) / intro.settleDur);
     const scaleIntro =
       INTRO_SCALE *
       (0.65 + 0.35 * easeOutBack(tPop)) *
       (1 + 0.08 * (1 - easeOutCubic(tSettle)));
+
     const rotXIntro = THREE.MathUtils.lerp(
       -0.35,
       BASE_TILT_X,
@@ -186,20 +242,11 @@ function LogoModel({
     );
     const yawIntro = THREE.MathUtils.lerp(0.18, 0, easeOutCubic(tSettle));
 
-    // ---------- Scroll-Fahrt (Ellipsenbahn + Parallax) ----------
-    const p = clamp01(scroll);
-    const path = ellipsePath(p, -0.8, 0.7, 0.02, 0.12); // X/Y
-    const yawFromScroll = Math.sin(p * Math.PI * 2) * 0.22;
-    const zParallax = -Math.sin(p * Math.PI) * 1.4;
+    const arcT = clamp01(
+      (elapsed - intro.arcStart) / (intro.arcEnd - intro.arcStart)
+    );
 
-    // Idle (sehr dezent)
-    const idle = REDUCED ? 0 : 1;
-    const idleYaw = Math.sin(state.clock.elapsedTime * 0.6) * 0.1 * idle;
-    const idlePitch =
-      Math.sin(state.clock.elapsedTime * 0.7 + Math.PI / 3) * 0.06 * idle;
-    const breathY = Math.sin(state.clock.elapsedTime * 0.9) * 0.012 * idle;
-
-    // ---------- Showcase (seamless flourish) ----------
+    /* ---------- Showcase (seamless flourish) ---------- */
     const SHOWCASE_DUR = 2000;
     const FLOURISH = {
       yaw: 0.32,
@@ -219,7 +266,7 @@ function LogoModel({
       const pp = clamp01(
         (performance.now() - showcaseStart.current) / SHOWCASE_DUR
       );
-      const w = 0.5 * (1 - Math.cos(2 * Math.PI * pp));
+      const w = 0.5 * (1 - Math.cos(2 * Math.PI * pp)); // Hann
       const tf = pp * FLOURISH.freq * 2 * Math.PI;
       flourYaw = FLOURISH.yaw * Math.sin(tf) * w;
       flourPitch = FLOURISH.pitch * Math.sin(tf + FLOURISH.phaseShift) * w;
@@ -229,44 +276,70 @@ function LogoModel({
       if (pp >= 1) showcaseStart.current = null;
     }
 
-    // ---------- FAQ/Footer-Schutz ----------
-    // 1) Am Ende des Onepagers (letzte 12%) sanft ausblenden
-    const tailFade = 1 - clamp01((p - 0.88) / 0.12); // 1 → 0 zwischen 88% und 100%
-    // 2) In echten FAQ/Footer-Sections: nach rechts, kleiner und tiefer
+    /* ---------- FAQ/Footer-Schutz & Tail Fade ---------- */
+    const p = clamp01(scroll);
+    const tailFade = 1 - clamp01((p - 0.88) / 0.12); // 1 → 0 in den letzten ~12%
     const isBottomAct = act === "faq" || act === "footer";
-    const avoidX = isBottomAct ? 0.9 : 0;
-    const avoidY = isBottomAct ? -0.06 : 0;
-    const avoidZ = isBottomAct ? -1.0 : 0;
-    const avoidScale = isBottomAct ? 0.9 : 1.0;
 
-    // ---------- Zielwerte ----------
+    /* ============================
+       PATCH: Scroll-Fahrt + 3D-Rotation
+       ============================ */
+    // Position entlang Ellipse (um Park-X)
+    const path = ellipsePath(p, parkXRef.current);
+
+    // Parallax in Z (dezent)
+    const zParallax = -Math.sin(p * Math.PI) * 1.2;
+
+    // Echte 3D-Rotation aus Scroll:
+    // Yaw (Y) 1x pro Runde, Pitch (X) phasenversetzt, Roll (Z) doppelte Frequenz
+    const yawFromScroll = Math.sin(p * Math.PI * 2) * 0.35; // ±20°
+    const pitchFromScroll = Math.sin(p * Math.PI * 2 + Math.PI / 2) * 0.18; // ±10°
+    const rollFromScroll = Math.sin(p * Math.PI * 4) * 0.12; // ±7°
+
+    // Idle minimal
+    const idle = REDUCED ? 0 : 1;
+    const idleYaw = Math.sin(state.clock.elapsedTime * 0.6) * 0.08 * idle;
+    const idlePitch =
+      Math.sin(state.clock.elapsedTime * 0.7 + Math.PI / 3) * 0.05 * idle;
+    const breathY = Math.sin(state.clock.elapsedTime * 0.9) * 0.01 * idle;
+
+    // Ziele
     const k = 1 - Math.pow(0.0016, delta);
 
     const scaleGoal =
       (phase === "intro" ? scaleIntro : PARK_SCALE) *
       (1 + Math.sin(state.clock.elapsedTime * 0.7) * 0.01 * idle) *
       flourScale *
-      avoidScale;
+      (isBottomAct ? 0.9 : 1.0);
 
-    const rotXGoal = (phase === "intro" ? rotXIntro : BASE_TILT_X) + idlePitch;
+    const rotXGoal =
+      (phase === "intro" ? rotXIntro : BASE_TILT_X) +
+      idlePitch +
+      (phase === "intro" ? 0 : pitchFromScroll) +
+      (flourPitch || 0);
+
     const rotYGoal =
-      (phase === "intro" ? yawIntro : 0) + idleYaw + yawFromScroll + flourYaw;
-    const rotZGoal = 0;
+      (phase === "intro" ? yawIntro : 0) +
+      idleYaw +
+      (phase === "intro" ? 0 : yawFromScroll) +
+      (flourYaw || 0);
 
-    const introT = clamp01(
-      (elapsed - intro.arcStart) / (intro.arcEnd - intro.arcStart)
-    );
+    const rotZGoal = phase === "intro" ? 0 : rollFromScroll;
+
     const posXBase =
       phase === "intro"
-        ? THREE.MathUtils.lerp(0, intro.arcLeft, easeOutCubic(introT))
-        : path.x + flourX + avoidX;
+        ? THREE.MathUtils.lerp(0, intro.arcLeft, easeOutCubic(arcT))
+        : path.x + (flourX || 0) + (isBottomAct ? 0.9 : 0);
+
     const posYBase =
       phase === "intro"
-        ? intro.arcHeight * Math.sin(Math.PI * introT)
-        : path.y + breathY + flourY + avoidY;
-    const posZBase = zParallax + avoidZ;
+        ? intro.arcHeight * Math.sin(Math.PI * arcT)
+        : path.y + breathY + (flourY || 0) + (isBottomAct ? -0.06 : 0);
 
-    // ---------- Apply / Fade ----------
+    const posZBase =
+      phase === "intro" ? 0 : zParallax + (isBottomAct ? -1.0 : 0);
+
+    // Apply
     const s = THREE.MathUtils.lerp(group.current.scale.x, scaleGoal, k);
     group.current.scale.setScalar(s);
 
@@ -306,6 +379,7 @@ function LogoModel({
     prepared.traverse((o) => {
       const m = (o as THREE.Mesh).material as
         | THREE.MeshStandardMaterial
+        | THREE.MeshPhysicalMaterial
         | undefined;
       if (!m) return;
       const targetOpacity =
@@ -318,7 +392,9 @@ function LogoModel({
 }
 useGLTF.preload("/models/logo.final.glb", undefined, true, attachMeshopt);
 
-// ---------- Parallax Camera ----------
+/* ============================
+   Parallax Camera
+   ============================ */
 function ParallaxCamera() {
   const { camera } = useThree();
   const camTarget = useRef(new THREE.Vector3(0, 0, 3.2));
@@ -337,7 +413,9 @@ function ParallaxCamera() {
   return null;
 }
 
-// ---------- Canvas Wrapper bleibt fixed ----------
+/* ============================
+   Canvas Wrapper (fixed)
+   ============================ */
 export default function ThreeLogo({
   phase,
   showcaseSeq = 0,
@@ -361,9 +439,22 @@ export default function ThreeLogo({
       >
         <AdaptiveDpr pixelated />
         <AdaptiveEvents />
-        <ambientLight intensity={0.45} />
-        <directionalLight position={[3, 2, 2]} intensity={2.1} />
-        <directionalLight position={[-2.4, 1.4, -1.2]} intensity={0.7} />
+
+        {/* Apple-clean Lighting */}
+        <ambientLight intensity={0.33} />
+        {/* Warmes Key-Light (leicht seitlich) */}
+        <directionalLight
+          position={[2.4, 2.0, 2.2]}
+          intensity={1.45}
+          color={new THREE.Color("#ffd9b8")}
+        />
+        {/* Kühles Rim von hinten links */}
+        <directionalLight
+          position={[-2.8, 1.6, -1.8]}
+          intensity={0.95}
+          color={new THREE.Color("#8fb9ff")}
+        />
+
         <ParallaxCamera />
         <Suspense fallback={null}>
           <Environment preset="studio" />
@@ -377,11 +468,11 @@ export default function ThreeLogo({
             <EffectComposer>
               <SMAA />
               <Bloom
-                intensity={0.12}
-                luminanceThreshold={0.3}
-                luminanceSmoothing={0.85}
+                intensity={0.09}
+                luminanceThreshold={0.58}
+                luminanceSmoothing={0.9}
               />
-              <Vignette eskil={false} offset={0.1} darkness={0.75} />
+              <Vignette eskil={false} offset={0.12} darkness={0.74} />
             </EffectComposer>
           )}
         </Suspense>

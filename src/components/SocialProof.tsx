@@ -1,49 +1,68 @@
 // src/components/SocialProof.tsx
-import React from "react";
-import Image from "next/image"; // Importiere die Image-Komponente
+import Image from "next/image";
 
 const logos = [
-  {
-    name: "Transistor",
-    src: "https://tailwindui.com/img/logos/158x48/transistor-logo-white.svg",
-  },
-  {
-    name: "Reform",
-    src: "https://tailwindui.com/img/logos/158x48/reform-logo-white.svg",
-  },
-  {
-    name: "Tuple",
-    src: "https://tailwindui.com/img/logos/158x48/tuple-logo-white.svg",
-  },
-  {
-    name: "SavvyCal",
-    src: "https://tailwindui.com/img/logos/158x48/savvycal-logo-white.svg",
-  },
+  { name: "Partner 1", src: "/socialproof/socialproof1.png" },
+  { name: "Partner 2", src: "/socialproof/socialproof2.png" },
+  { name: "Partner 3", src: "/socialproof/socialproof3.png" },
+  { name: "Partner 4", src: "/socialproof/socialproof4.png" },
 ];
 
-const SocialProof = () => {
+export default function SocialProof() {
   return (
-    <section className="container">
-      <div className="mx-auto max-w-lg text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-foreground/60">
-          Vertrauensvoller Partner für ambitionierte Unternehmen
-        </p>
-        <div className="mt-6 grid grid-cols-2 items-center gap-x-8 gap-y-10 sm:grid-cols-4">
-          {logos.map((logo) => (
-            <Image
-              key={logo.name}
-              className="h-10 w-full object-contain"
-              src={logo.src}
-              alt={logo.name}
-              width={158}
-              height={48}
-              unoptimized // Gut für SVGs, die keine Komprimierung brauchen
-            />
-          ))}
+    <section
+      id="socialproof"
+      className="relative isolate"
+      aria-labelledby="socialproof-heading"
+    >
+      <div className="container">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2
+            id="socialproof-heading"
+            className="text-sm font-semibold tracking-wider uppercase text-foreground/60"
+          >
+            Vertrauensvoller Partner für ambitionierte Unternehmen
+          </h2>
+
+          {/* Frosted Panel: lesbar, lässt 3D durchscheinen */}
+          <div
+            className="
+              mx-auto mt-6 rounded-2xl border border-white/10 bg-background/40
+              backdrop-blur-md ring-1 ring-black/5
+              shadow-[0_8px_32px_-8px_rgba(0,0,0,0.35)]
+              dark:border-white/5 dark:bg-background/25 dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)]
+            "
+          >
+            {/* Hairline */}
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
+
+            <div className="px-4 py-6 sm:px-6 sm:py-8">
+              {/* Gleichmäßiges Raster; alle Logos fluchten */}
+              <div className="grid items-center grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4 sm:gap-x-8 sm:gap-y-8">
+                {logos.map((logo) => (
+                  <figure
+                    key={logo.name}
+                    className="relative flex items-center justify-center w-full h-24 sm:h-28"
+                    aria-label={logo.name}
+                  >
+                    <Image
+                      src={logo.src}
+                      alt={logo.name}
+                      fill
+                      sizes="(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 220px"
+                      className="object-contain p-1.5 sm:p-2 [image-rendering:-webkit-optimize-contrast]"
+                      priority={false}
+                    />
+                  </figure>
+                ))}
+              </div>
+            </div>
+
+            {/* Hairline */}
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
+          </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default SocialProof;
+}
