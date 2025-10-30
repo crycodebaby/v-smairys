@@ -51,44 +51,56 @@ const attachMeshopt = (loader: GLTFLoader) => {
   );
 };
 
-/* ============================
-   Park-Offsets & Pfad
-   ============================ */
+/* ========= Mobile Detection ========= */
+const isMobileNow = () =>
+  typeof window !== "undefined" && window.innerWidth < 768;
 
-// weiter links parken (Desktop), Mobile etwas weniger
+function useIsMobile() {
+  const [mob, setMob] = useState<boolean>(() => isMobileNow());
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let raf = 0;
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setMob(isMobileNow()));
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+  return mob;
+}
+
+/* ========= Park-Offsets & Pfad ========= */
+// Desktop links, Mobile noch weiter links
 const PARK_X_DESKTOP = -1.28;
-const PARK_X_MOBILE = -0.92;
+const PARK_X_MOBILE = -1.38;
 const PARK_Y = 0.02;
 
-// kleine Helper
-const isMobile = () => typeof window !== "undefined" && window.innerWidth < 768;
-
-// elliptische Scrollbahn (glatt, bleibt aus dem Zentrum)
+// elliptische Scrollbahn
 function ellipsePath(t: number, cx: number, rx = 0.5, cy = PARK_Y, ry = 0.1) {
   const a = 2 * Math.PI * t;
   return new THREE.Vector2(cx + rx * Math.cos(a), cy + ry * Math.sin(a * 1.25));
 }
 
-/* ============================
-   Farben & dezente Tints
-   ============================ */
-const DARK_BASE = new THREE.Color("#f5f7ff"); // hell, edel (Dark Mode)
-const LIGHT_BASE = new THREE.Color("#2b2f35"); // Graphit (Light Mode)
+/* ========= Farben & Tints ========= */
+const DARK_BASE = new THREE.Color("#f5f7ff");
+const LIGHT_BASE = new THREE.Color("#2b2f35");
 
 const TINTS: Record<string, THREE.Color> = {
   hero: new THREE.Color("#ffffff"),
   bento: new THREE.Color("#ffffff"),
   cta: new THREE.Color("#ffffff"),
-  process: new THREE.Color("#8ecaff"), // kühler Touch
+  process: new THREE.Color("#8ecaff"),
   testimonials: new THREE.Color("#ffffff"),
-  faq: new THREE.Color("#ffd9a8"), // warm
+  faq: new THREE.Color("#ffd9a8"),
   footer: new THREE.Color("#ffffff"),
   none: new THREE.Color("#ffffff"),
 };
 
-/* ============================
-   Easing / Utils
-   ============================ */
+/* ========= Utils ========= */
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeOutBack = (t: number, s = 1.70158) =>
@@ -97,12 +109,9 @@ const smoothstep = (t: number) => {
   const x = clamp01(t);
   return x * x * (3 - 2 * x);
 };
-// time-constant based exponential smoothing → stable across FPS
 const xexp = (lambda: number, dt: number) => 1 - Math.exp(-lambda * dt);
 
-/* ============================
-   Model
-   ============================ */
+/* ========= Model ========= */
 function LogoModel({
   phase,
   showcaseSeq = 0,
@@ -120,6 +129,13 @@ function LogoModel({
 
   const [mountedAt] = useState<number>(() => performance.now());
   const { resolvedTheme } = useTheme();
+  const isMob = useIsMobile();
+
+  // Mobile-Profile (enger, dezenter, sparsamer)
+  const MOB_RX = 0.36;
+  const MOB_RY = 0.075;
+  const MOB_SCALE = 0.9;
+  const MOB_OPACITY_CAP = 0.6;
 
   const prepared = useMemo(() => {
     const root = gltf.scene.clone(true);
@@ -127,7 +143,6 @@ function LogoModel({
       const mesh = obj as THREE.Mesh;
       if (!mesh.isMesh) return;
 
-      // Standardbasis – wird im Theme-Effect ggf. zu Physical getauscht
       const base =
         mesh.material instanceof THREE.MeshStandardMaterial
           ? mesh.material.clone()
@@ -136,7 +151,7 @@ function LogoModel({
       base.metalness = 0.68;
       base.roughness = 0.28;
       base.envMapIntensity = 1.0;
-      base.transparent = true; // für Fade
+      base.transparent = true;
       base.opacity = 1;
 
       mesh.material = base;
@@ -144,13 +159,13 @@ function LogoModel({
     return root;
   }, [gltf.scene]);
 
-  // Theme-Farbe & dezente Section-Tints mischen (dezenter)
+  // Theme-Farb/Tint
   useEffect(() => {
     const baseColor = (
       resolvedTheme === "light" ? LIGHT_BASE : DARK_BASE
     ).clone();
     const tint = (TINTS[act as string] ?? TINTS.hero).clone();
-    const tintAmount = act === "process" || act === "faq" ? 0.12 : 0.06; // 6–12 %
+    const tintAmount = act === "process" || act === "faq" ? 0.12 : 0.06;
 
     prepared.traverse((o) => {
       const mesh = o as THREE.Mesh;
@@ -161,11 +176,10 @@ function LogoModel({
       const mixed = baseColor.clone().lerp(tint, tintAmount);
 
       if (resolvedTheme === "light") {
-        // Light Mode → satin-metal mit Clearcoat/Sheen
         const pm = new THREE.MeshPhysicalMaterial({
           color: mixed,
           metalness: 0.85,
-          roughness: 0.35, // satin
+          roughness: 0.35,
           envMapIntensity: 0.9,
           clearcoat: 0.6,
           clearcoatRoughness: 0.25,
@@ -177,7 +191,6 @@ function LogoModel({
         });
         mesh.material = pm;
       } else {
-        // Dark Mode → hell/edel
         const sm =
           mesh.material instanceof THREE.MeshStandardMaterial
             ? mesh.material
@@ -196,17 +209,17 @@ function LogoModel({
     });
   }, [prepared, resolvedTheme, act]);
 
-  // Intro: sanfter Pop + kleiner Bogen nach links
+  // Intro
   const intro = {
     popDur: 0.35,
     settleDur: 0.65,
     arcStart: 0.8,
     arcEnd: 1.6,
     arcHeight: 0.12,
-    arcLeft: PARK_X_DESKTOP, // später parken wir sowieso links; Arc geht dahin
+    arcLeft: PARK_X_DESKTOP,
   };
 
-  // Showcase-Trigger
+  // Showcase
   const showcaseStart = useRef<number | null>(null);
   const lastSeq = useRef<number>(showcaseSeq);
   useEffect(() => {
@@ -217,40 +230,26 @@ function LogoModel({
     }
   }, [showcaseSeq]);
 
-  // Park-X pro Mount & auf Resize
-  const parkXRef = useRef<number>(isMobile() ? PARK_X_MOBILE : PARK_X_DESKTOP);
+  // Park/Radius-Refs (wechseln bei Resize)
+  const parkXRef = useRef<number>(isMob ? PARK_X_MOBILE : PARK_X_DESKTOP);
+  const rxRef = useRef<number>(isMob ? MOB_RX : 0.5);
+  const ryRef = useRef<number>(isMob ? MOB_RY : 0.1);
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    let raf = 0;
-    const onResize = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        parkXRef.current = isMobile() ? PARK_X_MOBILE : PARK_X_DESKTOP;
-        invalidate();
-      });
-    };
-    window.addEventListener("resize", onResize, { passive: true });
-    return () => {
-      window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
+    parkXRef.current = isMob ? PARK_X_MOBILE : PARK_X_DESKTOP;
+    rxRef.current = isMob ? MOB_RX : 0.5;
+    ryRef.current = isMob ? MOB_RY : 0.1;
+    invalidate();
+  }, [isMob]);
 
-  // cached quaternions & vectors for smooth slerp/lerp (no allocations per frame)
-  const qCurrent = useRef(new THREE.Quaternion());
+  // Quaternion cache
   const qTarget = useRef(new THREE.Quaternion());
-  const eulerTmp = useRef(new THREE.Euler(0, 0, 0, "YXZ")); // yaw→pitch→roll feel
-  const v3Tmp = useRef(new THREE.Vector3());
-
-  // previous scroll to derive speed → modulate rotation amount
+  const eulerTmp = useRef(new THREE.Euler(0, 0, 0, "YXZ"));
   const prevScroll = useRef(scroll);
 
   useFrame((state, delta) => {
     if (!group.current) return;
 
-    // Cap dt for stability (tab re-focus spikes)
-    const dt = Math.min(delta, 1 / 30); // clamp to ~33ms
-
+    const dt = Math.min(delta, 1 / 30);
     const elapsed = (performance.now() - mountedAt) / 1000;
     const active =
       elapsed < 2 ||
@@ -259,14 +258,13 @@ function LogoModel({
       !REDUCED;
     if (active) invalidate();
 
-    /* ---------- Intro ---------- */
+    // Intro
     const tPop = clamp01(elapsed / intro.popDur);
     const tSettle = clamp01((elapsed - intro.popDur) / intro.settleDur);
     const scaleIntro =
       INTRO_SCALE *
       (0.65 + 0.35 * easeOutBack(tPop)) *
       (1 + 0.08 * (1 - easeOutCubic(tSettle)));
-
     const rotXIntro = THREE.MathUtils.lerp(
       -0.35,
       BASE_TILT_X,
@@ -277,14 +275,14 @@ function LogoModel({
       (elapsed - intro.arcStart) / (intro.arcEnd - intro.arcStart)
     );
 
-    /* ---------- Showcase (seamless flourish) ---------- */
+    // Showcase (leicht reduziert)
     const SHOWCASE_DUR = 2000;
     const FLOURISH = {
-      yaw: 0.28, // leicht reduziert → edler
+      yaw: 0.26,
       pitch: 0.1,
       posX: 0.04,
       posY: 0.03,
-      scale: 0.018,
+      scale: 0.016,
       freq: 0.9,
       phaseShift: Math.PI / 2,
     };
@@ -297,7 +295,7 @@ function LogoModel({
       const pp = clamp01(
         (performance.now() - showcaseStart.current) / SHOWCASE_DUR
       );
-      const w = 0.5 * (1 - Math.cos(2 * Math.PI * pp)); // Hann
+      const w = 0.5 * (1 - Math.cos(2 * Math.PI * pp));
       const tf = pp * FLOURISH.freq * 2 * Math.PI;
       flourYaw = FLOURISH.yaw * Math.sin(tf) * w;
       flourPitch = FLOURISH.pitch * Math.sin(tf + FLOURISH.phaseShift) * w;
@@ -307,62 +305,87 @@ function LogoModel({
       if (pp >= 1) showcaseStart.current = null;
     }
 
-    /* ---------- FAQ/Footer-Schutz & Tail Fade ---------- */
+    // FAQ/Footer Fade
     const p = clamp01(scroll);
-    const tailFade = 1 - smoothstep((p - 0.88) / 0.12); // smoother than linear
+    const tailFade = 1 - smoothstep((p - 0.88) / 0.12);
     const isBottomAct = act === "faq" || act === "footer";
 
-    /* ---------- Scroll-Fahrt + 3D-Rotation ---------- */
-    // Scroll speed → dämpfe Rotationen wenn Nutzer stoppt (no micro-jitter)
+    // Geschwindigkeit → Rotationsdämpfung
     const dp = Math.abs(p - prevScroll.current);
     prevScroll.current = p;
-    const speed = Math.min(dp / Math.max(dt, 1e-4), 4); // normalized
+    const speed = Math.min(dp / Math.max(dt, 1e-4), 4);
     const speedFactor = REDUCED ? 0 : THREE.MathUtils.smoothstep(speed, 0, 1);
 
-    // Position entlang Ellipse (um Park-X)
-    const path = ellipsePath(p, parkXRef.current);
+    // Pfad (mit mobilen Radien)
+    const path = ellipsePath(
+      p,
+      parkXRef.current,
+      rxRef.current,
+      PARK_Y,
+      ryRef.current
+    );
 
-    // Parallax in Z (dezent)
+    // Parallax
     const zParallax = -Math.sin(p * Math.PI) * 1.2;
 
-    // Echte 3D-Rotation aus Scroll:
+    // Scroll-Rotation (gedämpft, auf Mobil etwas geringer)
     const yawFromScroll =
-      Math.sin(p * Math.PI * 2) * 0.35 * (0.6 + 0.4 * speedFactor);
+      Math.sin(p * Math.PI * 2) *
+      0.32 *
+      (0.6 + 0.4 * speedFactor) *
+      (isMob ? 0.85 : 1);
     const pitchFromScroll =
       Math.sin(p * Math.PI * 2 + Math.PI / 2) *
-      0.18 *
-      (0.6 + 0.4 * speedFactor);
+      0.16 *
+      (0.6 + 0.4 * speedFactor) *
+      (isMob ? 0.85 : 1);
     const rollFromScroll =
-      Math.sin(p * Math.PI * 4) * 0.12 * (0.6 + 0.4 * speedFactor);
+      Math.sin(p * Math.PI * 4) *
+      0.1 *
+      (0.6 + 0.4 * speedFactor) *
+      (isMob ? 0.85 : 1);
 
     // Idle minimal
     const idle = REDUCED ? 0 : 1;
-    const idleYaw = Math.sin(state.clock.elapsedTime * 0.55) * 0.06 * idle;
+    const idleYaw =
+      Math.sin(state.clock.elapsedTime * 0.55) *
+      0.055 *
+      idle *
+      (isMob ? 0.8 : 1);
     const idlePitch =
-      Math.sin(state.clock.elapsedTime * 0.7 + Math.PI / 3) * 0.045 * idle;
-    const breathY = Math.sin(state.clock.elapsedTime * 0.9) * 0.01 * idle;
+      Math.sin(state.clock.elapsedTime * 0.7 + Math.PI / 3) *
+      0.04 *
+      idle *
+      (isMob ? 0.8 : 1);
+    const breathY =
+      Math.sin(state.clock.elapsedTime * 0.9) *
+      0.009 *
+      idle *
+      (isMob ? 0.8 : 1);
 
-    // Ziele (time-constant smoothing)
-    const kPos = xexp(6.0, dt); // ~crisp but smooth position
-    const kRot = xexp(8.0, dt); // a bit snappier for rotation via slerp
+    // Smoothing
+    const kPos = xexp(6.0, dt);
+    const kRot = xexp(8.0, dt);
     const kScl = xexp(6.0, dt);
 
+    // Scale (Mobile etwas kleiner)
     const scaleGoal =
       (phase === "intro" ? scaleIntro : PARK_SCALE) *
+      (isMob ? MOB_SCALE : 1) *
       (1 + Math.sin(state.clock.elapsedTime * 0.7) * 0.008 * idle) *
       flourScale *
       (isBottomAct ? 0.9 : 1.0);
 
     const rotXGoal =
       (phase === "intro" ? rotXIntro : BASE_TILT_X) +
-      idlePitch +
       (phase === "intro" ? 0 : pitchFromScroll) +
+      idlePitch +
       (flourPitch || 0);
 
     const rotYGoal =
       (phase === "intro" ? yawIntro : 0) +
-      idleYaw +
       (phase === "intro" ? 0 : yawFromScroll) +
+      idleYaw +
       (flourYaw || 0);
 
     const rotZGoal = phase === "intro" ? 0 : rollFromScroll;
@@ -380,7 +403,7 @@ function LogoModel({
     const posZBase =
       phase === "intro" ? 0 : zParallax + (isBottomAct ? -1.0 : 0);
 
-    // ---------- Apply (position / scale via exp-smoothing) ----------
+    // Apply
     const s = THREE.MathUtils.lerp(group.current.scale.x, scaleGoal, kScl);
     group.current.scale.setScalar(s);
 
@@ -392,7 +415,7 @@ function LogoModel({
     group.current.position.y = THREE.MathUtils.lerp(
       group.current.position.y,
       posYBase,
-      0.1 // a touch slower on Y feels natural
+      0.1
     );
     group.current.position.z = THREE.MathUtils.lerp(
       group.current.position.z,
@@ -400,24 +423,22 @@ function LogoModel({
       kPos
     );
 
-    // ---------- Rotation via quaternion slerp (no gimbal) ----------
+    // Quaternion slerp (kein Gimbal)
     eulerTmp.current.set(rotXGoal, rotYGoal, rotZGoal, "YXZ");
     qTarget.current.setFromEuler(eulerTmp.current);
+    group.current.quaternion.slerp(qTarget.current, kRot);
 
-    group.current.getWorldQuaternion(qCurrent.current); // start from current
-    qCurrent.current.slerp(qTarget.current, kRot);
-    group.current.quaternion.copy(qCurrent.current);
-
-    // Material-Opacity (FAQ/Footer + End-of-page)
+    // Opacity (Mobile capped)
     prepared.traverse((o) => {
       const m = (o as THREE.Mesh).material as
         | THREE.MeshStandardMaterial
         | THREE.MeshPhysicalMaterial
         | undefined;
       if (!m) return;
-      const targetOpacity =
+      const baseTarget =
         (phase === "intro" ? 1 : tailFade) * (isBottomAct ? 0.85 : 1);
-      m.opacity = THREE.MathUtils.lerp(m.opacity, targetOpacity, xexp(10, dt));
+      const capped = isMob ? Math.min(baseTarget, MOB_OPACITY_CAP) : baseTarget;
+      m.opacity = THREE.MathUtils.lerp(m.opacity, capped, xexp(10, dt));
     });
   });
 
@@ -425,16 +446,14 @@ function LogoModel({
 }
 useGLTF.preload("/models/logo.final.glb", undefined, true, attachMeshopt);
 
-/* ============================
-   Parallax Camera (smoother)
-   ============================ */
+/* ========= Parallax Camera ========= */
 function ParallaxCamera() {
   const { camera } = useThree();
   const camTarget = useRef(new THREE.Vector3(0, 0, 3.2));
   useFrame((state, delta) => {
     if (REDUCED) return;
     const dt = Math.min(delta, 1 / 30);
-    const k = xexp(7.0, dt); // time-constant smoothing
+    const k = xexp(7.0, dt);
     const maxOffset = 0.12;
     camTarget.current.set(
       THREE.MathUtils.clamp(state.pointer.x, -1, 1) * maxOffset,
@@ -447,57 +466,64 @@ function ParallaxCamera() {
   return null;
 }
 
-/* ============================
-   Canvas Wrapper (fixed)
-   ============================ */
+/* ========= Canvas Wrapper ========= */
 export default function ThreeLogo({
   phase,
   showcaseSeq = 0,
   scroll = 0,
   act = "hero",
 }: Props) {
-  const enableBloom = !REDUCED;
+  const isMob = useIsMobile();
+
+  // Mobile: PostFX & DPR & GL sparen
+  const enableBloom = !REDUCED && !isMob;
+  const dprTuple: [number, number] = isMob ? [1, 1.5] : [1, 2]; // <-- fix: Tupel, nicht number[]
+
   return (
     <div className="fixed inset-0 pointer-events-none -z-10">
       <Canvas
-        dpr={[1, 2]}
+        dpr={dprTuple} // <-- typisiert als [number, number]
         camera={{ position: [0, 0, 3.2], fov: 45 }}
         frameloop="demand"
         gl={{
           antialias: true,
-          powerPreference: "high-performance",
+          powerPreference: isMob ? "low-power" : "high-performance",
+          alpha: true,
           toneMapping: THREE.ACESFilmicToneMapping,
         }}
-        onCreated={(s) => (s.gl.toneMappingExposure = 1.08)}
+        onCreated={(s) => {
+          s.gl.toneMappingExposure = 1.06;
+          s.gl.setClearColor(0x000000, 0); // transparent
+        }}
         aria-label="3D-Logo"
       >
         <AdaptiveDpr pixelated />
         <AdaptiveEvents />
 
-        {/* Apple-clean Lighting */}
-        <ambientLight intensity={0.33} />
-        {/* Warmes Key-Light (leicht seitlich) */}
+        {/* Lighting: Mobile dezentere Intensitäten */}
+        <ambientLight intensity={isMob ? 0.25 : 0.33} />
         <directionalLight
           position={[2.4, 2.0, 2.2]}
-          intensity={1.45}
+          intensity={isMob ? 1.0 : 1.45}
           color={new THREE.Color("#ffd9b8")}
         />
-        {/* Kühles Rim von hinten links */}
         <directionalLight
           position={[-2.8, 1.6, -1.8]}
-          intensity={0.95}
+          intensity={isMob ? 0.7 : 0.95}
           color={new THREE.Color("#8fb9ff")}
         />
 
         <ParallaxCamera />
         <Suspense fallback={null}>
-          <Environment preset="studio" />
+          <Environment preset="studio" background={false} />
           <LogoModel
             phase={phase}
             showcaseSeq={showcaseSeq}
             scroll={scroll}
             act={act}
           />
+
+          {/* PostFX: auf Mobile aus → spart GPU & Overdraw */}
           {enableBloom && (
             <EffectComposer>
               <SMAA />
