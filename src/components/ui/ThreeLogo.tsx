@@ -52,7 +52,7 @@ const attachMeshopt = (loader: GLTFLoader) => {
 };
 
 /* ============================
-   Patches: Park-Offsets & Pfad
+   Park-Offsets & Pfad
    ============================ */
 
 // weiter links parken (Desktop), Mobile etwas weniger
@@ -93,6 +93,12 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeOutBack = (t: number, s = 1.70158) =>
   1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
+const smoothstep = (t: number) => {
+  const x = clamp01(t);
+  return x * x * (3 - 2 * x);
+};
+// time-constant based exponential smoothing → stable across FPS
+const xexp = (lambda: number, dt: number) => 1 - Math.exp(-lambda * dt);
 
 /* ============================
    Model
@@ -211,11 +217,39 @@ function LogoModel({
     }
   }, [showcaseSeq]);
 
-  // Park-X einmal pro Mount ermitteln
+  // Park-X pro Mount & auf Resize
   const parkXRef = useRef<number>(isMobile() ? PARK_X_MOBILE : PARK_X_DESKTOP);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let raf = 0;
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        parkXRef.current = isMobile() ? PARK_X_MOBILE : PARK_X_DESKTOP;
+        invalidate();
+      });
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // cached quaternions & vectors for smooth slerp/lerp (no allocations per frame)
+  const qCurrent = useRef(new THREE.Quaternion());
+  const qTarget = useRef(new THREE.Quaternion());
+  const eulerTmp = useRef(new THREE.Euler(0, 0, 0, "YXZ")); // yaw→pitch→roll feel
+  const v3Tmp = useRef(new THREE.Vector3());
+
+  // previous scroll to derive speed → modulate rotation amount
+  const prevScroll = useRef(scroll);
 
   useFrame((state, delta) => {
     if (!group.current) return;
+
+    // Cap dt for stability (tab re-focus spikes)
+    const dt = Math.min(delta, 1 / 30); // clamp to ~33ms
 
     const elapsed = (performance.now() - mountedAt) / 1000;
     const active =
@@ -224,8 +258,6 @@ function LogoModel({
       phase === "intro" ||
       !REDUCED;
     if (active) invalidate();
-
-    /* ---------- Act: sehr dezente Farbverschiebung wird bereits im Effect gesetzt ---------- */
 
     /* ---------- Intro ---------- */
     const tPop = clamp01(elapsed / intro.popDur);
@@ -241,7 +273,6 @@ function LogoModel({
       easeOutCubic(tSettle)
     );
     const yawIntro = THREE.MathUtils.lerp(0.18, 0, easeOutCubic(tSettle));
-
     const arcT = clamp01(
       (elapsed - intro.arcStart) / (intro.arcEnd - intro.arcStart)
     );
@@ -249,12 +280,12 @@ function LogoModel({
     /* ---------- Showcase (seamless flourish) ---------- */
     const SHOWCASE_DUR = 2000;
     const FLOURISH = {
-      yaw: 0.32,
-      pitch: 0.12,
-      posX: 0.045,
-      posY: 0.032,
-      scale: 0.022,
-      freq: 1.0,
+      yaw: 0.28, // leicht reduziert → edler
+      pitch: 0.1,
+      posX: 0.04,
+      posY: 0.03,
+      scale: 0.018,
+      freq: 0.9,
       phaseShift: Math.PI / 2,
     };
     let flourX = 0,
@@ -278,12 +309,16 @@ function LogoModel({
 
     /* ---------- FAQ/Footer-Schutz & Tail Fade ---------- */
     const p = clamp01(scroll);
-    const tailFade = 1 - clamp01((p - 0.88) / 0.12); // 1 → 0 in den letzten ~12%
+    const tailFade = 1 - smoothstep((p - 0.88) / 0.12); // smoother than linear
     const isBottomAct = act === "faq" || act === "footer";
 
-    /* ============================
-       PATCH: Scroll-Fahrt + 3D-Rotation
-       ============================ */
+    /* ---------- Scroll-Fahrt + 3D-Rotation ---------- */
+    // Scroll speed → dämpfe Rotationen wenn Nutzer stoppt (no micro-jitter)
+    const dp = Math.abs(p - prevScroll.current);
+    prevScroll.current = p;
+    const speed = Math.min(dp / Math.max(dt, 1e-4), 4); // normalized
+    const speedFactor = REDUCED ? 0 : THREE.MathUtils.smoothstep(speed, 0, 1);
+
     // Position entlang Ellipse (um Park-X)
     const path = ellipsePath(p, parkXRef.current);
 
@@ -291,24 +326,30 @@ function LogoModel({
     const zParallax = -Math.sin(p * Math.PI) * 1.2;
 
     // Echte 3D-Rotation aus Scroll:
-    // Yaw (Y) 1x pro Runde, Pitch (X) phasenversetzt, Roll (Z) doppelte Frequenz
-    const yawFromScroll = Math.sin(p * Math.PI * 2) * 0.35; // ±20°
-    const pitchFromScroll = Math.sin(p * Math.PI * 2 + Math.PI / 2) * 0.18; // ±10°
-    const rollFromScroll = Math.sin(p * Math.PI * 4) * 0.12; // ±7°
+    const yawFromScroll =
+      Math.sin(p * Math.PI * 2) * 0.35 * (0.6 + 0.4 * speedFactor);
+    const pitchFromScroll =
+      Math.sin(p * Math.PI * 2 + Math.PI / 2) *
+      0.18 *
+      (0.6 + 0.4 * speedFactor);
+    const rollFromScroll =
+      Math.sin(p * Math.PI * 4) * 0.12 * (0.6 + 0.4 * speedFactor);
 
     // Idle minimal
     const idle = REDUCED ? 0 : 1;
-    const idleYaw = Math.sin(state.clock.elapsedTime * 0.6) * 0.08 * idle;
+    const idleYaw = Math.sin(state.clock.elapsedTime * 0.55) * 0.06 * idle;
     const idlePitch =
-      Math.sin(state.clock.elapsedTime * 0.7 + Math.PI / 3) * 0.05 * idle;
+      Math.sin(state.clock.elapsedTime * 0.7 + Math.PI / 3) * 0.045 * idle;
     const breathY = Math.sin(state.clock.elapsedTime * 0.9) * 0.01 * idle;
 
-    // Ziele
-    const k = 1 - Math.pow(0.0016, delta);
+    // Ziele (time-constant smoothing)
+    const kPos = xexp(6.0, dt); // ~crisp but smooth position
+    const kRot = xexp(8.0, dt); // a bit snappier for rotation via slerp
+    const kScl = xexp(6.0, dt);
 
     const scaleGoal =
       (phase === "intro" ? scaleIntro : PARK_SCALE) *
-      (1 + Math.sin(state.clock.elapsedTime * 0.7) * 0.01 * idle) *
+      (1 + Math.sin(state.clock.elapsedTime * 0.7) * 0.008 * idle) *
       flourScale *
       (isBottomAct ? 0.9 : 1.0);
 
@@ -339,41 +380,33 @@ function LogoModel({
     const posZBase =
       phase === "intro" ? 0 : zParallax + (isBottomAct ? -1.0 : 0);
 
-    // Apply
-    const s = THREE.MathUtils.lerp(group.current.scale.x, scaleGoal, k);
+    // ---------- Apply (position / scale via exp-smoothing) ----------
+    const s = THREE.MathUtils.lerp(group.current.scale.x, scaleGoal, kScl);
     group.current.scale.setScalar(s);
-
-    group.current.rotation.x = THREE.MathUtils.lerp(
-      group.current.rotation.x,
-      rotXGoal,
-      0.12
-    );
-    group.current.rotation.y = THREE.MathUtils.lerp(
-      group.current.rotation.y,
-      rotYGoal,
-      0.14
-    );
-    group.current.rotation.z = THREE.MathUtils.lerp(
-      group.current.rotation.z,
-      rotZGoal,
-      0.12
-    );
 
     group.current.position.x = THREE.MathUtils.lerp(
       group.current.position.x,
       posXBase,
-      k
+      kPos
     );
     group.current.position.y = THREE.MathUtils.lerp(
       group.current.position.y,
       posYBase,
-      0.1
+      0.1 // a touch slower on Y feels natural
     );
     group.current.position.z = THREE.MathUtils.lerp(
       group.current.position.z,
       posZBase,
-      k
+      kPos
     );
+
+    // ---------- Rotation via quaternion slerp (no gimbal) ----------
+    eulerTmp.current.set(rotXGoal, rotYGoal, rotZGoal, "YXZ");
+    qTarget.current.setFromEuler(eulerTmp.current);
+
+    group.current.getWorldQuaternion(qCurrent.current); // start from current
+    qCurrent.current.slerp(qTarget.current, kRot);
+    group.current.quaternion.copy(qCurrent.current);
 
     // Material-Opacity (FAQ/Footer + End-of-page)
     prepared.traverse((o) => {
@@ -384,7 +417,7 @@ function LogoModel({
       if (!m) return;
       const targetOpacity =
         (phase === "intro" ? 1 : tailFade) * (isBottomAct ? 0.85 : 1);
-      m.opacity = THREE.MathUtils.lerp(m.opacity, targetOpacity, 0.2);
+      m.opacity = THREE.MathUtils.lerp(m.opacity, targetOpacity, xexp(10, dt));
     });
   });
 
@@ -393,14 +426,15 @@ function LogoModel({
 useGLTF.preload("/models/logo.final.glb", undefined, true, attachMeshopt);
 
 /* ============================
-   Parallax Camera
+   Parallax Camera (smoother)
    ============================ */
 function ParallaxCamera() {
   const { camera } = useThree();
   const camTarget = useRef(new THREE.Vector3(0, 0, 3.2));
   useFrame((state, delta) => {
     if (REDUCED) return;
-    const k = 1 - Math.pow(0.0025, delta);
+    const dt = Math.min(delta, 1 / 30);
+    const k = xexp(7.0, dt); // time-constant smoothing
     const maxOffset = 0.12;
     camTarget.current.set(
       THREE.MathUtils.clamp(state.pointer.x, -1, 1) * maxOffset,

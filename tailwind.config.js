@@ -14,11 +14,13 @@ module.exports = {
       screens: { "2xl": "1400px" },
     },
     extend: {
+      /* -------------------- FONTS -------------------- */
       fontFamily: {
-        heading: ["var(--font-poppins)"],
-        sans: ["var(--font-inter)"],
+        heading: ["var(--font-heading)"], // Outfit
+        sans: ["var(--font-sans)"], // Inter
       },
-      /* 👇 bleibt an CSS-Variablen gebunden – ändert sich zentral in globals.css */
+
+      /* -------------------- COLORS & DESIGN TOKENS -------------------- */
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -53,14 +55,14 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-
-        /* 🔵 praktischer Alias, falls du mal außerhalb der Tokens direkt auf Brand zugreifen willst */
         brand: {
-          blue: "hsl(var(--brand-blue))", // #3b82f6
+          blue: "hsl(var(--brand-blue))",
           black: "hsl(var(--brand-black))",
           white: "hsl(var(--brand-white))",
         },
       },
+
+      /* -------------------- RADII & ANIMATIONS -------------------- */
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -80,7 +82,8 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
-      /* Utility-Name für deinen Markenverlauf */
+
+      /* -------------------- GRADIENT -------------------- */
       backgroundImage: {
         "gradient-primary":
           "linear-gradient(135deg, var(--gradient-from) 0%, var(--gradient-via) 50%, var(--gradient-to) 100%)",

@@ -2,19 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ====== BRAND TOKENS – EINMAL FESTLEGEN ====== */
+/* ================================
+   BRAND TOKENS & THEMES
+   ================================ */
 @layer base {
   :root {
-    /* Brand-Basis */
-    --brand-blue: 217 91% 60%; /* #3b82f6 */
-    --brand-black: 0 0% 3%; /* fast schwarz für Text auf weiß */
+    /* Brand */
+    --brand-blue: 217 91% 60%;
+    --brand-black: 0 0% 3%;
     --brand-white: 0 0% 100%;
 
-    /* Oberfläche (Light) */
+    /* Surface (Light) */
     --background: var(--brand-white);
     --foreground: var(--brand-black);
 
-    /* Komponententokens (Light) – alles aus den drei Brandfarben abgeleitet */
     --card: var(--brand-white);
     --card-foreground: var(--brand-black);
 
@@ -24,7 +25,7 @@
     --primary: var(--brand-blue);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96%; /* helles Grau für Flächenchips */
+    --secondary: 0 0% 96%;
     --secondary-foreground: var(--brand-black);
 
     --muted: 0 0% 96%;
@@ -42,15 +43,21 @@
 
     --radius: 0.5rem;
 
-    /* Gradient-Stopps (für einheitliche Hero/CTA-Hintergründe) */
+    /* Gradient */
     --gradient-from: hsl(var(--brand-blue));
-    --gradient-via: hsl(217 91% 55%); /* etwas dunkler für Tiefe */
+    --gradient-via: hsl(217 91% 55%);
     --gradient-to: hsl(217 91% 45%);
+
+    /* Elevation (Shadows) */
+    --shadow-sm: 0 6px 18px -10px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 12px 32px -12px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 18px 48px -14px rgba(0, 0, 0, 0.55);
+
+    color-scheme: light;
   }
 
   .dark {
-    /* Oberfläche (Dark) – Schwarz/Weiß + dein Blau */
-    --background: 0 0% 4%; /* nahezu schwarz */
+    --background: 0 0% 4%;
     --foreground: 0 0% 98%;
 
     --card: 0 0% 6%;
@@ -59,7 +66,7 @@
     --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: var(--brand-blue); /* Blau bleibt gleich – konsistente Marke */
+    --primary: var(--brand-blue);
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 14%;
@@ -78,29 +85,169 @@
     --input: 0 0% 14%;
     --ring: var(--brand-blue);
 
-    /* Dark-Variante des Gradients */
     --gradient-from: hsl(217 91% 40%);
     --gradient-via: hsl(217 91% 50%);
     --gradient-to: hsl(217 91% 60%);
+
+    color-scheme: dark;
   }
 }
 
-/* Basalelemente */
+/* ================================
+   BASE ELEMENTS & TYPOGRAPHY
+   ================================ */
 @layer base {
   * {
     @apply border-border;
   }
+
+  html {
+    /* Fluid Type Scale (Outfit/Inter wirken damit besonders sauber) */
+    font-size: clamp(15px, 0.95vw + 9px, 18px);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply antialiased bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-kerning: normal;
+    font-feature-settings: "kern", "liga", "clig", "calt";
+  }
+
+  /* Headings veredeln (leicht enger & kräftiger) */
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.01em;
+  }
+  h1 {
+    font-weight: 700;
+  }
+  h2,
+  h3 {
+    font-weight: 600;
+  }
+
+  /* Link-Styling: dezent, hochwertig */
+  a {
+    text-underline-offset: 3px;
+    text-decoration-thickness: 0.08em;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* Textauswahl in Brand */
+  ::selection {
+    background: hsl(var(--brand-blue) / 0.22);
+    color: hsl(var(--foreground));
+  }
+
+  /* Fokus klar sichtbar, aber elegant */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Medien: Reduzierte Bewegung respektieren */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Dezente Scrollbar (Chromium/Firefox) */
+  :root {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
+    scrollbar-width: thin;
+  }
+  ::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      to bottom,
+      hsl(var(--muted-foreground) / 0.35),
+      hsl(var(--muted-foreground) / 0.2)
+    );
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 
-/* ====== EINHEITLICHER MARKEN-GRADIENT ====== */
-.bg-gradient-primary {
-  background-image: linear-gradient(
-    135deg,
-    var(--gradient-from) 0%,
-    var(--gradient-via) 50%,
-    var(--gradient-to) 100%
-  );
+/* ================================
+   UTILITIES (PREMIUM LOOK)
+   ================================ */
+@layer utilities {
+  /* Einheitlicher Marken-Gradient */
+  .bg-gradient-primary {
+    background-image: linear-gradient(
+      135deg,
+      var(--gradient-from) 0%,
+      var(--gradient-via) 50%,
+      var(--gradient-to) 100%
+    );
+  }
+
+  /* Liquid/Frosted Glass Panels – dunkler & heller Modus */
+  .glass {
+    background-color: hsl(var(--background) / 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-md);
+    border: 1px solid hsl(var(--foreground) / 0.08);
+  }
+  .dark .glass {
+    background-color: hsl(var(--background) / 0.22);
+    box-shadow: var(--shadow-lg);
+    border-color: hsl(var(--foreground) / 0.06);
+  }
+
+  /* Hairline Divider (zentriert, weich) */
+  .hairline {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0) 0%,
+      hsl(var(--foreground) / 0.12) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+
+  /* Atmosphärische Glows – ohne harte Flächen */
+  .brand-glow {
+    background: radial-gradient(
+      closest-side,
+      hsl(var(--brand-blue) / 0.16),
+      transparent 70%
+    );
+    filter: blur(40px);
+  }
+
+  /* Subtile Noise-Overlay für „Material“-Gefühl */
+  .noise-overlay {
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='0.8'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* Container-Weite mit sanftem Padding */
+  .container-soft {
+    @apply container px-4 sm:px-6 lg:px-8;
+  }
 }
