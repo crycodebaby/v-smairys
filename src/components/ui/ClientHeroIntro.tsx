@@ -1,97 +1,147 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import ThreeLogo, { type LogoPhase } from "@/components/ui/ThreeLogo";
 import { invalidate } from "@react-three/fiber";
+import ThreeLogo, { type LogoPhase } from "@/components/ui/ThreeLogo";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useSectionAct, type SectionAct } from "@/lib/useSectionAct";
+import { useViewportTier, type ViewportTier } from "@/hooks/useViewportTier";
 
+/**
+ * Hero-Intro mit 3D-Logo:
+ * - führt initiale Logo-Intro-Animation aus
+ * - blendet Hero-Inhalt synchron ein
+ * - triggert Showcase-Animation nach Inaktivität
+ * - reagiert auf Scroll und Section-Änderungen (invalidate)
+ */
 interface ClientHeroIntroProps {
   children?: ReactNode;
 }
 
+/** Showcase startet nach dieser Inaktivität (ms) */
 const INACTIVITY_MS = 12000;
+
+/** Zeit (ms) nach der das Logo vom Intro in Park übergeht */
+const INTRO_TO_PARK_MS = 1400;
+
+/** Zeit (ms) nach der der Hero-Content sichtbar wird */
+const HERO_REVEAL_DELAY_MS = 1500;
 
 export default function ClientHeroIntro({ children }: ClientHeroIntroProps) {
   const [phase, setPhase] = useState<LogoPhase>("intro");
   const [showcaseSeq, setShowcaseSeq] = useState<number>(0);
-  const scroll = useScrollProgress();
-  const act = useSectionAct();
 
+  /** Scroll-Progress (0–1) & Section-State */
+  const scroll = useScrollProgress();
+  const act: SectionAct = useSectionAct();
+
+  /** Gerätegröße ermitteln & fixieren (keine ständigen Updates während Scroll) */
+  const liveTier = useViewportTier();
+  const tierRef = useRef<ViewportTier>(liveTier);
+  const [tierLocked] = useState<ViewportTier>(() => liveTier); // fix beim ersten Mount
+
+  /** Hero sichtbar, sobald Logo geparkt */
+  const heroVisible = phase === "park";
+
+  /* -------------------------------
+     A) Intro -> Park & Hero-Reveal
+  ------------------------------- */
   useEffect(() => {
-    const id = setTimeout(() => {
+    const introTimer = window.setTimeout(() => {
       setPhase("park");
       invalidate();
-    }, 1200);
-    return () => clearTimeout(id);
+    }, INTRO_TO_PARK_MS);
+
+    const heroTimer = window.setTimeout(() => {
+      invalidate();
+    }, HERO_REVEAL_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(introTimer);
+      window.clearTimeout(heroTimer);
+    };
   }, []);
 
-  // Inaktivitäts-Showcase
+  /* -------------------------------
+     B) Showcase bei Inaktivität
+  ------------------------------- */
   useEffect(() => {
     let timer: number | null = null;
-    const reset = () => {
-      if (timer) clearTimeout(timer);
-      timer = window.setTimeout(() => {
-        if (document.visibilityState === "visible") {
-          setShowcaseSeq((n) => n + 1);
-          invalidate();
-        }
-      }, INACTIVITY_MS);
+
+    const triggerShowcase = () => {
+      if (document.visibilityState === "visible") {
+        setShowcaseSeq((n) => n + 1);
+        invalidate();
+      }
     };
-    const onAny = () => reset();
-    const onVis = () =>
+
+    const resetTimer = () => {
+      if (timer) clearTimeout(timer);
+      timer = window.setTimeout(triggerShowcase, INACTIVITY_MS);
+    };
+
+    const onActivity = () => resetTimer();
+    const onVisibilityChange = () =>
       document.visibilityState === "visible"
-        ? reset()
+        ? resetTimer()
         : timer && clearTimeout(timer);
 
-    ["pointermove", "wheel", "keydown", "touchstart"].forEach((e) =>
-      window.addEventListener(e, onAny, { passive: true })
+    ["pointermove", "wheel", "keydown", "touchstart"].forEach((evt) =>
+      window.addEventListener(evt, onActivity, { passive: true })
     );
-    document.addEventListener("visibilitychange", onVis);
-    reset();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    resetTimer();
 
     return () => {
       if (timer) clearTimeout(timer);
-      ["pointermove", "wheel", "keydown", "touchstart"].forEach((e) =>
-        window.removeEventListener(e, onAny)
+      ["pointermove", "wheel", "keydown", "touchstart"].forEach((evt) =>
+        window.removeEventListener(evt, onActivity)
       );
-      document.removeEventListener("visibilitychange", onVis);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 
-  // Invalidate bei Scroll/Act-Wechsel
+  /* -------------------------------
+     C) Re-render bei Scroll/Section-Änderung
+  ------------------------------- */
   useEffect(() => {
     invalidate();
   }, [scroll, act]);
 
-  const heroVisible = phase === "park";
-
+  /* -------------------------------
+     D) Render
+  ------------------------------- */
   return (
     <>
+      {/* 3D-Logo mit Tier-spezifischem Verhalten */}
       <ThreeLogo
         phase={phase}
         showcaseSeq={showcaseSeq}
         scroll={scroll}
         act={act}
+        tier={tierLocked}
       />
 
+      {/* Dunkler Radial-Backdrop während Intro */}
       <motion.div
-        initial={{ opacity: 0.8 }}
-        animate={{ opacity: heroVisible ? 0 : 0.8 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="pointer-events-none fixed inset-0 -z-5 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.55),rgba(0,0,0,0.9))]"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: heroVisible ? 0 : 1 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="pointer-events-none fixed inset-0 -z-5 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.6),rgba(0,0,0,0.9))]"
       />
 
+      {/* Hero-Content: sanftes Einfaden + Blur-Lift */}
       <motion.div
-        initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
+        initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
         animate={{
           opacity: heroVisible ? 1 : 0,
-          y: heroVisible ? 0 : 10,
+          y: heroVisible ? 0 : 12,
           filter: heroVisible ? "blur(0px)" : "blur(6px)",
         }}
         transition={{
-          delay: heroVisible ? 0.05 : 0,
+          delay: heroVisible ? 0.08 : 0,
           duration: 0.55,
           ease: "easeOut",
         }}

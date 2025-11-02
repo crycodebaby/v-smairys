@@ -75,10 +75,6 @@ export default function Home() {
         <BentoGridSection />
       </section>
 
-      <section id="cta" className="relative">
-        <CtaSection />
-      </section>
-
       <section id="process" className="relative">
         <ProcessSection />
       </section>
