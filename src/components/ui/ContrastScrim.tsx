@@ -1,3 +1,4 @@
+// src/components/ui/ContrastScrim.tsx
 "use client";
 
 import React from "react";
@@ -6,56 +7,61 @@ import clsx from "clsx";
 type Props = {
   children: React.ReactNode;
   className?: string;
-  /** 0..1 Deckkraft des Panels */
+  /** Deckkraft der Fläche (0..1) */
   strength?: number;
-  /** px-Blur; z.B. 6–10 für „Apple-clean“ */
+  /** Blur in px (6–10 wirkt „Apple-clean“) */
   blur?: number;
-  /** px-Eckenradius */
+  /** Eckenradius in px */
   radius?: number;
-  /** z.B. "px-3 py-2" */
+  /** z. B. "px-3 py-2" */
   insetClassName?: string;
-  /** radiale Maske für weiche Ränder */
+  /** Radiale Maskierung für weiche Ränder */
   masked?: boolean;
+};
+
+/** Erweitertes Style-Objekt mit typisierter CSS-Variable */
+type StyleWithVars = React.CSSProperties & {
+  ["--scrim-radius"]?: string;
 };
 
 export default function ContrastScrim({
   children,
   className,
-  strength = 0.62,
-  blur = 8,
+  strength = 0.72,
+  blur = 9,
   radius = 14,
   insetClassName = "",
   masked = true,
 }: Props) {
-  // Fallback-sicher: hsl(var(--background) / α)
-  const bg = `hsl(var(--background) / ${Math.round(strength * 100)}%)`;
+  // Theme-sicher: nutzt deine HSL-Token direkt (Light/Dark-fähig)
+  const background = `hsl(var(--background) / ${Math.round(strength * 100)}%)`;
+
+  const layerStyle: StyleWithVars = {
+    background,
+    // Dynamischer Blur per inline-style (funktioniert auf iOS/Safari/Chrome)
+    backdropFilter: `blur(${blur}px)`,
+    WebkitBackdropFilter: `blur(${blur}px)`,
+    // Eckenradius als CSS-Var, falls du ihn in Klassen referenzieren willst
+    borderRadius: `${radius}px`,
+    ["--scrim-radius"]: `${radius}px`,
+    // Weiche Kanten via Mask – doppelt für WebKit
+    maskImage: masked
+      ? "radial-gradient(120% 100% at 50% 50%, black 65%, transparent 100%)"
+      : undefined,
+    WebkitMaskImage: masked
+      ? "radial-gradient(120% 100% at 50% 50%, black 65%, transparent 100%)"
+      : undefined,
+  };
 
   return (
     <div className={clsx("relative", className)}>
+      {/* Scrim-Layer (unter dem Content) */}
       <div
         aria-hidden
-        className={clsx(
-          "pointer-events-none absolute inset-0",
-          // Tailwind Backdrop (funktioniert zuverlässig auf iOS/Chrome)
-          // Arbitrary value für Blur:
-          `backdrop-blur-[${blur}px]`,
-          "rounded-[var(--scrim-radius)]"
-        )}
-        style={{
-          background: bg,
-          WebkitBackdropFilter: `blur(${blur}px)`,
-          borderRadius: `${radius}px`,
-          // sanfte, radiale Kante
-          maskImage: masked
-            ? "radial-gradient(120% 100% at 50% 50%, black 65%, transparent 100%)"
-            : undefined,
-          // Für Safari: ein Hauch Weichzeichner auf der Kante
-          WebkitMaskImage: masked
-            ? "radial-gradient(120% 100% at 50% 50%, black 65%, transparent 100%)"
-            : undefined,
-          ["--scrim-radius" as any]: `${radius}px`,
-        }}
+        className="absolute inset-0 pointer-events-none"
+        style={layerStyle}
       />
+      {/* Inhalt bleibt im normalen Flow */}
       <div className={clsx("relative", insetClassName)}>{children}</div>
     </div>
   );

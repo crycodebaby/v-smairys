@@ -17,8 +17,13 @@ import {
 import FadeIn from "@/components/FadeIn";
 import EdgeFade from "./ui/EdgeFade";
 
+/**
+ * iOS-safe Card Styles:
+ * - overflow-hidden darf bleiben (Rundung), aber: kein gefilterter, großer Blur-Layer in der Card!
+ * - ring-0/transition kann bleiben, will-change nur auf dem Container (nicht auf dem Glow).
+ */
 const cardBase =
-  "relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/90 shadow-sm ring-1 ring-black/0 transition-all";
+  "relative flex flex-col rounded-2xl overflow-hidden border border-border/60 bg-card/90 shadow-sm ring-1 ring-black/0 transition-all will-change-transform";
 
 const hoverFx =
   "hover:shadow-xl hover:ring-black/5 hover:border-border/80 motion-safe:hover:-translate-y-[1px]";
@@ -29,13 +34,23 @@ const textCls = "text-sm text-foreground/80 leading-6";
 const chipCls =
   "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium border-border/60 text-foreground/70 bg-background/60";
 
-const glow = (
+/**
+ * iOS-safe Glow:
+ * - KEIN filter: blur()
+ * - Reine Gradients mit breiten Stops → weicher Look ohne GPU-Overkill
+ * - Schlanker Layer, innerhalb der Card, clipped durch overflow-hidden
+ * - pointer-events-none + -z-10
+ */
+const Glow = () => (
   <div
     aria-hidden
-    className="absolute pointer-events-none -inset-24 -z-10 blur-3xl"
+    className="absolute inset-0 pointer-events-none -z-10"
     style={{
+      // zwei überlagerte Radial-Gradients, weich durch große Farbstopps
       background:
-        "radial-gradient(120px 120px at 80% 20%, hsl(var(--primary)/0.15), transparent 60%), radial-gradient(140px 120px at 10% 80%, hsl(var(--muted-foreground)/0.12), transparent 60%)",
+        "radial-gradient(240px 220px at 80% 18%, hsl(var(--primary)/0.16) 0%, transparent 70%)," +
+        "radial-gradient(260px 220px at 12% 86%, hsl(var(--muted-foreground)/0.12) 0%, transparent 72%)",
+      opacity: 1,
     }}
   />
 );
@@ -135,7 +150,7 @@ export default function BentoGridSection() {
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-8 p-5 sm:p-6`}
           >
-            {glow}
+            <Glow />
             <div className="flex items-center gap-2">
               <Code2 className="w-5 h-5 text-primary" />
               <h3 className={titleCls}>Premium Web-Entwicklung</h3>
@@ -184,6 +199,7 @@ export default function BentoGridSection() {
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
+            <Glow />
             <div className="flex items-center gap-2">
               <SearchCheck className="w-5 h-5 text-primary" />
               <h3 className={titleCls}>Nachhaltiges SEO</h3>
@@ -206,11 +222,12 @@ export default function BentoGridSection() {
             </div>
           </motion.div>
 
-          {/* Brand & Design – kompakter, mit Beispiel-Chips */}
+          {/* Brand & Design – kompakt */}
           <motion.div
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
+            <Glow />
             <div className="flex items-center gap-2">
               <Palette className="w-5 h-5 text-primary" />
               <h3 className={titleCls}>Markenidentität & Design</h3>
@@ -250,6 +267,7 @@ export default function BentoGridSection() {
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-8 items-center justify-center text-center p-6`}
           >
+            <Glow />
             <div className="max-w-lg mx-auto">
               <div className="mb-2 inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-[11px] font-medium text-foreground/70">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -276,11 +294,12 @@ export default function BentoGridSection() {
             </div>
           </motion.div>
 
-          {/* Security/Compliance – schmal, sehr prägnant */}
+          {/* Security/Compliance – schmal, prägnant */}
           <motion.div
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
+            <Glow />
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-primary" />
               <h3 className={titleCls}>Sicherheit & Compliance</h3>
