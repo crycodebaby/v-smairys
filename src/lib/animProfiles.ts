@@ -73,7 +73,7 @@ export type AnimProfile = {
     exposure: number;
   };
 
-  /** Optional: Showcase-Feinheiten (wird in ThreeLogo berücksichtigt) */
+  /** Optional: Showcase-Feinheiten */
   showcase?: {
     duration?: number; // ms
     amplitudes?: {
@@ -127,34 +127,39 @@ function gentleScrollRot(
 /* ---------------------------------------------------
    Profile
    – Optimiert für: 350px Phones, Tablets (768–1024), Desktop (≥1024)
-   – Patches: Park & Intro weiter nach links (weg von der Textspalte)
+   – Tablet/Desktop sind bereits „weiter links“ gepatcht.
+   – MOBILE jetzt enger & näher im Frame (sichtbar auf iPhone mit URL-Bar).
 --------------------------------------------------- */
 
 /**
  * MOBILE
- * Zielgeräte: ~350–767 px (iPhone SE/8/12 mini/13 mini etc.)
- * Philosophie: Kompaktere Ellipse, etwas weniger Tiefe, behutsamere Idle.
- * PATCH: arcLeft -1.05, park.x -1.08
+ * Zielgeräte: ~350–767 px
+ * Philosophie: Kompakt & viewport-sicher, links geparkt aber sichtbar.
+ * NEU (Patch A):
+ *   arcLeft:  -0.58
+ *   park.pos: x = -0.62
+ *   introScale: 2.05
+ *   path center: (-0.62, 0.02, 0.0)
+ *   radii: 0.22 / 0.06, depth: -0.60
  */
 const MOBILE: AnimProfile = {
   intro: {
     duration: 1200,
     pop: 300,
     settle: 500,
-    arcLeft: -1.05, // PATCH (vorher -0.85)
-    arcHeight: 0.1,
-    start: 400,
-    end: 1100,
-    introScale: 2.2,
+    arcLeft: -0.58, // vorher -1.05 (jetzt im Viewport)
+    arcHeight: 0.09,
+    start: 380,
+    end: 1050,
+    introScale: 2.05, // vorher 2.2 (kleiner, sicherer)
     baseTiltX: -1.42,
   },
   park: {
-    scale: 1.02, // PATCH (vorher 1.05 → minimal kleiner, edler)
-    pos: v3(-1.08, 0.02, 0.0), // PATCH (vorher -0.90)
+    scale: 1.0, // vorher 1.02
+    pos: v3(-0.62, 0.02, 0.0), // vorher -1.08
   },
-  // Pfad-Zentrum konsistent zur neuen Park-Position
-  path: (t) => ellipsePath(v3(-1.08, 0.02, 0.0), 0.36, 0.08, -0.9, t),
-  scrollRot: (t) => gentleScrollRot(0.3, 0.16, 0.1, t),
+  path: (t) => ellipsePath(v3(-0.62, 0.02, 0.0), 0.22, 0.06, -0.6, t),
+  scrollRot: (t) => gentleScrollRot(0.28, 0.14, 0.09, t),
   idle: {
     yaw: 0.06,
     pitch: 0.04,
@@ -182,16 +187,15 @@ const MOBILE: AnimProfile = {
 
 /**
  * TABLET
- * Zielgeräte: ~768–1023 px (iPad, kleinere Android-Tablets)
- * Philosophie: Größere Ellipse, leicht mehr Tiefe und Rotation.
- * PATCH: arcLeft -1.28, park.x -1.30
+ * Zielgeräte: ~768–1023 px
+ * (links gepatcht – bleibt wie zuletzt abgestimmt)
  */
 const TABLET: AnimProfile = {
   intro: {
     duration: 1300,
     pop: 320,
     settle: 560,
-    arcLeft: -1.28, // PATCH (vorher -1.05)
+    arcLeft: -1.28,
     arcHeight: 0.12,
     start: 420,
     end: 1200,
@@ -200,7 +204,7 @@ const TABLET: AnimProfile = {
   },
   park: {
     scale: 1.12,
-    pos: v3(-1.3, 0.03, 0.0), // PATCH (vorher -1.10)
+    pos: v3(-1.3, 0.03, 0.0),
   },
   path: (t) => ellipsePath(v3(-1.3, 0.03, 0.0), 0.42, 0.09, -1.1, t),
   scrollRot: (t) => gentleScrollRot(0.34, 0.18, 0.11, t),
@@ -232,15 +236,14 @@ const TABLET: AnimProfile = {
 /**
  * DESKTOP
  * Zielgeräte: ≥1024 px
- * Philosophie: Weiteste Ellipse, klarere Tiefe, etwas mehr Rotation, aber edel.
- * PATCH: arcLeft -1.55, park.x -1.55
+ * (links gepatcht – bleibt wie zuletzt abgestimmt)
  */
 const DESKTOP: AnimProfile = {
   intro: {
     duration: 1400,
     pop: 350,
     settle: 650,
-    arcLeft: -1.55, // PATCH (vorher -1.28)
+    arcLeft: -1.55,
     arcHeight: 0.12,
     start: 450,
     end: 1350,
@@ -248,8 +251,8 @@ const DESKTOP: AnimProfile = {
     baseTiltX: -1.42,
   },
   park: {
-    scale: 1.18, // PATCH (vorher 1.20 → minimal ruhiger)
-    pos: v3(-1.55, 0.04, 0.0), // PATCH (vorher -1.28)
+    scale: 1.18,
+    pos: v3(-1.55, 0.04, 0.0),
   },
   path: (t) => ellipsePath(v3(-1.55, 0.04, 0.0), 0.5, 0.1, -1.2, t),
   scrollRot: (t) => gentleScrollRot(0.35, 0.2, 0.12, t),

@@ -51,13 +51,13 @@ interface ThreeLogoProps {
    Hero-Guard & Bottom-Fade
    ============================ */
 const HERO_GUARD_X: Record<ViewportTier, number> = {
-  mobile: -0.98,
+  mobile: -0.58, // näher im Bild, aber links der Textspalte
   tablet: -1.2,
   desktop: -1.45,
 };
 
-const BOTTOM_FADE_START = 0.9;
-const BOTTOM_FADE_END = 0.98;
+const BOTTOM_FADE_START = 0.9; // ab 90% Scroll
+const BOTTOM_FADE_END = 0.98; // bis ~Footer unsichtbar
 
 const OCCLUDE_SECTIONS = new Set(["faq", "footer"]);
 
@@ -131,13 +131,15 @@ function LogoModel({
   const [mountedAt] = useState<number>(() => performance.now());
   const { resolvedTheme } = useTheme();
 
+  // Three viewport tools (für Viewport-Clamp)
+  const { camera, viewport } = useThree();
+
   // Scene-Klon
   const prepared = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
   /**
    * Material-Cache (einmalig):
-   * Wir setzen *einheitlich* MeshPhysicalMaterial pro Mesh, merken die Material-Instanzen
-   * in matsRef und passen später nur Eigenschaften an (statt Material-Objekte zu tauschen).
+   * Einheitlich MeshPhysicalMaterial pro Mesh, danach nur Properties updaten.
    */
   const matsRef = useRef<
     Array<THREE.MeshPhysicalMaterial & { opacity?: number }>
@@ -148,9 +150,8 @@ function LogoModel({
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
 
-      const baseCol = new THREE.Color("#f5f5f5");
       const pm = new THREE.MeshPhysicalMaterial({
-        color: baseCol,
+        color: new THREE.Color("#f5f5f5"),
         metalness: 0.75,
         roughness: 0.28,
         envMapIntensity: 1.0,
@@ -192,7 +193,7 @@ function LogoModel({
     }
   }, [resolvedTheme, act]);
 
-  // Showcase-Trigger (leichtes Flourish – *nicht* aus profile.camera/showcase!)
+  // Showcase-Trigger (leichtes Flourish – *ohne* profile.showcase)
   const showcaseStart = useRef<number | null>(null);
   const lastSeq = useRef<number>(showcaseSeq);
   useEffect(() => {
@@ -202,6 +203,12 @@ function LogoModel({
       invalidate();
     }
   }, [showcaseSeq]);
+
+  // Viewport-Weltmaße auf Z=0 (für Clamp)
+  const getWorldBounds = () => {
+    const vp = viewport.getCurrentViewport(camera, new THREE.Vector3(0, 0, 0));
+    return { worldW: vp.width as number, worldH: vp.height as number };
+  };
 
   useFrame((state, delta) => {
     if (!group.current) return;
@@ -267,7 +274,7 @@ function LogoModel({
         ? THREE.MathUtils.lerp(0, profile.intro.arcLeft, easeOutCubic(arcT))
         : path.x;
 
-    const posYGoal =
+    let posYGoal =
       phase === "intro"
         ? profile.intro.arcHeight * Math.sin(Math.PI * arcT)
         : path.y + breathY;
@@ -276,11 +283,23 @@ function LogoModel({
 
     const scaleGoal = phase === "intro" ? scaleIntro : profile.park.scale;
 
-    // ── Hero-Guard (niemals Textspalte überdecken) ───────────────────────────
-    const guardX = HERO_GUARD_X[tier];
-    posXGoal = Math.min(posXGoal, guardX);
+    // ── Viewport-Clamp (immer im Frame halten) ───────────────────────────────
+    const { worldW, worldH } = getWorldBounds();
+    const marginX = tier === "mobile" ? 0.08 : 0.1;
+    const marginY = tier === "mobile" ? 0.06 : 0.08;
 
-    // ── 3b) Bottom-Fade (FAQ/Footer) + opcionaler Act-Fade ───────────────────
+    const minX = -worldW / 2 + marginX;
+    const maxX = worldW / 2 - marginX;
+    const minY = -worldH / 2 + marginY;
+    const maxY = worldH / 2 - marginY;
+
+    // 1) nie in Textzone (Hero-Guard links halten)
+    posXGoal = Math.min(posXGoal, HERO_GUARD_X[tier]);
+    // 2) nie außerhalb des sichtbaren Frames
+    posXGoal = THREE.MathUtils.clamp(posXGoal, minX, maxX);
+    posYGoal = THREE.MathUtils.clamp(posYGoal, minY, maxY);
+
+    // ── Bottom-Fade + (optional) Act-Fade ────────────────────────────────────
     const bottomFade = smoothstep(BOTTOM_FADE_START, BOTTOM_FADE_END, p);
     const actFade = OCCLUDE_SECTIONS.has(String(act ?? "").toLowerCase())
       ? 0
@@ -361,7 +380,7 @@ function LogoModel({
 useGLTF.preload("/models/logo.final.glb", undefined, true, attachMeshopt);
 
 /* ============================
-   Parallax Camera (ohne profile.camera)
+   Parallax Camera (tier-sensitiv, ohne profile.camera)
    ============================ */
 function ParallaxCamera({ intensity = 0.12 }: { intensity?: number }) {
   const { camera } = useThree();
@@ -392,19 +411,23 @@ export default function ThreeLogo({
 }: ThreeLogoProps) {
   const profile: AnimProfile = ANIM_PROFILES[tier];
 
+  // iOS/URL-Bar safe sizing + Kamera je Tier
+  const camFov = tier === "mobile" ? 52 : 45;
+  const camZ = tier === "mobile" ? 3.5 : 3.2;
+
   // Bloom-Intensität je Tier (dezent)
   const bloomIntensity =
     tier === "mobile" ? 0.08 : tier === "tablet" ? 0.1 : 0.12;
 
-  // Parallax dezent je Tier ohne profile.camera
+  // Parallax je Tier (etwas schwächer auf Mobile)
   const parallaxIntensity =
     tier === "mobile" ? 0.08 : tier === "tablet" ? 0.1 : 0.12;
 
   return (
-    <div className="fixed inset-0 pointer-events-none -z-10">
+    <div className="fixed inset-0 h-[100svh] w-full pointer-events-none -z-10">
       <Canvas
         dpr={[1, 2]}
-        camera={{ position: [0, 0, 3.2], fov: 45 }}
+        camera={{ position: [0, 0, camZ], fov: camFov }}
         frameloop="demand"
         gl={{
           antialias: true,
@@ -445,7 +468,7 @@ export default function ThreeLogo({
             scroll={scroll}
             act={act}
             profile={profile}
-            tier={tier} // <-- wichtig für Hero-Guard
+            tier={tier} // für Hero-Guard/Clamp
           />
 
           {!REDUCED && (
