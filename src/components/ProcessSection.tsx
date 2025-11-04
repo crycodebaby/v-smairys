@@ -1,9 +1,10 @@
+// src/components/ProcessSection.tsx
 "use client";
 
 import { motion } from "framer-motion";
-import { ClipboardList, Code2, Rocket, Handshake } from "lucide-react";
-import FadeIn from "./FadeIn";
 import Link from "next/link";
+import FadeIn from "./FadeIn";
+import { Handshake, Code2, Rocket } from "lucide-react";
 
 const phases = [
   {
@@ -40,13 +41,13 @@ export default function ProcessSection() {
         </div>
       </FadeIn>
 
-      {/* Linie im Hintergrund */}
+      {/* zarte Verbindungslinie */}
       <div
         aria-hidden
         className="absolute inset-x-0 h-px pointer-events-none top-1/2 -z-10 bg-gradient-to-r from-transparent via-primary/30 to-transparent"
       />
 
-      {/* Timeline-Grid */}
+      {/* Timeline */}
       <div className="container relative grid gap-16 mt-16 sm:gap-12 md:grid-cols-3">
         {phases.map((p, i) => (
           <FadeIn key={i}>
@@ -55,7 +56,6 @@ export default function ProcessSection() {
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
               className="relative flex flex-col items-center p-8 text-center transition-all border shadow-sm rounded-2xl border-border/60 bg-card/80 hover:shadow-md"
             >
-              {/* Glow-Spot */}
               <div
                 aria-hidden
                 className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-transparent"
@@ -74,7 +74,7 @@ export default function ProcessSection() {
         ))}
       </div>
 
-      {/* CTA unten */}
+      {/* CTA */}
       <FadeIn>
         <div className="mt-16 text-center">
           <Link

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { invalidate } from "@react-three/fiber";
 import ThreeLogo, { type LogoPhase } from "@/components/ui/ThreeLogo";
@@ -9,23 +9,22 @@ import { useSectionAct, type SectionAct } from "@/lib/useSectionAct";
 import { useViewportTier, type ViewportTier } from "@/hooks/useViewportTier";
 
 /**
- * Hero-Intro mit 3D-Logo:
- * - führt initiale Logo-Intro-Animation aus
+ * ClientHeroIntro:
+ * - führt initiale 3D-Logo-Animation aus
  * - blendet Hero-Inhalt synchron ein
- * - triggert Showcase-Animation nach Inaktivität
- * - reagiert auf Scroll und Section-Änderungen (invalidate)
+ * - startet Showcase bei Inaktivität
+ * - reagiert auf Scroll und Section-Änderungen
  */
+
 interface ClientHeroIntroProps {
   children?: ReactNode;
 }
 
 /** Showcase startet nach dieser Inaktivität (ms) */
 const INACTIVITY_MS = 12000;
-
-/** Zeit (ms) nach der das Logo vom Intro in Park übergeht */
+/** Zeit (ms) bis Logo von Intro → Park übergeht */
 const INTRO_TO_PARK_MS = 1400;
-
-/** Zeit (ms) nach der der Hero-Content sichtbar wird */
+/** Zeit (ms) bis Hero-Content sichtbar wird */
 const HERO_REVEAL_DELAY_MS = 1500;
 
 export default function ClientHeroIntro({ children }: ClientHeroIntroProps) {
@@ -36,30 +35,29 @@ export default function ClientHeroIntro({ children }: ClientHeroIntroProps) {
   const scroll = useScrollProgress();
   const act: SectionAct = useSectionAct();
 
-  /** Gerätegröße ermitteln & fixieren (keine ständigen Updates während Scroll) */
+  /** Gerätegröße einmalig ermitteln (stabil während Session) */
   const liveTier = useViewportTier();
-  const tierRef = useRef<ViewportTier>(liveTier);
-  const [tierLocked] = useState<ViewportTier>(() => liveTier); // fix beim ersten Mount
+  const [tierLocked] = useState<ViewportTier>(() => liveTier);
 
-  /** Hero sichtbar, sobald Logo geparkt */
+  /** Hero sichtbar, sobald Logo „geparkt“ ist */
   const heroVisible = phase === "park";
 
   /* -------------------------------
-     A) Intro -> Park & Hero-Reveal
+     A) Intro → Park & Hero-Reveal
   ------------------------------- */
   useEffect(() => {
     const introTimer = window.setTimeout(() => {
       setPhase("park");
-      invalidate();
+      invalidate(); // Re-render Logo nach Phase-Wechsel
     }, INTRO_TO_PARK_MS);
 
     const heroTimer = window.setTimeout(() => {
-      invalidate();
+      invalidate(); // sicherstellen, dass Hero nach Render sichtbar wird
     }, HERO_REVEAL_DELAY_MS);
 
     return () => {
-      window.clearTimeout(introTimer);
-      window.clearTimeout(heroTimer);
+      clearTimeout(introTimer);
+      clearTimeout(heroTimer);
     };
   }, []);
 
@@ -82,17 +80,17 @@ export default function ClientHeroIntro({ children }: ClientHeroIntroProps) {
     };
 
     const onActivity = () => resetTimer();
-    const onVisibilityChange = () =>
-      document.visibilityState === "visible"
-        ? resetTimer()
-        : timer && clearTimeout(timer);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") resetTimer();
+      else if (timer) clearTimeout(timer);
+    };
 
     ["pointermove", "wheel", "keydown", "touchstart"].forEach((evt) =>
       window.addEventListener(evt, onActivity, { passive: true })
     );
     document.addEventListener("visibilitychange", onVisibilityChange);
 
-    resetTimer();
+    resetTimer(); // Timer initial starten
 
     return () => {
       if (timer) clearTimeout(timer);
@@ -104,7 +102,7 @@ export default function ClientHeroIntro({ children }: ClientHeroIntroProps) {
   }, []);
 
   /* -------------------------------
-     C) Re-render bei Scroll/Section-Änderung
+     C) Re-render bei Scroll / Section-Änderung
   ------------------------------- */
   useEffect(() => {
     invalidate();
@@ -115,7 +113,7 @@ export default function ClientHeroIntro({ children }: ClientHeroIntroProps) {
   ------------------------------- */
   return (
     <>
-      {/* 3D-Logo mit Tier-spezifischem Verhalten */}
+      {/* 3D-Logo – reagiert auf Scroll & Section */}
       <ThreeLogo
         phase={phase}
         showcaseSeq={showcaseSeq}
@@ -124,7 +122,7 @@ export default function ClientHeroIntro({ children }: ClientHeroIntroProps) {
         tier={tierLocked}
       />
 
-      {/* Dunkler Radial-Backdrop während Intro */}
+      {/* Dunkler radialer Hintergrund während Intro */}
       <motion.div
         initial={{ opacity: 1 }}
         animate={{ opacity: heroVisible ? 0 : 1 }}
@@ -132,7 +130,7 @@ export default function ClientHeroIntro({ children }: ClientHeroIntroProps) {
         className="pointer-events-none fixed inset-0 -z-5 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.6),rgba(0,0,0,0.9))]"
       />
 
-      {/* Hero-Content: sanftes Einfaden + Blur-Lift */}
+      {/* Hero-Content – smooth fade-in */}
       <motion.div
         initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
         animate={{
