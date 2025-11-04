@@ -50,10 +50,11 @@ export const testimonialsData: Testimonial[] = [
     company: "Crncic Bausanierung GmbH",
     logoLight: "/testimonials/crncic-schwarz.png",
     logoDark: "/testimonials/crncic-weiß.png",
-    quote: "SEO auf Pro-Level, smarte Automationen, 140 Prozent mehr Anfragen.",
+    quote:
+      "SEO auf hohem Niveau, Online Präsenz perfektioniert, 140 Prozent mehr Anfragen.",
     story:
       "Kompletter Neuauftritt mit technischer SEO, klarer Content-Struktur und Performance-Boost. Sichtbarkeit gestiegen, Anfragen deutlich nach oben.",
-    url: "https://bauunternehmen.saarland",
+    url: "https://www.crncic-bausanierung.de/",
     kpi: "+140% Projektanfragen",
     services: ["Webentwicklung", "SEO", "Performance", "Automationen"],
   },

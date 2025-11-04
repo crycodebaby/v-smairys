@@ -1,84 +1,93 @@
-// src/components/ProcessSection.tsx
-import React from "react";
-import { ClipboardList, Code, Rocket, TrendingUp } from "lucide-react";
-import FadeIn from "./FadeIn";
+"use client";
 
-const processSteps = [
+import { motion } from "framer-motion";
+import { ClipboardList, Code2, Rocket, Handshake } from "lucide-react";
+import FadeIn from "./FadeIn";
+import Link from "next/link";
+
+const phases = [
   {
-    step: "01",
-    title: "Strategie & Konzeption",
-    description:
-      "Jedes herausragende Projekt beginnt mit einem wasserdichten Plan. Wir analysieren Ihre Ziele, Zielgruppen und den Wettbewerb, um eine maßgeschneiderte digitale Roadmap zu entwickeln.",
-    icon: <ClipboardList className="w-12 h-12 text-primary" />,
+    icon: <Handshake className="w-10 h-10 text-primary" />,
+    title: "Verstehen",
+    text: "Du erklärst, was du brauchst – ich höre zu, stelle Fragen und denke mit.",
   },
   {
-    step: "02",
-    title: "Design & Entwicklung",
-    description:
-      "Hier wird Ihre Vision zur Realität. Mit pixelgenauem Design und handgefertigtem Code schmieden wir eine Website, die nicht nur beeindruckt, sondern auch auf technischer Exzellenz basiert.",
-    icon: <Code className="w-12 h-12 text-primary" />,
+    icon: <Code2 className="w-10 h-10 text-primary" />,
+    title: "Bauen",
+    text: "Ich programmiere deine Lösung, sauber, skalierbar, präzise – so, als wäre sie meine eigene.",
   },
   {
-    step: "03",
-    title: "Launch & SEO-Optimierung",
-    description:
-      "Der Startschuss für Ihren Erfolg. Wir sorgen für einen reibungslosen Livegang, führen finale Performance-Checks durch und optimieren Ihre Seite für eine Top-Platzierung bei Google.",
-    icon: <Rocket className="w-12 h-12 text-primary" />,
-  },
-  {
-    step: "04",
-    title: "Wachstum & Betreuung",
-    description:
-      "Unsere Partnerschaft endet nicht mit dem Launch. Wir stehen Ihnen mit fortlaufendem Support, Wartung und strategischer Beratung zur Seite, um Ihr digitales Wachstum nachhaltig zu sichern.",
-    icon: <TrendingUp className="w-12 h-12 text-primary" />,
+    icon: <Rocket className="w-10 h-10 text-primary" />,
+    title: "Begleiten",
+    text: "Nach dem Launch bleibe ich an deiner Seite – für Updates, Wachstum und neue Ideen.",
   },
 ];
 
-const ProcessSection = () => {
+export default function ProcessSection() {
   return (
-    <section id="prozess" className="container py-24 scroll-mt-28 sm:py-32">
+    <section
+      id="prozess"
+      className="relative py-24 overflow-hidden sm:py-32 scroll-mt-28"
+    >
       <FadeIn>
-        <div className="max-w-2xl mx-auto text-center">
+        <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl">
-            Ein Prozess, geschmiedet für Perfektion
+            Der Weg mit SMAIRYS
           </h2>
-          <p className="mt-6 text-lg leading-8 text-foreground/80">
-            Wir überlassen nichts dem Zufall. Unser bewährter 4-Stufen-Prozess
-            garantiert herausragende Ergebnisse und maximale Transparenz für
-            unsere Partner.
+          <p className="mt-4 text-lg text-foreground/80">
+            Kein komplizierter Prozess. Nur du, ich – und dein Ziel.
           </p>
         </div>
       </FadeIn>
 
-      <div className="relative max-w-3xl mx-auto mt-16">
-        {/* Dekorative vertikale Linie */}
-        <div
-          aria-hidden="true"
-          className="absolute w-px h-full left-8 top-8 bg-primary/20"
-        />
+      {/* Linie im Hintergrund */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 h-px pointer-events-none top-1/2 -z-10 bg-gradient-to-r from-transparent via-primary/30 to-transparent"
+      />
 
-        <ul className="space-y-12">
-          {processSteps.map((item, index) => (
-            <FadeIn key={index}>
-              <li className="flex items-start gap-x-6">
-                <div className="relative flex items-center justify-center flex-none w-16 h-16 rounded-full bg-background ring-2 ring-primary">
-                  {item.icon}
+      {/* Timeline-Grid */}
+      <div className="container relative grid gap-16 mt-16 sm:gap-12 md:grid-cols-3">
+        {phases.map((p, i) => (
+          <FadeIn key={i}>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              className="relative flex flex-col items-center p-8 text-center transition-all border shadow-sm rounded-2xl border-border/60 bg-card/80 hover:shadow-md"
+            >
+              {/* Glow-Spot */}
+              <div
+                aria-hidden
+                className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-transparent"
+              />
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full shadow-inner bg-background ring-2 ring-primary/70">
+                  {p.icon}
                 </div>
-                <div className="pt-2">
-                  <p className="text-xl font-semibold font-heading">
-                    {item.title}
-                  </p>
-                  <p className="mt-2 text-base text-foreground/80">
-                    {item.description}
-                  </p>
-                </div>
-              </li>
-            </FadeIn>
-          ))}
-        </ul>
+                <h3 className="mt-4 text-xl font-semibold font-heading">
+                  {p.title}
+                </h3>
+                <p className="mt-2 text-sm text-foreground/80">{p.text}</p>
+              </div>
+            </motion.div>
+          </FadeIn>
+        ))}
       </div>
+
+      {/* CTA unten */}
+      <FadeIn>
+        <div className="mt-16 text-center">
+          <Link
+            href="#kontakt"
+            className="inline-flex items-center justify-center btn-premium"
+          >
+            Jetzt unverbindlich sprechen
+          </Link>
+          <p className="mt-3 text-sm text-foreground/70">
+            Persönlich. Transparent. Ohne Agentur-Bla.
+          </p>
+        </div>
+      </FadeIn>
     </section>
   );
-};
-
-export default ProcessSection;
+}

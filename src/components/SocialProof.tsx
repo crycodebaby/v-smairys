@@ -15,34 +15,34 @@ export default function SocialProof() {
       className="relative isolate"
       aria-labelledby="socialproof-heading"
     >
-      <div className="container">
-        <div className="max-w-4xl mx-auto text-center">
+      <div className="container text-center">
+        <div className="max-w-4xl mx-auto">
+          {/* Überschrift */}
           <h2
             id="socialproof-heading"
-            className="text-sm font-semibold tracking-wider uppercase text-foreground/60"
+            className="text-sm font-semibold tracking-wider uppercase text-foreground/70"
           >
-            Vertrauensvoller Partner für ambitionierte Unternehmen
+            Vertrauenspartner führender Unternehmen
           </h2>
 
-          {/* Frosted Panel: lesbar, lässt 3D durchscheinen */}
+          {/* Frosted Panel */}
           <div
             className="
-              mx-auto mt-6 rounded-2xl border border-white/10 bg-background/40
-              backdrop-blur-md ring-1 ring-black/5
-              shadow-[0_8px_32px_-8px_rgba(0,0,0,0.35)]
-              dark:border-white/5 dark:bg-background/25 dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)]
+              mx-auto mt-6 rounded-2xl border border-border/60 bg-background/60
+              backdrop-blur-md shadow-[0_10px_40px_-12px_rgba(0,0,0,0.35)]
+              dark:bg-background/35 dark:border-border/40
+              transition
             "
           >
-            {/* Hairline */}
+            {/* Hairline oben */}
             <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
 
             <div className="px-4 py-6 sm:px-6 sm:py-8">
-              {/* Gleichmäßiges Raster; alle Logos fluchten */}
-              <div className="grid items-center grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4 sm:gap-x-8 sm:gap-y-8">
+              <div className="grid items-center grid-cols-2 logo-mono gap-x-6 gap-y-6 sm:grid-cols-4 sm:gap-x-8 sm:gap-y-8">
                 {logos.map((logo) => (
                   <figure
                     key={logo.name}
-                    className="relative flex items-center justify-center w-full h-24 sm:h-28"
+                    className="relative flex items-center justify-center w-full h-20 sm:h-24 md:h-28"
                     aria-label={logo.name}
                   >
                     <Image
@@ -58,9 +58,17 @@ export default function SocialProof() {
               </div>
             </div>
 
-            {/* Hairline */}
+            {/* Hairline unten */}
             <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
           </div>
+
+          {/* Unterzeile */}
+          <p className="mt-5 text-sm text-foreground/70">
+            <span className="font-medium text-foreground">
+              +112% durchschnittliches Anfragewachstum
+            </span>{" "}
+            in den ersten 90&nbsp;Tagen nach Relaunch.
+          </p>
         </div>
       </div>
     </section>

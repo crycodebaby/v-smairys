@@ -1,13 +1,6 @@
 "use client";
 
 import FadeIn from "@/components/FadeIn";
-import dynamic from "next/dynamic";
-
-// Use absolute alias so the import always resolves:
-const CtaWatermark3D = dynamic(
-  () => import("@/components/cta/CtaWatermark3D"),
-  { ssr: false }
-);
 
 const CAL_URL = "/kontakt";
 
@@ -18,78 +11,88 @@ export default function CtaSection() {
       className="relative overflow-hidden isolate scroll-mt-28"
       aria-labelledby="cta-heading"
     >
-      {/* 3D watermark sits behind the glass card, above the page background */}
-      <CtaWatermark3D />
-
-      {/* Atmosphere: fully transparent, no solid bars */}
+      {/* 🌇 Atmosphärischer Hintergrund */}
       <div aria-hidden className="absolute inset-0 pointer-events-none -z-10">
-        {/* ultra subtle vertical wash */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.02),transparent_18%,transparent_82%,rgba(0,0,0,0.03))]" />
-        {/* brand glows */}
-        <div className="absolute -top-24 left-1/2 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full blur-3xl bg-[radial-gradient(closest-side,theme(colors.primary.DEFAULT)/0.14,transparent)]" />
-        <div className="absolute -bottom-24 left-1/3 h-[20rem] w-[20rem] -translate-x-1/2 rounded-full blur-3xl bg-[radial-gradient(closest-side,theme(colors.primary.DEFAULT)/0.12,transparent)]" />
-        {/* fine noise to sell the glass look */}
+        {/* sanfter vertikaler Verlauf */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/90 to-background/95" />
+
+        {/* 🔥 Warm Glow unten – Emotion */}
         <div
-          className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
+          className="absolute bottom-0 left-1/2 h-[40rem] w-[60rem] -translate-x-1/2 rounded-[100%] blur-[140px]
+          bg-[radial-gradient(closest-side,hsl(var(--primary))/0.12,transparent)] dark:bg-[radial-gradient(closest-side,hsl(var(--primary))/0.18,transparent)]"
+        />
+
+        {/* 💨 Cooler Nebel oben – Kontrast */}
+        <div
+          className="absolute top-0 left-1/2 h-[22rem] w-[50rem] -translate-x-1/2 rounded-[100%] blur-[100px]
+          bg-[radial-gradient(closest-side,hsl(var(--brand-blue))/0.12,transparent)] dark:bg-[radial-gradient(closest-side,hsl(var(--brand-blue))/0.2,transparent)]"
+        />
+
+        {/* 🕳️ Dynamische Vignette simuliert Tiefe */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_65%,rgba(0,0,0,0.12)_100%)] mix-blend-multiply dark:mix-blend-screen transition-all duration-700" />
+
+        {/* ✨ Partikelstaub für subtile Bewegung */}
+        <div
+          className="absolute inset-0 opacity-[0.03] mix-blend-overlay animate-[pulse_10s_ease-in-out_infinite]"
           style={{
             backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='0.8'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='0.8'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
           }}
         />
       </div>
 
+      {/* 💎 Inhalt */}
       <FadeIn className="relative z-10">
-        <div className="container py-20 sm:py-24 md:py-28">
-          {/* Liquid / frosted glass card */}
+        <div className="container py-28 sm:py-32 md:py-36">
           <div
             className="mx-auto max-w-3xl rounded-2xl border border-white/10
-                       bg-background/35 backdrop-blur-xl ring-1 ring-black/5
-                       shadow-[0_14px_48px_-12px_rgba(0,0,0,0.55)]
-                       dark:border-white/5 dark:bg-background/25 dark:shadow-[0_16px_56px_-14px_rgba(0,0,0,0.7)]"
+                       bg-background/45 backdrop-blur-2xl ring-1 ring-black/5
+                       shadow-[0_14px_48px_-12px_rgba(0,0,0,0.45)]
+                       dark:border-white/10 dark:bg-background/25
+                       dark:shadow-[0_18px_64px_-14px_rgba(0,0,0,0.65)]"
           >
-            {/* hairline top */}
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
-
-            <div className="px-6 py-10 text-center sm:px-10 sm:py-12 md:px-12 md:py-14">
+            <div className="px-6 py-12 text-center sm:px-10 sm:py-14 md:px-14">
               <h2
                 id="cta-heading"
-                className="text-2xl font-bold leading-tight tracking-tight font-heading sm:text-4xl md:text-5xl"
-                style={{ textWrap: "balance" }}
+                className="text-3xl font-bold tracking-tight font-heading sm:text-4xl md:text-5xl"
               >
-                Bereit, Ihre Vision zu verwirklichen?
+                Bereit, das nächste Kapitel Ihrer Marke zu schreiben?
               </h2>
-              <p className="max-w-2xl mx-auto mt-4 text-base leading-7 text-foreground/80 sm:mt-6 sm:text-lg sm:leading-8">
-                Lassen Sie uns in einem kostenfreien Gespräch prüfen, ob wir der
-                richtige Partner sind – fokussiert, praxisnah und ohne
-                Verkaufsdruck.
+
+              <p className="max-w-2xl mx-auto mt-4 text-base leading-7 text-foreground/85 sm:mt-6 sm:text-lg">
+                Ich entwickle Websites, die sich wie Ihre Marke anfühlen:
+                persönlich, präzise und mit Substanz. Lassen Sie uns
+                herausfinden, was Ihre Vision verdient.
               </p>
 
-              <div className="flex flex-col items-center justify-center gap-3 mt-8 sm:mt-10 sm:flex-row sm:gap-4">
+              <div className="flex flex-col items-center justify-center gap-4 mt-10 sm:flex-row">
                 <a
                   href={CAL_URL}
-                  className="inline-flex items-center justify-center w-full py-3 text-sm font-semibold transition rounded-md shadow-sm bg-primary px-7 text-primary-foreground hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:w-auto sm:text-base"
+                  className="inline-flex items-center justify-center w-full sm:w-auto px-7 py-3 text-sm sm:text-base font-semibold rounded-md shadow-sm bg-primary text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:scale-[1.02]"
                 >
-                  Kostenfreie Potenzialanalyse anfordern
+                  Jetzt Gespräch vereinbaren
                 </a>
-
                 <a
                   href="#prozess"
-                  className="inline-flex items-center justify-center py-3 text-sm font-semibold transition border rounded-md shadow-sm border-foreground/15 bg-background/60 px-7 text-foreground backdrop-blur-md hover:border-foreground/25 sm:text-base"
+                  className="inline-flex items-center justify-center px-7 py-3 text-sm sm:text-base font-semibold rounded-md border border-border/70 bg-background/60 text-foreground shadow-sm hover:border-foreground/25 transition-all duration-300 hover:scale-[1.01]"
                 >
-                  Unsere Methode ansehen
+                  Mehr über meine Arbeitsweise
                 </a>
               </div>
 
-              <p className="mx-auto mt-4 max-w-xs text-[11px] leading-snug text-foreground/65 sm:mt-5 sm:text-xs">
-                100&nbsp;% strategisch&nbsp;&middot;&nbsp;0&nbsp;% Verkaufsdruck
+              <p className="mx-auto mt-5 max-w-xs text-[11px] leading-snug text-foreground/60 sm:text-xs">
+                Direkt mit Robin Schmeiries · kein Vertrieb, keine Agentur
               </p>
             </div>
-
-            {/* hairline bottom */}
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
           </div>
         </div>
       </FadeIn>
+
+      {/* ✨ Licht-Schnitt, der das „Logo-Versinken“ betont */}
+      <div
+        aria-hidden
+        className="absolute bottom-0 left-0 right-0 h-48 transition-all duration-700 pointer-events-none bg-gradient-to-t from-background via-background/60 to-transparent dark:from-background/80 dark:via-background/40"
+      />
     </section>
   );
 }

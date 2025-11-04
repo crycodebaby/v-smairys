@@ -14,21 +14,22 @@ module.exports = {
       screens: { "2xl": "1400px" },
     },
     extend: {
-      /* -------------------- FONTS -------------------- */
+      /* ---------- FONTS ---------- */
       fontFamily: {
         heading: ["var(--font-heading)"], // Outfit
         sans: ["var(--font-sans)"], // Inter
       },
 
-      /* -------------------- COLORS & DESIGN TOKENS -------------------- */
+      /* ---------- DESIGN TOKENS (via CSS Vars) ---------- */
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "hsl(var(--primary))", // Smairys Crimson
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
@@ -55,14 +56,9 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        brand: {
-          blue: "hsl(var(--brand-blue))",
-          black: "hsl(var(--brand-black))",
-          white: "hsl(var(--brand-white))",
-        },
       },
 
-      /* -------------------- RADII & ANIMATIONS -------------------- */
+      /* ---------- RADII & ANIMATIONS ---------- */
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -83,7 +79,7 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
 
-      /* -------------------- GRADIENT -------------------- */
+      /* ---------- GRADIENT ---------- */
       backgroundImage: {
         "gradient-primary":
           "linear-gradient(135deg, var(--gradient-from) 0%, var(--gradient-via) 50%, var(--gradient-to) 100%)",

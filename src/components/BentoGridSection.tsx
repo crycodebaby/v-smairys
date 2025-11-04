@@ -1,4 +1,3 @@
-// src/components/ui/BentoGridSection.tsx
 "use client";
 
 import React from "react";
@@ -17,47 +16,37 @@ import {
 import FadeIn from "@/components/FadeIn";
 import EdgeFade from "./ui/EdgeFade";
 
-/**
- * iOS-safe Card Styles:
- * - overflow-hidden darf bleiben (Rundung), aber: kein gefilterter, großer Blur-Layer in der Card!
- * - ring-0/transition kann bleiben, will-change nur auf dem Container (nicht auf dem Glow).
- */
+/* ----------------------------------------------------
+   Base Styles (Performance & Eleganz)
+---------------------------------------------------- */
 const cardBase =
-  "relative flex flex-col rounded-2xl overflow-hidden border border-border/60 bg-card/90 shadow-sm ring-1 ring-black/0 transition-all will-change-transform";
-
+  "relative flex flex-col rounded-2xl border border-border/60 bg-card/90 shadow-sm ring-1 ring-black/0 transition-all";
 const hoverFx =
-  "hover:shadow-xl hover:ring-black/5 hover:border-border/80 motion-safe:hover:-translate-y-[1px]";
-
+  "hover:shadow-xl hover:ring-black/5 hover:border-border/80 motion-safe:hover:-translate-y-[2px]";
 const titleCls = "text-[17px] font-semibold font-heading tracking-tight";
 const textCls = "text-sm text-foreground/80 leading-6";
-
 const chipCls =
   "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium border-border/60 text-foreground/70 bg-background/60";
 
-/**
- * iOS-safe Glow:
- * - KEIN filter: blur()
- * - Reine Gradients mit breiten Stops → weicher Look ohne GPU-Overkill
- * - Schlanker Layer, innerhalb der Card, clipped durch overflow-hidden
- * - pointer-events-none + -z-10
- */
+/* ----------------------------------------------------
+   iOS-Safe Glow (keine Blurs, kein Overdraw)
+---------------------------------------------------- */
 const Glow = () => (
   <div
     aria-hidden
     className="absolute inset-0 pointer-events-none -z-10"
     style={{
-      // zwei überlagerte Radial-Gradients, weich durch große Farbstopps
       background:
-        "radial-gradient(240px 220px at 80% 18%, hsl(var(--primary)/0.16) 0%, transparent 70%)," +
-        "radial-gradient(260px 220px at 12% 86%, hsl(var(--muted-foreground)/0.12) 0%, transparent 72%)",
-      opacity: 1,
+        "linear-gradient(160deg, hsl(var(--primary)/0.08) 0%, transparent 70%)",
     }}
   />
 );
 
-// Mini Sparkline (SVG) – animiert
+/* ----------------------------------------------------
+   Sparkline (leicht animiert, sichtbar auf iOS)
+---------------------------------------------------- */
 function Sparkline({
-  points = [2, 4, 3, 6, 5, 8, 7, 10, 12, 11],
+  points = [3, 4, 4, 6, 5, 8, 7, 9, 12, 13],
 }: {
   points?: number[];
 }) {
@@ -66,38 +55,41 @@ function Sparkline({
     .map((y, i) => `${i === 0 ? "M" : "L"} ${i * 10} ${20 - (y / max) * 18}`)
     .join(" ");
   return (
-    <svg viewBox="0 0 100 22" className="w-full">
+    <svg viewBox="0 0 100 22" className="w-full text-primary">
       <motion.path
         d={d}
         fill="none"
-        stroke="currentColor"
-        className="text-primary"
+        stroke="hsl(var(--primary))"
         strokeWidth={2}
         initial={{ pathLength: 0 }}
         whileInView={{ pathLength: 1 }}
-        viewport={{ once: true, amount: 0.8 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
+        viewport={{ once: true, amount: 0.7 }}
+        transition={{ duration: 1.1, ease: "easeOut" }}
       />
     </svg>
   );
 }
 
-// Animierte Progress-Bar
+/* ----------------------------------------------------
+   Progress Bars (KPI Visualisierung)
+---------------------------------------------------- */
 function Progress({ value, delay = 0 }: { value: number; delay?: number }) {
   return (
     <div className="w-full h-2 overflow-hidden rounded-full bg-border/60">
       <motion.div
-        className="h-full rounded-full bg-primary"
+        className="h-full rounded-full bg-primary will-change-[width]"
         initial={{ width: 0 }}
         whileInView={{ width: `${value}%` }}
-        viewport={{ once: true, amount: 0.8 }}
+        viewport={{ once: true, amount: 0.6 }}
         transition={{ duration: 0.8, delay, ease: "easeOut" }}
       />
     </div>
   );
 }
 
-// Pille/KPI
+/* ----------------------------------------------------
+   KPI Chip (Icon + Label)
+---------------------------------------------------- */
 function Kpi({
   icon: Icon,
   label,
@@ -107,12 +99,15 @@ function Kpi({
 }) {
   return (
     <span className={chipCls}>
-      <Icon className="h-3.5 w-3.5" />
+      <Icon className="h-3.5 w-3.5 shrink-0" />
       {label}
     </span>
   );
 }
 
+/* ----------------------------------------------------
+   SECTION
+---------------------------------------------------- */
 export default function BentoGridSection() {
   return (
     <section
@@ -120,23 +115,24 @@ export default function BentoGridSection() {
       className="container py-18 scroll-mt-28 sm:py-24 lg:py-28"
       aria-labelledby="leistungen-title"
     >
+      {/* ---------- Intro ---------- */}
       <FadeIn>
         <div className="max-w-3xl mx-auto text-center">
           <h2
             id="leistungen-title"
             className="text-3xl font-bold tracking-tight font-heading sm:text-4xl"
           >
-            Ihre Vision, unser Handwerk.
+            Ihre Vision. Unser Handwerk.
           </h2>
           <p className="max-w-2xl mx-auto mt-4 text-base leading-7 text-foreground/80 sm:text-lg">
-            Strategisches Design trifft technologische Exzellenz – für digitale
-            Erlebnisse, die beeindrucken und messbar performen.
+            SMAIRYS vereint Design, Technologie und Strategie zu digitalen
+            Erlebnissen, die sichtbar performen – schnell, präzise, messbar.
           </p>
         </div>
       </FadeIn>
 
+      {/* ---------- GRID ---------- */}
       <FadeIn>
-        {/* Dichte 12-Spalten-Bento mit Auto-Row-Höhen */}
         <div
           className="
             mx-auto mt-12 grid max-w-7xl
@@ -145,7 +141,7 @@ export default function BentoGridSection() {
             md:grid-cols-12
           "
         >
-          {/* Web-Entwicklung – groß, mit KPI-Zeile */}
+          {/* ----------- Web-Entwicklung ----------- */}
           <motion.div
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-8 p-5 sm:p-6`}
@@ -155,20 +151,17 @@ export default function BentoGridSection() {
               <Code2 className="w-5 h-5 text-primary" />
               <h3 className={titleCls}>Premium Web-Entwicklung</h3>
             </div>
-
             <p className={`${textCls} mt-2`}>
               Handgeschriebener Code, modulare Architektur, kompromisslose
-              Performance – gebaut für Skalierung und Conversion.
+              Performance – entwickelt für Marken, die wachsen.
             </p>
 
-            {/* KPI Row – greifbare Beweise */}
             <div className="flex flex-wrap items-center gap-2 mt-4">
               <Kpi icon={Gauge} label="Lighthouse 98–100" />
-              <Kpi icon={Rocket} label="TTFB &lt; 100ms" />
+              <Kpi icon={Rocket} label="TTFB < 100 ms" />
               <Kpi icon={ShieldCheck} label="DSGVO & Hosting DE" />
             </div>
 
-            {/* Progress Trio */}
             <div className="grid grid-cols-3 gap-3 mt-5 text-xs text-foreground/70">
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -194,7 +187,7 @@ export default function BentoGridSection() {
             </div>
           </motion.div>
 
-          {/* SEO – Sparkline + Nutzenpunkte */}
+          {/* ----------- SEO ----------- */}
           <motion.div
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
@@ -205,8 +198,8 @@ export default function BentoGridSection() {
               <h3 className={titleCls}>Nachhaltiges SEO</h3>
             </div>
 
-            <div className="p-3 mt-3 border rounded-lg border-border/60 bg-background/50">
-              <Sparkline points={[3, 4, 4, 6, 5, 8, 7, 9, 12, 13]} />
+            <div className="p-3 mt-3 border rounded-lg border-border/60 bg-background/70">
+              <Sparkline />
             </div>
 
             <ul className="grid gap-1 pl-4 mt-3 text-sm list-disc text-foreground/75">
@@ -216,13 +209,13 @@ export default function BentoGridSection() {
             </ul>
 
             <div className="mt-3 flex flex-wrap gap-1.5">
-              <span className={chipCls}>+180% Sichtbarkeit</span>
+              <span className={chipCls}>+ 180 % Sichtbarkeit</span>
               <span className={chipCls}>Indexierung stabil</span>
               <span className={chipCls}>Schema-Markup</span>
             </div>
           </motion.div>
 
-          {/* Brand & Design – kompakt */}
+          {/* ----------- Design & Branding ----------- */}
           <motion.div
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
@@ -232,15 +225,14 @@ export default function BentoGridSection() {
               <Palette className="w-5 h-5 text-primary" />
               <h3 className={titleCls}>Markenidentität & Design</h3>
             </div>
-
             <p className={`${textCls} mt-2`}>
-              Konsistente Typografie, Skalierungs-Systeme, Komponenten – ein
-              Interface, das Vertrauen schafft.
+              Konsistente Typografie, modulare Systeme, sinnvolle Bewegung –
+              Design, das Vertrauen schafft.
             </p>
 
             <div className="mt-3 flex flex-wrap gap-1.5">
               <span className={chipCls}>Design-System</span>
-              <span className={chipCls}>Komponentenbibliothek</span>
+              <span className={chipCls}>Komponenten-Library</span>
               <span className={chipCls}>Motion-Guidelines</span>
             </div>
 
@@ -262,7 +254,7 @@ export default function BentoGridSection() {
             </div>
           </motion.div>
 
-          {/* Versprechen / CTA – breit, knackig */}
+          {/* ----------- CTA / Versprechen ----------- */}
           <motion.div
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-8 items-center justify-center text-center p-6`}
@@ -271,19 +263,18 @@ export default function BentoGridSection() {
             <div className="max-w-lg mx-auto">
               <div className="mb-2 inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-[11px] font-medium text-foreground/70">
                 <Sparkles className="h-3.5 w-3.5" />
-                <span>Von Idee zu Live-Go in 30 Tagen</span>
+                <span>Von der Idee zum Launch in 30 Tagen</span>
               </div>
               <h3 className="text-2xl font-bold font-heading">
                 Ihre Vision. Unsere Expertise.
               </h3>
               <p className="mt-2 text-sm text-foreground/80">
-                Wir bauen Lösungen, die Ziele nicht nur erreichen, sondern
-                übertreffen – messbar.
+                Wir entwickeln Lösungen, die Ihre Ziele nicht nur erreichen,
+                sondern übertreffen – messbar und nachhaltig.
               </p>
               <Link
                 href="#prozess"
                 className="inline-flex items-center justify-center gap-2 px-4 py-2 mt-4 text-sm font-semibold transition-colors border rounded-lg group border-border/60 bg-background/70 text-primary hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                aria-label="Zum Prozess springen"
               >
                 Unser Prozess
                 <ArrowRight
@@ -294,7 +285,7 @@ export default function BentoGridSection() {
             </div>
           </motion.div>
 
-          {/* Security/Compliance – schmal, prägnant */}
+          {/* ----------- Sicherheit ----------- */}
           <motion.div
             whileHover={{ scale: 1.01 }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
@@ -305,7 +296,7 @@ export default function BentoGridSection() {
               <h3 className={titleCls}>Sicherheit & Compliance</h3>
             </div>
             <p className={`${textCls} mt-2`}>
-              DSGVO-konform, Hosting in Deutschland, sichere Pipelines.
+              DSGVO-konform, Hosting in Deutschland, sichere Deploy-Pipelines.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
               <span className={chipCls}>ISO-27001 Cloud</span>

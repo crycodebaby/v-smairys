@@ -1,4 +1,3 @@
-// src/components/TestimonialCard.tsx
 "use client";
 
 import React from "react";
@@ -32,19 +31,20 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
   return (
     <FadeIn>
       <motion.article
-        whileHover={{ y: -6, transition: { type: "spring", stiffness: 300 } }}
-        className="flex flex-col h-full overflow-hidden shadow-sm rounded-2xl bg-card ring-1 ring-border/60"
+        whileHover={{ y: -4 }}
+        transition={{ type: "spring", stiffness: 250, damping: 25 }}
+        className="flex flex-col h-full overflow-hidden transition-all border shadow-sm rounded-2xl border-border/60 bg-card/90 ring-1 ring-black/0 hover:shadow-lg hover:ring-border/70"
       >
-        {/* Logo-Bereich */}
-        <div className="relative flex items-center justify-center w-full h-40 bg-muted/30">
-          <div className="relative w-64 h-28">
+        {/* Logo-Area */}
+        <div className="relative flex items-center justify-center w-full border-b bg-muted/30 border-border/50">
+          <div className="relative w-full max-w-[200px] aspect-[3/1] m-8">
             {logoSingle ? (
               <Image
                 src={logoSingle}
                 alt={`${company} Logo`}
                 fill
                 className="object-contain"
-                sizes="160px"
+                sizes="(max-width:768px) 60vw, (max-width:1200px) 30vw, 200px"
                 priority={false}
               />
             ) : (
@@ -54,8 +54,8 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
                     src={logoLight}
                     alt={`${company} Logo hell`}
                     fill
-                    className="block object-contain dark:hidden"
-                    sizes="160px"
+                    className="object-contain dark:hidden"
+                    sizes="(max-width:768px) 60vw, (max-width:1200px) 30vw, 200px"
                   />
                 )}
                 {logoDark && (
@@ -64,7 +64,7 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
                     alt={`${company} Logo dunkel`}
                     fill
                     className="hidden object-contain dark:block"
-                    sizes="160px"
+                    sizes="(max-width:768px) 60vw, (max-width:1200px) 30vw, 200px"
                   />
                 )}
               </>
@@ -72,15 +72,18 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
           </div>
         </div>
 
+        {/* Text-Content */}
         <div className="flex flex-col flex-1 p-6">
           {/* KPI Badge */}
-          <div className="inline-flex items-center self-start px-3 py-1 mb-4 text-xs font-medium rounded-full gap-x-2 bg-primary/10 text-primary">
-            <TrendingUp size={14} aria-hidden="true" />
-            <span>{kpi}</span>
-            {timeframe ? (
-              <span className="text-foreground/60">· {timeframe}</span>
-            ) : null}
-          </div>
+          {kpi && (
+            <div className="inline-flex items-center self-start px-3 py-1 mb-4 text-xs font-medium rounded-full gap-x-2 bg-primary/10 text-primary">
+              <TrendingUp size={14} aria-hidden="true" />
+              <span>{kpi}</span>
+              {timeframe && (
+                <span className="text-foreground/60">· {timeframe}</span>
+              )}
+            </div>
+          )}
 
           {/* Quote */}
           <blockquote className="text-foreground">
@@ -89,32 +92,36 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
             </p>
           </blockquote>
 
-          {/* Kunde + Name + Link */}
+          {/* Kunde */}
           <div className="flex items-center justify-between mt-5">
             <div>
               <p className="font-semibold">{name}</p>
-              <p className="text-sm text-foreground/60">{title}</p>
+              {title && <p className="text-sm text-foreground/60">{title}</p>}
             </div>
 
-            <Link
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Live Projekt von ${company} öffnen`}
-              className="p-2 transition-colors rounded-full hover:bg-foreground/5"
-            >
-              <ExternalLink
-                size={20}
-                className="transition-colors text-foreground/60 hover:text-primary"
-                aria-hidden="true"
-              />
-            </Link>
+            {url && (
+              <Link
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Live Projekt von ${company} öffnen`}
+                className="p-2 transition-colors rounded-full hover:bg-foreground/5"
+              >
+                <ExternalLink
+                  size={20}
+                  className="transition-colors text-foreground/60 hover:text-primary"
+                  aria-hidden="true"
+                />
+              </Link>
+            )}
           </div>
 
           {/* Kurz-Story */}
-          <p className="mt-5 text-sm leading-6 text-foreground/70 line-clamp-4">
-            {story}
-          </p>
+          {story && (
+            <p className="mt-5 text-sm leading-6 text-foreground/70 line-clamp-4">
+              {story}
+            </p>
+          )}
 
           {/* Services */}
           {services?.length ? (
