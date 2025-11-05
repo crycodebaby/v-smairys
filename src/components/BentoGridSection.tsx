@@ -122,11 +122,11 @@ export default function BentoGridSection() {
             id="leistungen-title"
             className="text-3xl font-bold tracking-tight font-heading sm:text-4xl"
           >
-            Ihre Vision. Unser Handwerk.
+            Deine Vision. Unser Handwerk.
           </h2>
           <p className="max-w-2xl mx-auto mt-4 text-base leading-7 text-foreground/80 sm:text-lg">
             SMAIRYS vereint Design, Technologie und Strategie zu digitalen
-            Erlebnissen, die sichtbar performen – schnell, präzise, messbar.
+            Erlebnissen, die sichtbar performen.
           </p>
         </div>
       </FadeIn>
@@ -266,11 +266,11 @@ export default function BentoGridSection() {
                 <span>Von der Idee zum Launch in 30 Tagen</span>
               </div>
               <h3 className="text-2xl font-bold font-heading">
-                Ihre Vision. Unsere Expertise.
+                Deine Vision. Unsere Expertise.
               </h3>
               <p className="mt-2 text-sm text-foreground/80">
-                Wir entwickeln Lösungen, die Ihre Ziele nicht nur erreichen,
-                sondern übertreffen – messbar und nachhaltig.
+                Wir entwickeln Lösungen, die deine Ziele nicht nur erreichen,
+                sondern übertreffen: messbar und nachhaltig.
               </p>
               <Link
                 href="#prozess"

@@ -15,12 +15,12 @@ const phases = [
   {
     icon: <Code2 className="w-10 h-10 text-primary" />,
     title: "Bauen",
-    text: "Ich programmiere deine Lösung, sauber, skalierbar, präzise – so, als wäre sie meine eigene.",
+    text: "Ich programmiere deine Lösung, sauber, skalierbar, präzise. So, als wäre sie meine eigene.",
   },
   {
     icon: <Rocket className="w-10 h-10 text-primary" />,
     title: "Begleiten",
-    text: "Nach dem Launch bleibe ich an deiner Seite – für Updates, Wachstum und neue Ideen.",
+    text: "Nach dem Launch bleibe ich an deiner Seite; für Updates, Wachstum und neue Ideen.",
   },
 ];
 

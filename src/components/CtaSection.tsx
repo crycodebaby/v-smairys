@@ -56,13 +56,13 @@ export default function CtaSection() {
                 id="cta-heading"
                 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl md:text-5xl"
               >
-                Bereit, das nächste Kapitel Ihrer Marke zu schreiben?
+                Bereit, das nächste Kapitel deiner Marke zu schreiben?
               </h2>
 
               <p className="max-w-2xl mx-auto mt-4 text-base leading-7 text-foreground/85 sm:mt-6 sm:text-lg">
-                Ich entwickle Websites, die sich wie Ihre Marke anfühlen:
-                persönlich, präzise und mit Substanz. Lassen Sie uns
-                herausfinden, was Ihre Vision verdient.
+                Ich entwickle Websites, die sich wie deine Marke anfühlen:
+                persönlich, präzise und mit Substanz. Lass uns herausfinden, was
+                deine Vision verdient.
               </p>
 
               <div className="flex flex-col items-center justify-center gap-4 mt-10 sm:flex-row">
