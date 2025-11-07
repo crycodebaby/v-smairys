@@ -9,8 +9,8 @@ import { Menu, X, User, Shield } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle"; // alias: robust, egal wo diese Datei liegt
 
 const navLinks = [
-  { name: "Leistungen", href: "#leistungen" },
-  { name: "Prozess", href: "#prozess" },
+  { name: "Leistungen", href: "/leistungen" },
+  { name: "Aktuelles Projekt", href: "/projekt" },
   // Kontakt ist als Primary-CTA separat
 ];
 

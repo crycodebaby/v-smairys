@@ -1,11 +1,32 @@
 // src/components/SocialProof.tsx
-import Image from "next/image";
+import ScrollingLogos from "@/components/ui/ScrollingLogos";
 
 const logos = [
-  { name: "Partner 1", src: "/socialproof/socialproof1.png" },
-  { name: "Partner 2", src: "/socialproof/socialproof2.png" },
-  { name: "Partner 3", src: "/socialproof/socialproof3.png" },
-  { name: "Partner 4", src: "/socialproof/socialproof4.png" },
+  {
+    id: "p1",
+    name: "Partner 1",
+    image: "/socialproof/socialproof1.png",
+    height: "h-7 md:h-9",
+  },
+  {
+    id: "p2",
+    name: "Partner 2",
+    image: "/socialproof/socialproof2.png",
+    height: "h-7 md:h-9",
+  },
+  {
+    id: "p3",
+    name: "Partner 3",
+    image: "/socialproof/socialproof3.png",
+    height: "h-7 md:h-9",
+  },
+  {
+    id: "p4",
+    name: "Partner 4",
+    image: "/socialproof/socialproof4.png",
+    height: "h-7 md:h-9",
+  },
+  // → empfehlenswert sind 8–12 unterschiedliche Logos
 ];
 
 export default function SocialProof() {
@@ -17,7 +38,6 @@ export default function SocialProof() {
     >
       <div className="container text-center">
         <div className="max-w-4xl mx-auto">
-          {/* Überschrift */}
           <h2
             id="socialproof-heading"
             className="text-sm font-semibold tracking-wider uppercase text-foreground/70"
@@ -25,7 +45,6 @@ export default function SocialProof() {
             Vertrauenspartner führender Unternehmen
           </h2>
 
-          {/* Frosted Panel */}
           <div
             className="
               mx-auto mt-6 rounded-2xl border border-border/60 bg-background/60
@@ -34,35 +53,22 @@ export default function SocialProof() {
               transition
             "
           >
-            {/* Hairline oben */}
             <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
 
             <div className="px-4 py-6 sm:px-6 sm:py-8">
-              <div className="grid items-center grid-cols-2 logo-mono gap-x-6 gap-y-6 sm:grid-cols-4 sm:gap-x-8 sm:gap-y-8">
-                {logos.map((logo) => (
-                  <figure
-                    key={logo.name}
-                    className="relative flex items-center justify-center w-full h-20 sm:h-24 md:h-28"
-                    aria-label={logo.name}
-                  >
-                    <Image
-                      src={logo.src}
-                      alt={logo.name}
-                      fill
-                      sizes="(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 220px"
-                      className="object-contain p-1.5 sm:p-2 [image-rendering:-webkit-optimize-contrast]"
-                      priority={false}
-                    />
-                  </figure>
-                ))}
-              </div>
+              <ScrollingLogos
+                logos={logos}
+                speed="normal"
+                direction="left"
+                pauseOnHover
+                subtle
+                className="mx-auto"
+              />
             </div>
 
-            {/* Hairline unten */}
             <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
           </div>
 
-          {/* Unterzeile */}
           <p className="mt-5 text-sm text-foreground/70">
             <span className="font-medium text-foreground">
               +112% durchschnittliches Anfragewachstum
