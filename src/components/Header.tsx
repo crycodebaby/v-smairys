@@ -100,7 +100,7 @@ const Header: React.FC = () => {
 
             {/* Primary CTA */}
             <Link
-              href="#kontakt"
+              href="/kontakt"
               className="items-center justify-center hidden px-4 py-2 text-sm font-semibold transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 md:inline-flex"
             >
               Kontakt

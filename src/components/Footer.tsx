@@ -118,10 +118,10 @@ export default function Footer() {
               <ul className="mt-4 space-y-2">
                 {[
                   { href: "/leistungen", label: "Leistungen" },
-                  { href: "/#prozess", label: "Aktuelles Projekt" }, // konsistent mit Header
+                  { href: "/projekt", label: "Aktuelles Projekt" },
                   { href: "/#testimonials", label: "Partner" },
                   { href: "/#faq", label: "FAQ" },
-                  { href: "/#kontakt", label: "Kontakt" },
+                  { href: "/kontakt", label: "Kontakt" },
                 ].map((link) => (
                   <li key={link.href}>
                     <Link
