@@ -1,4 +1,3 @@
-// src/components/leistungen/ServiceFigure3D.tsx
 "use client";
 
 import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
@@ -55,10 +54,20 @@ function useGlassMaterial(theme?: string): THREE.MeshPhysicalMaterial {
     [tint, theme]
   );
 
-  // tidy up GPU memory on unmount
-  useEffect(() => () => mat.dispose(), [mat]);
-
+  useEffect(() => () => mat.dispose(), [mat]); // tidy up GPU memory on unmount
   return mat;
+}
+
+/** Element-Typ mit Pointer-Capture-APIs */
+type PointerCaptureElement = Element & {
+  setPointerCapture(id: number): void;
+  releasePointerCapture(id: number): void;
+};
+
+function isPointerCaptureElement(
+  el: Element | null
+): el is PointerCaptureElement {
+  return !!el && "setPointerCapture" in el && "releasePointerCapture" in el;
 }
 
 type SculptureProps = {
@@ -90,21 +99,29 @@ function Sculpture({ variant, mat, active, reduced }: SculptureProps) {
     g.rotation.set(lerped.current.rx, lerped.current.ry, 0);
   });
 
-  // Pointer handlers (no any, capture pointer for stable drags)
+  // Pointer handlers (typ-sicher, ohne any)
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
-    e.target.setPointerCapture?.(e.pointerId);
+    const el = e.target as unknown as Element | null; // ThreeEvent.target ist ein generisches EventTarget
+    if (isPointerCaptureElement(el)) {
+      el.setPointerCapture(e.pointerId);
+    }
     setDragging(true);
   };
+
   const endDrag = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
-    try {
-      e.target.releasePointerCapture?.(e.pointerId);
-    } catch {
-      /* noop */
+    const el = e.target as unknown as Element | null;
+    if (isPointerCaptureElement(el)) {
+      try {
+        el.releasePointerCapture(e.pointerId);
+      } catch {
+        /* noop */
+      }
     }
     setDragging(false);
   };
+
   const onPointerMove = (e: ThreeEvent<PointerEvent>) => {
     if (!dragging) return;
     const dx = e.movementX ?? 0;
@@ -186,8 +203,13 @@ export default function ServiceFigure3D({
   className?: string;
 }) {
   const { resolvedTheme } = useTheme();
+
+  // HTMLDivElement-Ref für DOM, aber Hook erwartet Element → sauber beim Aufruf casten
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(wrapperRef, { threshold: 0.35 });
+  const inView = useInView(wrapperRef as unknown as React.RefObject<Element>, {
+    threshold: 0.35,
+  });
+
   const reduced = useReducedMotion();
   const mat = useGlassMaterial(resolvedTheme);
 
@@ -226,7 +248,7 @@ export default function ServiceFigure3D({
           state.gl.toneMappingExposure = 1.05;
         }}
       >
-        {/* Light — warm key + cool fill, markenkonform */}
+        {/* Light — warm key + cool fill */}
         <ambientLight intensity={0.25} />
         <directionalLight
           position={[2, 2, 3]}
