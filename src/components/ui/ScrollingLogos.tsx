@@ -12,6 +12,8 @@ type Logo = {
   image?: string;
   /** z.B. "h-6 md:h-8" */
   height?: string;
+  /** Zusätzliche Klassen am Wrapper, z.B. "dark:hidden" */
+  className?: string;
 };
 
 type Speed = "slow" | "normal" | "fast";
@@ -82,7 +84,8 @@ export default function ScrollingLogos({
               className={cn(
                 "mx-8 flex items-center whitespace-nowrap",
                 subtle &&
-                  "opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
+                  "opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0",
+                logo.className
               )}
             >
               {logo.svg ? (

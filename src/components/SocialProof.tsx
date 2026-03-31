@@ -1,6 +1,8 @@
 // src/components/SocialProof.tsx
 import ScrollingLogos from "@/components/ui/ScrollingLogos";
 
+// Für Logos mit hell/dunkel-Varianten: zwei Einträge mit className-Sichtbarkeit.
+// Für Logos ohne Variante (Szalontai): ein Eintrag, der in beiden Themes funktioniert.
 const logos = [
   {
     id: "ergart",
@@ -20,7 +22,7 @@ const logos = [
     name: "Eppelstyle",
     image: "/testimonials/eppelstyle-weiß.png",
     height: "h-7 md:h-9",
-    className: "hidden dark:block",
+    className: "hidden dark:flex",
   },
   {
     id: "crncic-light",
@@ -34,7 +36,15 @@ const logos = [
     name: "Crncic Bausanierung GmbH",
     image: "/testimonials/crncic-weiß.png",
     height: "h-7 md:h-9",
-    className: "hidden dark:block",
+    className: "hidden dark:flex",
+  },
+  {
+    id: "szalontai",
+    name: "Sportgerätevertrieb Szalontai",
+    image: "/testimonials/szalontai.jpg",
+    height: "h-8 md:h-10",
+    // Im Dark-Mode leicht aufgehellt, da das Logo einen weißen Hintergrund hat
+    className: "dark:brightness-90 dark:contrast-110 rounded",
   },
 ];
 

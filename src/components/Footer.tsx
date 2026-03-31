@@ -171,7 +171,7 @@ export default function Footer() {
             <span className="font-heading text-foreground/80">© {year}</span>{" "}
             <span className="text-foreground/70">SMAIRYS&nbsp;Netz-Manufaktur</span>
             <span className="block mt-1 text-[12px] text-foreground/55 sm:inline sm:mt-0 sm:ml-1">
-              · Robin Schmeiries · Heusweiler, Saarland
+              · Robin Schmeiries · Eppelborn, Saarland
             </span>
           </p>
         </motion.div>
