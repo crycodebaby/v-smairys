@@ -28,9 +28,25 @@ const inter = Inter({
 
 /* -------------------- METADATA -------------------- */
 export const metadata: Metadata = {
-  title: "Smairys Netz-Manufaktur | Premium Websites & SEO",
+  metadataBase: new URL("https://smairys-netz-manufaktur.de"),
+  title: {
+    default: "SMAIRYS Netz-Manufaktur – Websites für Handwerker & Betriebe",
+    template: "%s | SMAIRYS Netz-Manufaktur",
+  },
   description:
-    "Wir schmieden Ihre digitale Präsenz. Handgefertigte Premium-Websites, die überzeugen und nachhaltiges Wachstum durch SEO generieren.",
+    "Handgefertigte Websites mit technischem SEO für Handwerker und regionale Betriebe im Saarland. Messbar mehr Anfragen – persönlich begleitet.",
+  openGraph: {
+    siteName: "SMAIRYS Netz-Manufaktur",
+    locale: "de_DE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 /* -------------------- ROOT LAYOUT -------------------- */

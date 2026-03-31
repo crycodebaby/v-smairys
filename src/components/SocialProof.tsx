@@ -3,30 +3,39 @@ import ScrollingLogos from "@/components/ui/ScrollingLogos";
 
 const logos = [
   {
-    id: "p1",
-    name: "Partner 1",
-    image: "/socialproof/socialproof1.png",
-    height: "h-7 md:h-9",
+    id: "ergart",
+    name: "Ergart GmbH",
+    image: "/testimonials/ergart-logo.png",
+    height: "h-8 md:h-10",
   },
   {
-    id: "p2",
-    name: "Partner 2",
-    image: "/socialproof/socialproof2.png",
+    id: "eppelstyle-light",
+    name: "Eppelstyle",
+    image: "/testimonials/eppelstyle-schwarz.png",
     height: "h-7 md:h-9",
+    className: "dark:hidden",
   },
   {
-    id: "p3",
-    name: "Partner 3",
-    image: "/socialproof/socialproof3.png",
+    id: "eppelstyle-dark",
+    name: "Eppelstyle",
+    image: "/testimonials/eppelstyle-weiß.png",
     height: "h-7 md:h-9",
+    className: "hidden dark:block",
   },
   {
-    id: "p4",
-    name: "Partner 4",
-    image: "/socialproof/socialproof4.png",
+    id: "crncic-light",
+    name: "Crncic Bausanierung GmbH",
+    image: "/testimonials/crncic-schwarz.png",
     height: "h-7 md:h-9",
+    className: "dark:hidden",
   },
-  // → empfehlenswert sind 8–12 unterschiedliche Logos
+  {
+    id: "crncic-dark",
+    name: "Crncic Bausanierung GmbH",
+    image: "/testimonials/crncic-weiß.png",
+    height: "h-7 md:h-9",
+    className: "hidden dark:block",
+  },
 ];
 
 export default function SocialProof() {
@@ -42,7 +51,7 @@ export default function SocialProof() {
             id="socialproof-heading"
             className="text-sm font-semibold tracking-wider uppercase text-foreground/70"
           >
-            Vertrauenspartner führender Unternehmen
+            Unternehmen aus Handwerk, Bau und Service in der Region
           </h2>
 
           <div
@@ -71,9 +80,9 @@ export default function SocialProof() {
 
           <p className="mt-5 text-sm text-foreground/70">
             <span className="font-medium text-foreground">
-              +112% durchschnittliches Anfragewachstum
+              Kunden seit 2023
             </span>{" "}
-            in den ersten 90&nbsp;Tagen nach Relaunch.
+            · Region Saarland · Webentwicklung, SEO, Betreuung
           </p>
         </div>
       </div>

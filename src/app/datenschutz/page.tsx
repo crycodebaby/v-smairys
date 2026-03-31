@@ -5,14 +5,18 @@ import LegalSection from "@/components/legal/LegalSection";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Datenschutzerklärung – Smairys Netz-Manufaktur",
+  title: "Datenschutzerklärung – SMAIRYS Netz-Manufaktur",
   description:
     "Informationen zur Verarbeitung personenbezogener Daten nach DSGVO.",
-  alternates: { canonical: "/datenschutz" },
+  alternates: { canonical: "https://smairys-netz-manufaktur.de/datenschutz" },
   openGraph: {
-    title: "Datenschutzerklärung – Smairys Netz-Manufaktur",
-    url: "/datenschutz",
+    title: "Datenschutzerklärung – SMAIRYS Netz-Manufaktur",
+    url: "https://smairys-netz-manufaktur.de/datenschutz",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Datenschutzerklärung – SMAIRYS Netz-Manufaktur",
   },
 };
 
@@ -30,7 +34,7 @@ export default function DatenschutzPage() {
       >
         <LegalSection title="Verantwortlicher">
           <p>
-            <strong>Smairys Netz-Manufaktur</strong> – Robin Schmeiries
+            <strong>SMAIRYS Netz-Manufaktur</strong> – Robin Schmeiries
             <br />
             Kirschhofer Straße 15b, 66265 Heusweiler, Deutschland
             <br />

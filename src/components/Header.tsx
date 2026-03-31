@@ -5,19 +5,17 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, User, Shield } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle"; // alias: robust, egal wo diese Datei liegt
+import { Menu, X } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navLinks = [
   { name: "Leistungen", href: "/leistungen" },
-  { name: "Aktuelles Projekt", href: "/projekt" },
-  // Kontakt ist als Primary-CTA separat
+  { name: "Case Study", href: "/projekte/ergart" },
 ];
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Body scroll lock + ESC zum Schließen
   useEffect(() => {
     if (isMobileMenuOpen) {
       const original = document.body.style.overflow;
@@ -36,7 +34,7 @@ const Header: React.FC = () => {
     <>
       <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-background/80 backdrop-blur-lg dark:border-white/10">
         <div className="container flex items-center justify-between h-24 mx-auto">
-          {/* Flicker-freies Logo */}
+          {/* Logo */}
           <Link href="/" aria-label="Zurück zur Startseite">
             <motion.div
               whileHover={{ scale: 1.05, rotate: -1 }}
@@ -45,14 +43,14 @@ const Header: React.FC = () => {
               <div className="relative w-48 h-16">
                 <Image
                   src="/logo/smairys-black.png"
-                  alt="Smairys Logo (helles Theme)"
+                  alt="SMAIRYS Netz-Manufaktur Logo (helles Theme)"
                   fill
                   priority
                   className="object-contain dark:hidden"
                 />
                 <Image
                   src="/logo/smairys.png"
-                  alt="Smairys Logo (dunkles Theme)"
+                  alt="SMAIRYS Netz-Manufaktur Logo (dunkles Theme)"
                   fill
                   priority
                   className="hidden object-contain dark:block"
@@ -62,7 +60,7 @@ const Header: React.FC = () => {
           </Link>
 
           {/* Desktop-Navigation */}
-          <nav className="items-center hidden gap-x-8 md:flex">
+          <nav className="items-center hidden gap-x-8 md:flex" aria-label="Hauptnavigation">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -74,36 +72,13 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* Right cluster */}
+          {/* Rechts: CTA + Theme */}
           <div className="flex items-center gap-x-2 sm:gap-x-4">
-            {/* Optional: dezente Utility-Links ab sm */}
-            <div className="items-center hidden gap-x-4 sm:flex">
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 text-sm transition-all border rounded-full group gap-x-2 border-primary/50 text-primary hover:border-primary hover:bg-primary/10"
-              >
-                <User size={16} />
-                <span>Kunden-Login</span>
-              </a>
-              <a
-                href="#"
-                aria-label="Admin Dashboard"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors text-foreground/50 hover:text-primary"
-              >
-                <Shield size={20} />
-              </a>
-            </div>
-
-            {/* Primary CTA */}
             <Link
               href="/kontakt"
               className="items-center justify-center hidden px-4 py-2 text-sm font-semibold transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 md:inline-flex"
             >
-              Kontakt
+              Gespräch buchen
             </Link>
 
             <ThemeToggle />
@@ -128,6 +103,9 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <motion.div
             id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobilmenü"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -143,7 +121,7 @@ const Header: React.FC = () => {
               </button>
             </div>
 
-            <nav className="flex flex-col items-center mt-6 space-y-8">
+            <nav className="flex flex-col items-center mt-6 space-y-8" aria-label="Mobile Navigation">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -155,38 +133,17 @@ const Header: React.FC = () => {
                 </Link>
               ))}
 
-              <div className="w-full my-6 border-t border-white/10" />
+              <div className="w-full my-6 border-t border-border/30" />
 
               <Link
-                href="#kontakt"
+                href="/kontakt"
                 className="inline-flex items-center justify-center px-8 py-3 text-xl font-semibold transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Kontakt
+                Gespräch buchen
               </Link>
 
-              {/* Utility-Links auch mobil verfügbar */}
-              <div className="flex flex-col items-center gap-6 mt-4">
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center text-lg gap-x-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <User size={20} />
-                  <span>Kunden-Login</span>
-                </a>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Admin Dashboard"
-                  className="text-foreground/60"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Shield size={22} />
-                </a>
+              <div className="mt-4">
                 <ThemeToggle />
               </div>
             </nav>

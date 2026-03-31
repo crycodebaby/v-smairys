@@ -4,14 +4,18 @@ import LegalLayout from "@/components/legal/LegalLayout";
 import LegalSection from "@/components/legal/LegalSection";
 
 export const metadata: Metadata = {
-  title: "Impressum – Smairys Netz-Manufaktur",
+  title: "Impressum – SMAIRYS Netz-Manufaktur",
   description:
-    "Anbieterkennzeichnung (Impressum) der Smairys Netz-Manufaktur nach § 5 TMG und § 18 Abs. 2 MStV.",
-  alternates: { canonical: "/impressum" },
+    "Anbieterkennzeichnung (Impressum) der SMAIRYS Netz-Manufaktur nach § 5 TMG und § 18 Abs. 2 MStV.",
+  alternates: { canonical: "https://smairys-netz-manufaktur.de/impressum" },
   openGraph: {
-    title: "Impressum – Smairys Netz-Manufaktur",
-    url: "/impressum",
+    title: "Impressum – SMAIRYS Netz-Manufaktur",
+    url: "https://smairys-netz-manufaktur.de/impressum",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Impressum – SMAIRYS Netz-Manufaktur",
   },
 };
 

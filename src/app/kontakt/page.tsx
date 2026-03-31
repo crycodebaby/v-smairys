@@ -7,21 +7,27 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Kontakt – SMAIRYS Netz-Manufaktur",
   description:
-    "Kontaktieren Sie SMAIRYS für ein fokussiertes Erstgespräch. Schnell, präzise und ohne Verkaufsdruck.",
-  alternates: { canonical: "/kontakt" },
+    "Jetzt kostenfreies Erstgespräch buchen. 20 Minuten, kein Verkaufsdruck – Robin Schmeiries meldet sich persönlich.",
+  alternates: { canonical: "https://smairys-netz-manufaktur.de/kontakt" },
   openGraph: {
     title: "Kontakt – SMAIRYS Netz-Manufaktur",
     description:
-      "Kontaktieren Sie SMAIRYS für ein fokussiertes Erstgespräch. Schnell, präzise und ohne Verkaufsdruck.",
-    url: "/kontakt",
+      "Jetzt kostenfreies Erstgespräch buchen. 20 Minuten, kein Verkaufsdruck.",
+    url: "https://smairys-netz-manufaktur.de/kontakt",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kontakt – SMAIRYS Netz-Manufaktur",
+    description:
+      "Jetzt kostenfreies Erstgespräch buchen. 20 Minuten, kein Verkaufsdruck.",
   },
 };
 
 export default function KontaktPage() {
   return (
     <main className="relative isolate">
-      {/* dezente Atmosphäre */}
+      {/* Atmosphäre */}
       <div aria-hidden className="absolute inset-0 pointer-events-none -z-10">
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.03),transparent_20%,transparent_80%,rgba(0,0,0,0.04))]" />
         <div className="absolute left-1/2 top-[-6rem] h-[26rem] w-[26rem] -translate-x-1/2 rounded-full blur-3xl bg-[radial-gradient(closest-side,hsl(var(--primary)/0.10),transparent_70%)]" />
@@ -36,21 +42,22 @@ export default function KontaktPage() {
             Sprechen wir über Ihr Vorhaben
           </h1>
           <p className="max-w-2xl mx-auto mt-3 text-base text-foreground/80 sm:text-lg">
-            Kurz, konkret, wertschöpfend. Kein Verkaufsdruck – nur Klarheit.
+            20 Minuten, kein Pitch, kein Verkaufsdruck – nur ein ehrliches
+            Gespräch über Ihre Ziele.
           </p>
         </header>
 
-        {/* Booking-CTA prominent oben, spannt auf mobilen Geräten über die volle Breite */}
+        {/* Booking-CTA */}
         <div className="max-w-5xl mx-auto mt-10">
           <BookingCard />
         </div>
 
-        {/* 2 Spalten ab md: links Info, rechts Formular */}
+        {/* 2 Spalten: Info + Formular */}
         <div className="grid max-w-5xl grid-cols-1 gap-8 mx-auto mt-8 md:grid-cols-2">
           {/* Info-Card */}
           <div className="p-6 border shadow-sm rounded-2xl border-border/60 bg-card/80 backdrop-blur-xl sm:p-7">
             <h2 className="text-xl font-semibold tracking-tight font-heading">
-              Direkte Kontaktwege
+              Direkter Kontakt
             </h2>
             <ul className="mt-4 space-y-3 text-sm text-foreground/80">
               <li>
@@ -63,14 +70,14 @@ export default function KontaktPage() {
                 </a>
               </li>
               <li>Telefon: 0160&nbsp;5539220</li>
-              <li>Standort: 66265 Heusweiler (DE)</li>
+              <li>Standort: 66265 Heusweiler, Saarland</li>
             </ul>
 
             <div className="mt-6 text-sm text-foreground/70">
               <p>
                 Sie bevorzugen einen festen Termin? Nutzen Sie die Buchung oben
-                oder schreiben Sie kurz Ihr Ziel und Wunschzeitfenster; wir
-                melden uns mit einem Slot.
+                oder schreiben Sie kurz Ihr Ziel – ich melde mich innerhalb von
+                24 Stunden persönlich.
               </p>
               <p className="mt-3">
                 Rechtliches:{" "}
@@ -80,7 +87,7 @@ export default function KontaktPage() {
                 >
                   Impressum
                 </Link>{" "}
-                ·{" "}
+                &middot;{" "}
                 <Link
                   href="/datenschutz"
                   className="underline decoration-foreground/30 underline-offset-4 hover:text-primary"
