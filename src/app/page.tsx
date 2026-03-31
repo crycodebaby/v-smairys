@@ -41,13 +41,13 @@ const jsonLd = {
   description:
     "Handgefertigte Websites, technisches SEO und digitale Betreuung für Handwerker und Betriebe.",
   url: "https://smairys-netz-manufaktur.de",
-  telephone: "+49160 5539220",
-  email: "robin@smairys-netz-manufaktur.de",
+  telephone: "+4916055392220",
+  email: "robin@smairys.de",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Kirschhofer Straße 15b",
-    addressLocality: "Heusweiler",
-    postalCode: "66265",
+    streetAddress: "Zur Steinrausche 22",
+    addressLocality: "Eppelborn",
+    postalCode: "66571",
     addressCountry: "DE",
   },
   founder: {

@@ -37,21 +37,21 @@ export default function ImpressumPage() {
             <br />
             Robin Schmeiries
             <br />
-            Kirschhofer Straße 15b
+            Zur Steinrausche 22
             <br />
-            66265 Heusweiler
+            66571 Eppelborn
             <br />
             Deutschland
           </p>
           <p>
-            Telefon: 0160&nbsp;5539220
+            Telefon: 0160&nbsp;55&nbsp;39&nbsp;22&nbsp;0
             <br />
             E-Mail:{" "}
             <a
-              href="mailto:robin@smairys-netz-manufaktur.de"
+              href="mailto:robin@smairys.de"
               className="underline hover:no-underline"
             >
-              robin@smairys-netz-manufaktur.de
+              robin@smairys.de
             </a>
           </p>
         </LegalSection>
@@ -68,7 +68,7 @@ export default function ImpressumPage() {
         </LegalSection>
 
         <LegalSection title="Inhaltlich Verantwortlicher">
-          <p>Gemäß § 18 Abs. 2 MStV: Robin Schmeiries, Anschrift wie oben.</p>
+          <p>Gemäß § 18 Abs. 2 MStV: Robin Schmeiries, Zur Steinrausche 22, 66571 Eppelborn.</p>
         </LegalSection>
 
         <LegalSection title="Berufsrechtliche Angaben">
