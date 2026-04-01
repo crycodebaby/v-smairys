@@ -22,24 +22,24 @@ const PILLARS: Pillar[] = [
     label: "Sichtbarkeit",
     text: "Gefunden werden, bevor Ihre Konkurrenz angerufen wird.",
     sub: "Technisches SEO, das nachweislich rankt.",
-    color: "#b2ef80",
-    glow: "rgba(178,239,128,0.18)",
+    color: "#6f8cff",
+    glow: "rgba(111,140,255,0.16)",
     order: 0,
   },
   {
     label: "Vertrauen",
     text: "Ein professioneller erster Eindruck entscheidet vor dem ersten Gespräch.",
     sub: "Design und Substanz, die bleiben.",
-    color: "#37e5da",
-    glow: "rgba(55,229,218,0.18)",
+    color: "#7fd1ff",
+    glow: "rgba(127,209,255,0.16)",
     order: 1,
   },
   {
     label: "Anfragen",
     text: "Aus Besuchern werden Gespräche, wenn Struktur und Klarheit stimmen.",
     sub: "Conversion-Architektur, nicht Baukastenlogik.",
-    color: "#ecfbdf",
-    glow: "rgba(236,251,223,0.14)",
+    color: "#edf3fb",
+    glow: "rgba(237,243,251,0.12)",
     order: 2,
   },
 ];
@@ -160,7 +160,7 @@ function PillarCard({
       {/* main text */}
       <p
         className="text-base sm:text-lg font-medium leading-snug text-balance relative z-10"
-        style={{ color: "#ecfbdf" }}
+        style={{ color: "#edf3fb" }}
       >
         {pillar.text}
       </p>
@@ -168,7 +168,7 @@ function PillarCard({
       {/* sub */}
       <p
         className="text-sm leading-relaxed relative z-10 mt-auto"
-        style={{ color: "rgba(236,251,223,0.45)" }}
+        style={{ color: "rgba(237,243,251,0.45)" }}
       >
         {pillar.sub}
       </p>
@@ -266,7 +266,7 @@ export default function SignalEngineSection() {
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
-        style={{ background: "#0f1511" }}
+        style={{ background: "#0c1118" }}
       />
       {/* ambient radial glow */}
       <div
@@ -299,14 +299,14 @@ export default function SignalEngineSection() {
         >
           <p
             className="text-xs font-semibold tracking-[0.22em] uppercase mb-4"
-            style={{ color: "#b2ef80" }}
+            style={{ color: "#6f8cff" }}
           >
             Was eine starke Website wirklich leisten muss
           </p>
           <h2
             id="se-heading"
             className="text-3xl font-bold tracking-tight text-balance sm:text-5xl"
-            style={{ color: "#ecfbdf" }}
+            style={{ color: "#edf3fb" }}
           >
             Sichtbarkeit.&nbsp;Vertrauen.&nbsp;Anfragen.
           </h2>
@@ -404,9 +404,9 @@ export default function SignalEngineSection() {
             href="/leistungen"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200"
             style={{
-              background: "#b2ef80",
-              color: "#091002",
-              boxShadow: "0 8px 24px -8px rgba(178,239,128,0.40)",
+              background: "#6f8cff",
+              color: "#0c1118",
+              boxShadow: "0 8px 24px -8px rgba(111,140,255,0.38)",
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLAnchorElement).style.filter = "brightness(1.08)";

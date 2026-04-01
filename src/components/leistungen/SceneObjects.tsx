@@ -45,9 +45,9 @@ export default function SceneObjects({ theme, tier }: Props) {
       window.removeEventListener("smairys-act", handler as EventListener);
   }, []);
 
-  // Theme-Tint – neues gedämpftes Brand-System
+  // Theme-Tint – Midnight / Steel Blue Brand-System
   const tint = useMemo(
-    () => new THREE.Color(theme === "light" ? "#1d2a21" : "#c8dab8"),
+    () => new THREE.Color(theme === "light" ? "#1c2a3d" : "#c8d8f0"),
     [theme]
   );
 
