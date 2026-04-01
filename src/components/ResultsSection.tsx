@@ -65,9 +65,12 @@ export default function ResultsSection() {
             {stats.map((s, i) => (
               <motion.div
                 key={i}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className="relative flex flex-col p-6 border rounded-2xl border-border/60 bg-card/80 shadow-sm hover:shadow-md transition-all"
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.5, delay: i * 0.08, ease: "easeOut" }}
+                whileHover={{ y: -3, boxShadow: "0 12px 32px -8px rgba(0,0,0,0.18)" }}
+                className="relative flex flex-col p-6 border rounded-2xl border-border/60 bg-card/80 shadow-sm transition-colors"
               >
                 <div
                   aria-hidden

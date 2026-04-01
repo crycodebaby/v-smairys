@@ -74,7 +74,7 @@ export default function Home() {
       -------------------------------------------------- */}
       <section
         id="hero"
-        className="relative min-h-[90vh] overflow-hidden py-24 sm:py-32"
+        className="relative min-h-[90vh] py-24 sm:py-32"
       >
         <div className="absolute inset-0 pointer-events-none -z-20">
           <BackgroundGrid />

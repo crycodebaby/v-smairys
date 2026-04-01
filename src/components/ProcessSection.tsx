@@ -28,7 +28,7 @@ export default function ProcessSection() {
   return (
     <section
       id="prozess"
-      className="relative py-24 overflow-hidden sm:py-32 scroll-mt-28"
+      className="relative py-24 sm:py-32 scroll-mt-28"
     >
       <FadeIn>
         <div className="max-w-3xl mx-auto text-center">

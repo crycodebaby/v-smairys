@@ -98,21 +98,24 @@ export default function CaseStudyPreview() {
               </div>
             </div>
 
-            {/* Rechte Seite: Firmenzentrale Foto */}
-            <div className="relative min-h-[280px] md:min-h-full overflow-hidden md:rounded-r-3xl">
+            {/* Rechte Seite: Firmenzentrale Foto mit dezenter Parallax */}
+            <motion.div
+              className="relative min-h-[280px] md:min-h-full overflow-hidden md:rounded-r-3xl"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
               <Image
                 src="/case-studies/ergart/firmenzentrale.webp"
                 alt="Firmenzentrale Ergart GmbH mit Firmenfahrzeugen im Saarland"
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-700"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
-              {/* subtle overlay for text legibility if needed */}
               <div
                 aria-hidden
                 className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"
               />
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </FadeIn>

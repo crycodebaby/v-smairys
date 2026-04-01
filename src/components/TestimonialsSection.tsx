@@ -29,7 +29,7 @@ export default function TestimonialsSection() {
   return (
     <section
       id="testimonials"
-      className="relative py-24 overflow-hidden isolate sm:py-32"
+      className="relative py-24 sm:py-32"
     >
       {/* subtile Lichtquelle */}
       <BlurCircle className="-top-24 -right-40 opacity-70" />

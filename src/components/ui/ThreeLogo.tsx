@@ -249,12 +249,12 @@ function LogoModel({
     const rotScroll = profile.scrollRot(p); // Euler (x,y,z)
 
     // ── Idle (profilabhängig) ────────────────────────────────────────────────
-    const idleYaw = Math.sin(state.clock.elapsedTime * 0.6) * profile.idle.yaw;
+    const idleYaw = Math.sin(state.clock.elapsedTime * 0.38) * profile.idle.yaw;
     const idlePitch =
-      Math.sin(state.clock.elapsedTime * 0.7 + Math.PI / 3) *
+      Math.sin(state.clock.elapsedTime * 0.42 + Math.PI / 3) *
       profile.idle.pitch;
     const breathY =
-      Math.sin(state.clock.elapsedTime * 0.9) * profile.idle.breathY;
+      Math.sin(state.clock.elapsedTime * 0.55) * profile.idle.breathY;
 
     // ── Zielwerte (vor Guards) ───────────────────────────────────────────────
     const rotXGoal =
@@ -316,7 +316,8 @@ function LogoModel({
     }
 
     // ── Apply (Interpolation) ─────────────────────────────────────────────────
-    const k = 1 - Math.pow(0.0014, delta);
+    // k: weicheres Damping → filmischerer, ruhigerer Übergang
+    const k = 1 - Math.pow(0.003, delta);
 
     group.current.position.x = THREE.MathUtils.lerp(
       group.current.position.x,
@@ -340,17 +341,17 @@ function LogoModel({
     group.current.rotation.x = THREE.MathUtils.lerp(
       group.current.rotation.x,
       rotXGoal,
-      0.12
+      0.07
     );
     group.current.rotation.y = THREE.MathUtils.lerp(
       group.current.rotation.y,
       rotYGoal,
-      0.14
+      0.08
     );
     group.current.rotation.z = THREE.MathUtils.lerp(
       group.current.rotation.z,
       rotZGoal,
-      0.12
+      0.07
     );
 
     // Leichtes Showcase-Flourish (ohne profile.showcase)

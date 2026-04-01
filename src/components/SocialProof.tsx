@@ -64,9 +64,10 @@ export default function SocialProof() {
 
           <div
             className="
-              mx-auto mt-6 rounded-2xl border border-border/60 bg-background/60
-              backdrop-blur-md shadow-[0_10px_40px_-12px_rgba(0,0,0,0.35)]
-              dark:bg-background/35 dark:border-border/40
+              mx-auto mt-6 rounded-2xl border border-border/60
+              bg-background/50 dark:bg-background/30
+              shadow-[0_4px_24px_-8px_rgba(0,0,0,0.18)]
+              dark:border-border/30
               transition
             "
           >

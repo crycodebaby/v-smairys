@@ -21,7 +21,7 @@ import EdgeFade from "./ui/EdgeFade";
 const cardBase =
   "relative flex flex-col rounded-2xl border border-border/60 bg-card/90 shadow-sm ring-1 ring-black/0 transition-all";
 const hoverFx =
-  "hover:shadow-xl hover:ring-black/5 hover:border-border/80 motion-safe:hover:-translate-y-[2px]";
+  "hover:shadow-xl hover:ring-black/5 hover:border-border/80 motion-safe:hover:-translate-y-1 motion-safe:transition-transform";
 const titleCls = "text-[17px] font-semibold font-heading tracking-tight";
 const textCls = "text-sm text-foreground/80 leading-6";
 const chipCls =
@@ -132,7 +132,8 @@ export default function BentoGridSection() {
         >
           {/* Web-Entwicklung */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-8 p-5 sm:p-6`}
           >
             <Glow />
@@ -178,7 +179,8 @@ export default function BentoGridSection() {
 
           {/* SEO */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
             <Glow />
@@ -205,7 +207,8 @@ export default function BentoGridSection() {
 
           {/* Design & Branding */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
             <Glow />
@@ -244,7 +247,8 @@ export default function BentoGridSection() {
 
           {/* CTA */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-8 items-center justify-center text-center p-6`}
           >
             <Glow />
@@ -275,7 +279,8 @@ export default function BentoGridSection() {
 
           {/* Sicherheit */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
             <Glow />
