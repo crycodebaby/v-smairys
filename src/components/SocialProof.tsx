@@ -39,10 +39,18 @@ const logos = [
     className: "hidden dark:flex",
   },
   {
-    id: "szalontai",
+    id: "szalontai-light",
     name: "Sportgerätevertrieb Szalontai",
     image: "/testimonials/szalontai.png",
     height: "h-8 md:h-10",
+    className: "dark:hidden",
+  },
+  {
+    id: "szalontai-dark",
+    name: "Sportgerätevertrieb Szalontai",
+    image: "/testimonials/szalontai-weiß.png",
+    height: "h-8 md:h-10",
+    className: "hidden dark:flex",
   },
 ];
 
