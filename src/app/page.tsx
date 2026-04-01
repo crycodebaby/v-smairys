@@ -1,7 +1,7 @@
 // app/page.tsx
 import type { Metadata } from "next";
 import SocialProof from "@/components/SocialProof";
-import BentoGridSection from "@/components/BentoGridSection";
+import SignalEngineSection from "@/components/SignalEngineSection";
 import CtaSection from "@/components/CtaSection";
 import ProcessSection from "@/components/ProcessSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -146,11 +146,9 @@ export default function Home() {
       <CaseStudyPreview />
 
       {/* --------------------------------------------------
-          LEISTUNGEN (Bento)
+          SIGNAL ENGINE
       -------------------------------------------------- */}
-      <section id="bento" className="relative">
-        <BentoGridSection />
-      </section>
+      <SignalEngineSection />
 
       {/* --------------------------------------------------
           PROZESS
