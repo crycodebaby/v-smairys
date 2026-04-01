@@ -41,10 +41,8 @@ const logos = [
   {
     id: "szalontai",
     name: "Sportgerätevertrieb Szalontai",
-    image: "/testimonials/szalontai.jpg",
+    image: "/testimonials/szalontai.png",
     height: "h-8 md:h-10",
-    // Im Dark-Mode leicht aufgehellt, da das Logo einen weißen Hintergrund hat
-    className: "dark:brightness-90 dark:contrast-110 rounded",
   },
 ];
 
