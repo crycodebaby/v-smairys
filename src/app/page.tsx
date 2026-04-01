@@ -81,7 +81,7 @@ export default function Home() {
         </div>
 
         <ClientHeroIntro>
-          <div className="container mx-auto text-center">
+          <div className="container mx-auto text-center relative z-10">
             <div className="max-w-3xl mx-auto space-y-6">
               <ContrastScrim insetClassName="px-3 py-2" strength={0.6} blur={8}>
                 <h1 className="text-4xl font-bold tracking-tight font-heading sm:text-6xl">

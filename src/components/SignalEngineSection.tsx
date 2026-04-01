@@ -260,9 +260,14 @@ export default function SignalEngineSection() {
       ref={sectionRef}
       id="signal-engine"
       aria-labelledby="se-heading"
-      className="relative py-28 sm:py-36 overflow-hidden"
-      style={{ background: "#091002" }}
+      className="relative py-28 sm:py-36"
     >
+      {/* opaker Hintergrund als absolute Kind-Ebene → Canvas bleibt durch */}
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10"
+        style={{ background: "#0f1511" }}
+      />
       {/* ambient radial glow */}
       <div
         aria-hidden

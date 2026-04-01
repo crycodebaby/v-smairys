@@ -31,7 +31,7 @@ export default function ProcessSection() {
       className="relative py-24 sm:py-32 scroll-mt-28"
     >
       <FadeIn>
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-3xl mx-auto text-center relative z-10">
           <h2 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl">
             Der Weg mit SMAIRYS
           </h2>
@@ -48,7 +48,7 @@ export default function ProcessSection() {
       />
 
       {/* Timeline */}
-      <div className="container relative grid gap-16 mt-16 sm:gap-12 md:grid-cols-3">
+      <div className="container relative z-10 grid gap-16 mt-16 sm:gap-12 md:grid-cols-3">
         {phases.map((p, i) => (
           <FadeIn key={i}>
             <motion.div

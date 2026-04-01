@@ -43,7 +43,7 @@ export default function ResultsSection() {
         <div className="absolute left-1/2 top-1/2 h-[40rem] w-[60rem] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl bg-[radial-gradient(closest-side,hsl(var(--primary)/0.06),transparent_70%)]" />
       </div>
 
-      <div className="container">
+        <div className="container relative z-10">
         <FadeIn>
           <div className="max-w-3xl mx-auto text-center">
             <h2

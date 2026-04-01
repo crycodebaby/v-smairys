@@ -17,7 +17,7 @@ export default function CaseStudyPreview() {
   return (
     <section
       id="case-study-preview"
-      className="container py-20 scroll-mt-28 sm:py-24"
+      className="container relative z-10 py-20 scroll-mt-28 sm:py-24"
       aria-labelledby="case-preview-title"
     >
       <FadeIn>

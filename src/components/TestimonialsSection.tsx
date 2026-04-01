@@ -34,7 +34,7 @@ export default function TestimonialsSection() {
       {/* subtile Lichtquelle */}
       <BlurCircle className="-top-24 -right-40 opacity-70" />
 
-      <div className="container">
+      <div className="container relative z-10">
         <FadeIn>
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl">

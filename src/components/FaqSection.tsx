@@ -11,7 +11,7 @@ import {
 
 const FaqSection = () => {
   return (
-    <section className="container py-24 sm:py-32">
+    <section className="container relative z-10 py-24 sm:py-32">
       <FadeIn>
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl">

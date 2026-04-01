@@ -425,7 +425,7 @@ export default function ThreeLogo({
     tier === "mobile" ? 0.08 : tier === "tablet" ? 0.1 : 0.12;
 
   return (
-    <div className="fixed inset-0 h-[100svh] w-full pointer-events-none -z-10">
+    <div className="fixed inset-0 h-[100svh] w-full pointer-events-none" style={{ zIndex: 0 }}>
       <Canvas
         dpr={[1, 2]}
         camera={{ position: [0, 0, camZ], fov: camFov }}

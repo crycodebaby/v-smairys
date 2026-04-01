@@ -58,11 +58,11 @@ export default function SocialProof() {
   return (
     <section
       id="socialproof"
-      className="relative isolate"
+      className="relative"
       aria-labelledby="socialproof-heading"
     >
       <div className="container text-center">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto relative z-10">
           <h2
             id="socialproof-heading"
             className="text-sm font-semibold tracking-wider uppercase text-foreground/70"
