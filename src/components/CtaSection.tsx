@@ -15,8 +15,8 @@ export default function CtaSection() {
         {/* Warm Glow – nur als Farb-Hauch, kein opaker Gradient */}
         <div className="absolute bottom-0 left-1/2 h-[40rem] w-[60rem] -translate-x-1/2 rounded-[100%] blur-[140px] bg-[radial-gradient(closest-side,hsl(var(--primary)/0.10),transparent)] dark:bg-[radial-gradient(closest-side,hsl(var(--primary)/0.15),transparent)]" />
 
-        {/* Kühler Nebel oben */}
-        <div className="absolute top-0 left-1/2 h-[22rem] w-[50rem] -translate-x-1/2 rounded-[100%] blur-[100px] bg-[radial-gradient(closest-side,hsl(var(--brand-blue)/0.08),transparent)] dark:bg-[radial-gradient(closest-side,hsl(var(--brand-blue)/0.14),transparent)]" />
+        {/* Kühler Nebel oben – Cyan Accent */}
+        <div className="absolute top-0 left-1/2 h-[22rem] w-[50rem] -translate-x-1/2 rounded-[100%] blur-[100px] bg-[radial-gradient(closest-side,hsl(var(--accent)/0.08),transparent)] dark:bg-[radial-gradient(closest-side,hsl(var(--accent)/0.14),transparent)]" />
       </div>
 
       {/* Inhalt */}

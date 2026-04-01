@@ -72,20 +72,20 @@ const attachMeshopt = (loader: GLTFLoader) => {
 };
 
 /* ============================
-   Farben & dezente Tints
+   Farben & dezente Tints (neues Green/Cyan Brand-System)
    ============================ */
-const DARK_BASE = new THREE.Color("#f5f7ff"); // hell, edel im Dark Mode
-const LIGHT_BASE = new THREE.Color("#2b2f35"); // Graphit im Light Mode
+const DARK_BASE = new THREE.Color("#e8f8d0"); // helles Grünweiß im Dark Mode
+const LIGHT_BASE = new THREE.Color("#2a3428"); // dunkelgrünes Graphit im Light Mode
 
 const TINTS: Record<string, THREE.Color> = {
-  hero: new THREE.Color("#ffffff"),
-  bento: new THREE.Color("#ffffff"),
-  cta: new THREE.Color("#ffffff"),
-  process: new THREE.Color("#8ecaff"), // kühler Touch
-  testimonials: new THREE.Color("#ffffff"),
-  faq: new THREE.Color("#ffd9a8"), // warm
-  footer: new THREE.Color("#ffffff"),
-  none: new THREE.Color("#ffffff"),
+  hero:         new THREE.Color("#ecfbdf"), // Brand-Text als neutraler Tint
+  bento:        new THREE.Color("#ecfbdf"),
+  cta:          new THREE.Color("#b2ef80"), // Primary Green Hauch
+  process:      new THREE.Color("#37e5da"), // Cyan – kühler Touch
+  testimonials: new THREE.Color("#ecfbdf"),
+  faq:          new THREE.Color("#b2ef80"), // leichter Grün-Hauch
+  footer:       new THREE.Color("#ecfbdf"),
+  none:         new THREE.Color("#ecfbdf"),
 };
 
 /* ============================
@@ -151,7 +151,7 @@ function LogoModel({
       if (!mesh.isMesh) return;
 
       const pm = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color("#f5f5f5"),
+        color: new THREE.Color("#e8f6d8"), // leicht grünliches Basisweiß
         metalness: 0.75,
         roughness: 0.28,
         envMapIntensity: 1.0,

@@ -167,8 +167,8 @@ const MOBILE: AnimProfile = {
   },
   lighting: {
     ambient: 0.3,
-    key: { pos: [2.0, 1.8, 1.8], intensity: 1.2, color: "#ffd8b5" },
-    rim: { pos: [-2.0, 1.2, -1.6], intensity: 0.8, color: "#8fb9ff" },
+    key: { pos: [2.0, 1.8, 1.8], intensity: 1.2, color: "#d4f5a8" },
+    rim: { pos: [-2.0, 1.2, -1.6], intensity: 0.8, color: "#37e5da" },
     exposure: 1.05,
   },
   showcase: {
@@ -215,8 +215,8 @@ const TABLET: AnimProfile = {
   },
   lighting: {
     ambient: 0.32,
-    key: { pos: [2.2, 2.0, 2.2], intensity: 1.35, color: "#ffd9b8" },
-    rim: { pos: [-2.4, 1.4, -1.8], intensity: 0.85, color: "#8fb9ff" },
+    key: { pos: [2.2, 2.0, 2.2], intensity: 1.35, color: "#d4f5a8" },
+    rim: { pos: [-2.4, 1.4, -1.8], intensity: 0.85, color: "#37e5da" },
     exposure: 1.07,
   },
   showcase: {
@@ -263,8 +263,8 @@ const DESKTOP: AnimProfile = {
   },
   lighting: {
     ambient: 0.33,
-    key: { pos: [2.4, 2.0, 2.2], intensity: 1.45, color: "#ffd9b8" },
-    rim: { pos: [-2.8, 1.6, -1.8], intensity: 0.95, color: "#8fb9ff" },
+    key: { pos: [2.4, 2.0, 2.2], intensity: 1.45, color: "#d4f5a8" },
+    rim: { pos: [-2.8, 1.6, -1.8], intensity: 0.95, color: "#37e5da" },
     exposure: 1.08,
   },
   showcase: {
