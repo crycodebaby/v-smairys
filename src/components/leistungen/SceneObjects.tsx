@@ -45,9 +45,9 @@ export default function SceneObjects({ theme, tier }: Props) {
       window.removeEventListener("smairys-act", handler as EventListener);
   }, []);
 
-  // Theme-Tint – neue Brand-Welt (Grün/Cyan)
+  // Theme-Tint – neues gedämpftes Brand-System
   const tint = useMemo(
-    () => new THREE.Color(theme === "light" ? "#2a3428" : "#d4f5a8"),
+    () => new THREE.Color(theme === "light" ? "#1d2a21" : "#c8dab8"),
     [theme]
   );
 

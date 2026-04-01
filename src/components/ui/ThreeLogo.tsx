@@ -74,18 +74,18 @@ const attachMeshopt = (loader: GLTFLoader) => {
 /* ============================
    Farben & dezente Tints (neues Green/Cyan Brand-System)
    ============================ */
-const DARK_BASE = new THREE.Color("#e8f8d0"); // helles Grünweiß im Dark Mode
-const LIGHT_BASE = new THREE.Color("#2a3428"); // dunkelgrünes Graphit im Light Mode
+const DARK_BASE = new THREE.Color("#c8dab8"); // gedämpftes Grün-Weiß (--brand-text nahe, weniger neon)
+const LIGHT_BASE = new THREE.Color("#1d2a21"); // --card dark nahe (sehr dunkles Grün)
 
 const TINTS: Record<string, THREE.Color> = {
-  hero:         new THREE.Color("#ecfbdf"), // Brand-Text als neutraler Tint
-  bento:        new THREE.Color("#ecfbdf"),
-  cta:          new THREE.Color("#b2ef80"), // Primary Green Hauch
-  process:      new THREE.Color("#37e5da"), // Cyan – kühler Touch
-  testimonials: new THREE.Color("#ecfbdf"),
-  faq:          new THREE.Color("#b2ef80"), // leichter Grün-Hauch
-  footer:       new THREE.Color("#ecfbdf"),
-  none:         new THREE.Color("#ecfbdf"),
+  hero:         new THREE.Color("#eaf2e6"), // --brand-text
+  bento:        new THREE.Color("#eaf2e6"),
+  cta:          new THREE.Color("#a5c17a"), // --brand-primary
+  process:      new THREE.Color("#53bebb"), // --brand-accent (Cyan, dezent)
+  testimonials: new THREE.Color("#eaf2e6"),
+  faq:          new THREE.Color("#a5c17a"),
+  footer:       new THREE.Color("#eaf2e6"),
+  none:         new THREE.Color("#eaf2e6"),
 };
 
 /* ============================
@@ -151,14 +151,14 @@ function LogoModel({
       if (!mesh.isMesh) return;
 
       const pm = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color("#e8f6d8"), // leicht grünliches Basisweiß
-        metalness: 0.75,
-        roughness: 0.28,
-        envMapIntensity: 1.0,
-        clearcoat: 0.5,
-        clearcoatRoughness: 0.25,
-        sheen: 0.2,
-        sheenRoughness: 0.7,
+        color: new THREE.Color("#c8dab8"), // gedämpftes Salbei-Grün als Basis
+        metalness: 0.72,
+        roughness: 0.32,
+        envMapIntensity: 0.95,
+        clearcoat: 0.45,
+        clearcoatRoughness: 0.28,
+        sheen: 0.18,
+        sheenRoughness: 0.72,
         transmission: 0,
         transparent: true,
         opacity: 1,

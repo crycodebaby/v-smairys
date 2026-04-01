@@ -31,7 +31,7 @@ function useReducedMotion(): boolean {
 /** Reusable glassy material tuned for your theme tokens */
 function useGlassMaterial(theme?: string): THREE.MeshPhysicalMaterial {
   const tint = useMemo(
-    () => new THREE.Color(theme === "light" ? "#2a3428" : "#d4f5a8"),
+    () => new THREE.Color(theme === "light" ? "#1d2a21" : "#c8dab8"),
     [theme]
   );
 
@@ -248,17 +248,17 @@ export default function ServiceFigure3D({
           state.gl.toneMappingExposure = 1.05;
         }}
       >
-        {/* Light — green key + cyan fill */}
+        {/* Light — muted sage key + cyan accent rim */}
         <ambientLight intensity={0.25} />
         <directionalLight
           position={[2, 2, 3]}
           intensity={1.0}
-          color={"#d4f5a8"}
+          color={"#c8dab8"}
         />
         <directionalLight
           position={[-2, -1, -2]}
           intensity={0.8}
-          color={"#37e5da"}
+          color={"#53bebb"}
         />
 
         <Environment background={false} resolution={256}>
