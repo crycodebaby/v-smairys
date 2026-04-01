@@ -63,14 +63,14 @@ export default function KontaktPage() {
               <li>
                 E-Mail:{" "}
                 <a
-                  href="mailto:robin@smairys-netz-manufaktur.de"
+                  href="mailto:robin@smairys.de"
                   className="underline decoration-foreground/30 underline-offset-4 hover:text-primary"
                 >
-                  robin@smairys-netz-manufaktur.de
+                  robin@smairys.de
                 </a>
               </li>
-              <li>Telefon: 0160&nbsp;5539220</li>
-              <li>Standort: 66265 Heusweiler, Saarland</li>
+              <li>Telefon: 0160&nbsp;553&nbsp;922&nbsp;0</li>
+              <li>Standort: 66571 Eppelborn, Saarland</li>
             </ul>
 
             <div className="mt-6 text-sm text-foreground/70">
