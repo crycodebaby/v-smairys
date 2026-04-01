@@ -1,55 +1,81 @@
 // src/components/SocialProof.tsx
 import ScrollingLogos from "@/components/ui/ScrollingLogos";
 
+// Für Logos mit hell/dunkel-Varianten: zwei Einträge mit className-Sichtbarkeit.
+// Für Logos ohne Variante (Szalontai): ein Eintrag, der in beiden Themes funktioniert.
 const logos = [
   {
-    id: "p1",
-    name: "Partner 1",
-    image: "/socialproof/socialproof1.png",
-    height: "h-7 md:h-9",
+    id: "ergart",
+    name: "Ergart GmbH",
+    image: "/testimonials/ergart-logo.png",
+    height: "h-8 md:h-10",
   },
   {
-    id: "p2",
-    name: "Partner 2",
-    image: "/socialproof/socialproof2.png",
+    id: "eppelstyle-light",
+    name: "Eppelstyle",
+    image: "/testimonials/eppelstyle-schwarz.png",
     height: "h-7 md:h-9",
+    className: "dark:hidden",
   },
   {
-    id: "p3",
-    name: "Partner 3",
-    image: "/socialproof/socialproof3.png",
+    id: "eppelstyle-dark",
+    name: "Eppelstyle",
+    image: "/testimonials/eppelstyle-weiß.png",
     height: "h-7 md:h-9",
+    className: "hidden dark:flex",
   },
   {
-    id: "p4",
-    name: "Partner 4",
-    image: "/socialproof/socialproof4.png",
+    id: "crncic-light",
+    name: "Crncic Bausanierung GmbH",
+    image: "/testimonials/crncic-schwarz.png",
     height: "h-7 md:h-9",
+    className: "dark:hidden",
   },
-  // → empfehlenswert sind 8–12 unterschiedliche Logos
+  {
+    id: "crncic-dark",
+    name: "Crncic Bausanierung GmbH",
+    image: "/testimonials/crncic-weiß.png",
+    height: "h-7 md:h-9",
+    className: "hidden dark:flex",
+  },
+  {
+    id: "szalontai-light",
+    name: "Sportgerätevertrieb Szalontai",
+    image: "/testimonials/szalontai.png",
+    height: "h-8 md:h-10",
+    className: "dark:hidden",
+  },
+  {
+    id: "szalontai-dark",
+    name: "Sportgerätevertrieb Szalontai",
+    image: "/testimonials/szalontai-weiß.png",
+    height: "h-8 md:h-10",
+    className: "hidden dark:flex",
+  },
 ];
 
 export default function SocialProof() {
   return (
     <section
       id="socialproof"
-      className="relative isolate"
+      className="relative"
       aria-labelledby="socialproof-heading"
     >
       <div className="container text-center">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto relative z-10">
           <h2
             id="socialproof-heading"
             className="text-sm font-semibold tracking-wider uppercase text-foreground/70"
           >
-            Vertrauenspartner führender Unternehmen
+            Unternehmen aus Handwerk, Bau und Service in der Region
           </h2>
 
           <div
             className="
-              mx-auto mt-6 rounded-2xl border border-border/60 bg-background/60
-              backdrop-blur-md shadow-[0_10px_40px_-12px_rgba(0,0,0,0.35)]
-              dark:bg-background/35 dark:border-border/40
+              mx-auto mt-6 rounded-2xl border border-border/60
+              bg-background/50 dark:bg-background/30
+              shadow-[0_4px_24px_-8px_rgba(0,0,0,0.18)]
+              dark:border-border/30
               transition
             "
           >
@@ -71,9 +97,9 @@ export default function SocialProof() {
 
           <p className="mt-5 text-sm text-foreground/70">
             <span className="font-medium text-foreground">
-              +112% durchschnittliches Anfragewachstum
+              Kunden seit 2023
             </span>{" "}
-            in den ersten 90&nbsp;Tagen nach Relaunch.
+            · Region Saarland · Webentwicklung, SEO, Betreuung
           </p>
         </div>
       </div>

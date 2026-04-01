@@ -72,20 +72,20 @@ const attachMeshopt = (loader: GLTFLoader) => {
 };
 
 /* ============================
-   Farben & dezente Tints
+   Farben & dezente Tints (neues Green/Cyan Brand-System)
    ============================ */
-const DARK_BASE = new THREE.Color("#f5f7ff"); // hell, edel im Dark Mode
-const LIGHT_BASE = new THREE.Color("#2b2f35"); // Graphit im Light Mode
+const DARK_BASE = new THREE.Color("#c8dab8"); // gedämpftes Grün-Weiß (--brand-text nahe, weniger neon)
+const LIGHT_BASE = new THREE.Color("#1d2a21"); // --card dark nahe (sehr dunkles Grün)
 
 const TINTS: Record<string, THREE.Color> = {
-  hero: new THREE.Color("#ffffff"),
-  bento: new THREE.Color("#ffffff"),
-  cta: new THREE.Color("#ffffff"),
-  process: new THREE.Color("#8ecaff"), // kühler Touch
-  testimonials: new THREE.Color("#ffffff"),
-  faq: new THREE.Color("#ffd9a8"), // warm
-  footer: new THREE.Color("#ffffff"),
-  none: new THREE.Color("#ffffff"),
+  hero:         new THREE.Color("#eaf2e6"), // --brand-text
+  bento:        new THREE.Color("#eaf2e6"),
+  cta:          new THREE.Color("#a5c17a"), // --brand-primary
+  process:      new THREE.Color("#53bebb"), // --brand-accent (Cyan, dezent)
+  testimonials: new THREE.Color("#eaf2e6"),
+  faq:          new THREE.Color("#a5c17a"),
+  footer:       new THREE.Color("#eaf2e6"),
+  none:         new THREE.Color("#eaf2e6"),
 };
 
 /* ============================
@@ -151,14 +151,14 @@ function LogoModel({
       if (!mesh.isMesh) return;
 
       const pm = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color("#f5f5f5"),
-        metalness: 0.75,
-        roughness: 0.28,
-        envMapIntensity: 1.0,
-        clearcoat: 0.5,
-        clearcoatRoughness: 0.25,
-        sheen: 0.2,
-        sheenRoughness: 0.7,
+        color: new THREE.Color("#c8dab8"), // gedämpftes Salbei-Grün als Basis
+        metalness: 0.72,
+        roughness: 0.32,
+        envMapIntensity: 0.95,
+        clearcoat: 0.45,
+        clearcoatRoughness: 0.28,
+        sheen: 0.18,
+        sheenRoughness: 0.72,
         transmission: 0,
         transparent: true,
         opacity: 1,
@@ -249,12 +249,12 @@ function LogoModel({
     const rotScroll = profile.scrollRot(p); // Euler (x,y,z)
 
     // ── Idle (profilabhängig) ────────────────────────────────────────────────
-    const idleYaw = Math.sin(state.clock.elapsedTime * 0.6) * profile.idle.yaw;
+    const idleYaw = Math.sin(state.clock.elapsedTime * 0.38) * profile.idle.yaw;
     const idlePitch =
-      Math.sin(state.clock.elapsedTime * 0.7 + Math.PI / 3) *
+      Math.sin(state.clock.elapsedTime * 0.42 + Math.PI / 3) *
       profile.idle.pitch;
     const breathY =
-      Math.sin(state.clock.elapsedTime * 0.9) * profile.idle.breathY;
+      Math.sin(state.clock.elapsedTime * 0.55) * profile.idle.breathY;
 
     // ── Zielwerte (vor Guards) ───────────────────────────────────────────────
     const rotXGoal =
@@ -316,7 +316,8 @@ function LogoModel({
     }
 
     // ── Apply (Interpolation) ─────────────────────────────────────────────────
-    const k = 1 - Math.pow(0.0014, delta);
+    // k: weicheres Damping → filmischerer, ruhigerer Übergang
+    const k = 1 - Math.pow(0.003, delta);
 
     group.current.position.x = THREE.MathUtils.lerp(
       group.current.position.x,
@@ -340,17 +341,17 @@ function LogoModel({
     group.current.rotation.x = THREE.MathUtils.lerp(
       group.current.rotation.x,
       rotXGoal,
-      0.12
+      0.07
     );
     group.current.rotation.y = THREE.MathUtils.lerp(
       group.current.rotation.y,
       rotYGoal,
-      0.14
+      0.08
     );
     group.current.rotation.z = THREE.MathUtils.lerp(
       group.current.rotation.z,
       rotZGoal,
-      0.12
+      0.07
     );
 
     // Leichtes Showcase-Flourish (ohne profile.showcase)
@@ -424,7 +425,7 @@ export default function ThreeLogo({
     tier === "mobile" ? 0.08 : tier === "tablet" ? 0.1 : 0.12;
 
   return (
-    <div className="fixed inset-0 h-[100svh] w-full pointer-events-none -z-10">
+    <div className="fixed inset-0 h-[100svh] w-full pointer-events-none" style={{ zIndex: 0 }}>
       <Canvas
         dpr={[1, 2]}
         camera={{ position: [0, 0, camZ], fov: camFov }}

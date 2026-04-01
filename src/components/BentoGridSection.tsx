@@ -1,3 +1,4 @@
+// src/components/BentoGridSection.tsx
 "use client";
 
 import React from "react";
@@ -16,21 +17,17 @@ import {
 import FadeIn from "@/components/FadeIn";
 import EdgeFade from "./ui/EdgeFade";
 
-/* ----------------------------------------------------
-   Base Styles (Performance & Eleganz)
----------------------------------------------------- */
+/* -------------------------------------------------- Styles -- */
 const cardBase =
   "relative flex flex-col rounded-2xl border border-border/60 bg-card/90 shadow-sm ring-1 ring-black/0 transition-all";
 const hoverFx =
-  "hover:shadow-xl hover:ring-black/5 hover:border-border/80 motion-safe:hover:-translate-y-[2px]";
+  "hover:shadow-xl hover:ring-black/5 hover:border-border/80 motion-safe:hover:-translate-y-1 motion-safe:transition-transform";
 const titleCls = "text-[17px] font-semibold font-heading tracking-tight";
 const textCls = "text-sm text-foreground/80 leading-6";
 const chipCls =
   "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium border-border/60 text-foreground/70 bg-background/60";
 
-/* ----------------------------------------------------
-   iOS-Safe Glow (keine Blurs, kein Overdraw)
----------------------------------------------------- */
+/* -------------------------------------------------- Glow -- */
 const Glow = () => (
   <div
     aria-hidden
@@ -42,9 +39,7 @@ const Glow = () => (
   />
 );
 
-/* ----------------------------------------------------
-   Sparkline (leicht animiert, sichtbar auf iOS)
----------------------------------------------------- */
+/* -------------------------------------------------- Sparkline -- */
 function Sparkline({
   points = [3, 4, 4, 6, 5, 8, 7, 9, 12, 13],
 }: {
@@ -70,9 +65,7 @@ function Sparkline({
   );
 }
 
-/* ----------------------------------------------------
-   Progress Bars (KPI Visualisierung)
----------------------------------------------------- */
+/* -------------------------------------------------- Progress -- */
 function Progress({ value, delay = 0 }: { value: number; delay?: number }) {
   return (
     <div className="w-full h-2 overflow-hidden rounded-full bg-border/60">
@@ -87,9 +80,7 @@ function Progress({ value, delay = 0 }: { value: number; delay?: number }) {
   );
 }
 
-/* ----------------------------------------------------
-   KPI Chip (Icon + Label)
----------------------------------------------------- */
+/* -------------------------------------------------- KPI Chip -- */
 function Kpi({
   icon: Icon,
   label,
@@ -105,33 +96,31 @@ function Kpi({
   );
 }
 
-/* ----------------------------------------------------
-   SECTION
----------------------------------------------------- */
+/* -------------------------------------------------- SECTION -- */
 export default function BentoGridSection() {
   return (
     <section
       id="leistungen"
-      className="container py-18 scroll-mt-28 sm:py-24 lg:py-28"
+      className="container py-20 scroll-mt-28 sm:py-24 lg:py-28"
       aria-labelledby="leistungen-title"
     >
-      {/* ---------- Intro ---------- */}
+      {/* Intro */}
       <FadeIn>
         <div className="max-w-3xl mx-auto text-center">
           <h2
             id="leistungen-title"
             className="text-3xl font-bold tracking-tight font-heading sm:text-4xl"
           >
-            Deine Vision. Unser Handwerk.
+            Ihre Marke verdient mehr als einen Baukasten.
           </h2>
           <p className="max-w-2xl mx-auto mt-4 text-base leading-7 text-foreground/80 sm:text-lg">
-            SMAIRYS vereint Design, Technologie und Strategie zu digitalen
-            Erlebnissen, die sichtbar performen.
+            SMAIRYS verbindet handgeschriebenen Code, technisches SEO und
+            wirkungsstarkes Design – für Unternehmen, die online sichtbar wachsen wollen.
           </p>
         </div>
       </FadeIn>
 
-      {/* ---------- GRID ---------- */}
+      {/* Grid */}
       <FadeIn>
         <div
           className="
@@ -141,24 +130,25 @@ export default function BentoGridSection() {
             md:grid-cols-12
           "
         >
-          {/* ----------- Web-Entwicklung ----------- */}
+          {/* Web-Entwicklung */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-8 p-5 sm:p-6`}
           >
             <Glow />
             <div className="flex items-center gap-2">
               <Code2 className="w-5 h-5 text-primary" />
-              <h3 className={titleCls}>Premium Web-Entwicklung</h3>
+              <h3 className={titleCls}>Website-Programmierung & Design</h3>
             </div>
             <p className={`${textCls} mt-2`}>
-              Handgeschriebener Code, modulare Architektur, kompromisslose
-              Performance – entwickelt für Marken, die wachsen.
+              Handgeschriebener Next.js-Code, modulare Architektur, kompromisslose
+              Performance – entwickelt für Betriebe, die wachsen wollen.
             </p>
 
             <div className="flex flex-wrap items-center gap-2 mt-4">
               <Kpi icon={Gauge} label="Lighthouse 98–100" />
-              <Kpi icon={Rocket} label="TTFB < 100 ms" />
+              <Kpi icon={Rocket} label="TTFB &lt; 100 ms" />
               <Kpi icon={ShieldCheck} label="DSGVO & Hosting DE" />
             </div>
 
@@ -187,15 +177,16 @@ export default function BentoGridSection() {
             </div>
           </motion.div>
 
-          {/* ----------- SEO ----------- */}
+          {/* SEO */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
             <Glow />
             <div className="flex items-center gap-2">
               <SearchCheck className="w-5 h-5 text-primary" />
-              <h3 className={titleCls}>Nachhaltiges SEO</h3>
+              <h3 className={titleCls}>SEO & Sichtbarkeit</h3>
             </div>
 
             <div className="p-3 mt-3 border rounded-lg border-border/60 bg-background/70">
@@ -204,20 +195,20 @@ export default function BentoGridSection() {
 
             <ul className="grid gap-1 pl-4 mt-3 text-sm list-disc text-foreground/75">
               <li>Technisches Fundament (Core Web Vitals)</li>
-              <li>Content-Strategie statt „Tricks“</li>
-              <li>Saubere Informationsarchitektur</li>
+              <li>Google-relevante Inhaltsarchitektur</li>
+              <li>Schema-Markup & lokale Sichtbarkeit</li>
             </ul>
 
             <div className="mt-3 flex flex-wrap gap-1.5">
-              <span className={chipCls}>+ 180 % Sichtbarkeit</span>
-              <span className={chipCls}>Indexierung stabil</span>
-              <span className={chipCls}>Schema-Markup</span>
+              <span className={chipCls}>+300 % Traffic (Ergart)</span>
+              <span className={chipCls}>+140 % Anfragen (Crncic)</span>
             </div>
           </motion.div>
 
-          {/* ----------- Design & Branding ----------- */}
+          {/* Design & Branding */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
             <Glow />
@@ -227,7 +218,7 @@ export default function BentoGridSection() {
             </div>
             <p className={`${textCls} mt-2`}>
               Konsistente Typografie, modulare Systeme, sinnvolle Bewegung –
-              Design, das Vertrauen schafft.
+              ein Design, das Vertrauen schafft.
             </p>
 
             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -254,23 +245,24 @@ export default function BentoGridSection() {
             </div>
           </motion.div>
 
-          {/* ----------- CTA / Versprechen ----------- */}
+          {/* CTA */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-8 items-center justify-center text-center p-6`}
           >
             <Glow />
             <div className="max-w-lg mx-auto">
               <div className="mb-2 inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-[11px] font-medium text-foreground/70">
                 <Sparkles className="h-3.5 w-3.5" />
-                <span>Von der Idee zum Launch in 30 Tagen</span>
+                <span>Von der Idee zum Launch in 2–4 Wochen</span>
               </div>
               <h3 className="text-2xl font-bold font-heading">
-                Deine Vision. Unsere Expertise.
+                Ihre Vision. Unsere Expertise.
               </h3>
               <p className="mt-2 text-sm text-foreground/80">
-                Wir entwickeln Lösungen, die deine Ziele nicht nur erreichen,
-                sondern übertreffen: messbar und nachhaltig.
+                Messbar mehr Anfragen, Google-Sichtbarkeit und ein Auftritt, der
+                Ihre Marke stärkt – persönlich begleitet von Anfang bis nach dem Launch.
               </p>
               <Link
                 href="#prozess"
@@ -285,9 +277,10 @@ export default function BentoGridSection() {
             </div>
           </motion.div>
 
-          {/* ----------- Sicherheit ----------- */}
+          {/* Sicherheit */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`${cardBase} ${hoverFx} md:col-span-4 p-5 sm:p-6`}
           >
             <Glow />
@@ -299,9 +292,9 @@ export default function BentoGridSection() {
               DSGVO-konform, Hosting in Deutschland, sichere Deploy-Pipelines.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              <span className={chipCls}>ISO-27001 Cloud</span>
-              <span className={chipCls}>Pen-Test ready</span>
-              <span className={chipCls}>Role-based Access</span>
+              <span className={chipCls}>Hosting DE</span>
+              <span className={chipCls}>SSL & Updates</span>
+              <span className={chipCls}>Monitoring</span>
             </div>
           </motion.div>
         </div>

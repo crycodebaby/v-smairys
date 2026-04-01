@@ -10,17 +10,17 @@ const phases = [
   {
     icon: <Handshake className="w-10 h-10 text-primary" />,
     title: "Verstehen",
-    text: "Du erklärst, was du brauchst – ich höre zu, stelle Fragen und denke mit.",
+    text: "Sie schildern, was Sie brauchen – ich höre zu, stelle Fragen und denke mit.",
   },
   {
     icon: <Code2 className="w-10 h-10 text-primary" />,
     title: "Bauen",
-    text: "Ich programmiere deine Lösung, sauber, skalierbar, präzise. So, als wäre sie meine eigene.",
+    text: "Ich programmiere Ihre Lösung: sauber, skalierbar, präzise. So, als wäre sie meine eigene.",
   },
   {
     icon: <Rocket className="w-10 h-10 text-primary" />,
     title: "Begleiten",
-    text: "Nach dem Launch bleibe ich an deiner Seite; für Updates, Wachstum und neue Ideen.",
+    text: "Nach dem Launch bleibe ich an Ihrer Seite – für Updates, Wachstum und neue Ideen.",
   },
 ];
 
@@ -28,27 +28,27 @@ export default function ProcessSection() {
   return (
     <section
       id="prozess"
-      className="relative py-24 overflow-hidden sm:py-32 scroll-mt-28"
+      className="relative py-24 sm:py-32 scroll-mt-28"
     >
       <FadeIn>
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-3xl mx-auto text-center relative z-10">
           <h2 className="text-3xl font-bold tracking-tight font-heading sm:text-4xl">
             Der Weg mit SMAIRYS
           </h2>
           <p className="mt-4 text-lg text-foreground/80">
-            Kein komplizierter Prozess. Nur du, ich – und dein Ziel.
+            Kein komplizierter Prozess. Nur Sie, ich – und Ihr Ziel.
           </p>
         </div>
       </FadeIn>
 
-      {/* zarte Verbindungslinie */}
+      {/* Verbindungslinie */}
       <div
         aria-hidden
         className="absolute inset-x-0 h-px pointer-events-none top-1/2 -z-10 bg-gradient-to-r from-transparent via-primary/30 to-transparent"
       />
 
       {/* Timeline */}
-      <div className="container relative grid gap-16 mt-16 sm:gap-12 md:grid-cols-3">
+      <div className="container relative z-10 grid gap-16 mt-16 sm:gap-12 md:grid-cols-3">
         {phases.map((p, i) => (
           <FadeIn key={i}>
             <motion.div
@@ -78,13 +78,13 @@ export default function ProcessSection() {
       <FadeIn>
         <div className="mt-16 text-center">
           <Link
-            href="#kontakt"
+            href="/kontakt"
             className="inline-flex items-center justify-center btn-premium"
           >
             Jetzt unverbindlich sprechen
           </Link>
           <p className="mt-3 text-sm text-foreground/70">
-            Persönlich. Transparent. Ohne Agentur-Bla.
+            Persönlich. Transparent. Direkt mit Robin Schmeiries.
           </p>
         </div>
       </FadeIn>
