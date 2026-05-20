@@ -1,66 +1,90 @@
-// src/app/layout.tsx
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata, Viewport } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
 
-// 🧠 Google-Fonts mit next/font/google
-import { Outfit, Inter } from "next/font/google";
+const inter = Inter({ subsets: ["latin"] })
 
-// 🌐 Optional: Analytics + Theme
-import { Analytics } from "@vercel/analytics/next";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import ScrollCompanion from "@/components/ui/ScrollCompanion";
+const SITE_NAME = "Smairys Netz-Manufaktur"
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://smairys.de"
 
-/* -------------------- FONT SETUP -------------------- */
-const outfit = Outfit({
-  subsets: ["latin", "latin-ext"],
-  display: "swap",
-  variable: "--font-heading", // Für Überschriften
-  weight: ["400", "500", "600", "700"],
-});
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5, // Accessiblity: Allow zoom up to 5x
+}
 
-const inter = Inter({
-  subsets: ["latin", "latin-ext"],
-  display: "swap",
-  variable: "--font-sans", // Für Fließtext
-});
-
-/* -------------------- METADATA -------------------- */
 export const metadata: Metadata = {
-  title: "Smairys Netz-Manufaktur | Premium Websites & SEO",
-  description:
-    "Wir schmieden Ihre digitale Präsenz. Handgefertigte Premium-Websites, die überzeugen und nachhaltiges Wachstum durch SEO generieren.",
-};
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} | Premium Webentwicklung, SEO & Ads`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: "Die Premium-Vertriebswebsite für qualitätsbewusste KMU. Spezialisiert auf hochperformante Next.js Seiten, SEO und profitables Google Ads Management.",
+  keywords: ["Webentwicklung", "Next.js", "SEO", "Google Ads", "KMU", "Smairys Netz-Manufaktur"],
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "de_DE",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: "Die Premium-Vertriebswebsite für qualitätsbewusste KMU.",
+    images: [
+      {
+        url: "/og-image.jpg", // Placeholder
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} Og Image`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: "Die Premium-Vertriebswebsite für qualitätsbewusste KMU.",
+    creator: "@smairys",
+    images: ["/og-image.jpg"],
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
+}
 
-/* -------------------- ROOT LAYOUT -------------------- */
+import { Footer } from "@/components/layout/Footer"
+import { PlausibleAnalytics } from "@/components/analytics/PlausibleAnalytics"
+import { AttributionCapture } from "@/components/analytics/AttributionCapture"
+
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  // Plausible Analytics ist cookielos und privatsphärefreundlich und wird
+  // daher global ohne Consent-Banner geladen. GTM (falls später aktiviert)
+  // muss weiterhin hinter Consent laufen.
+
   return (
-    <html
-      lang="de"
-      suppressHydrationWarning
-      className={`${outfit.variable} ${inter.variable}`}
-    >
-      <body className="font-sans antialiased bg-background text-foreground">
-        <ScrollCompanion />
-
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Header />
-          <main className="relative">{children}</main>
-          <Footer />
-        </ThemeProvider>
-
-        <Analytics />
+    <html lang="de" className="scroll-smooth">
+      <body className={`${inter.className} min-h-screen antialiased flex flex-col`}>
+        <main className="flex-1">{children}</main>
+        <Footer />
+        <AttributionCapture />
+        <PlausibleAnalytics />
       </body>
     </html>
-  );
+  )
 }

@@ -2,6 +2,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { trackContactIntent, trackCtaClick } from "@/lib/analytics";
 
 const CAL_URL = "https://calendar.app.google/xZDxJVbdPxonZAqh7";
 
@@ -78,6 +79,13 @@ export default function BookingCard() {
               href={CAL_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackCtaClick({
+                  cta: "booking-google-calendar",
+                  location: "booking",
+                });
+                trackContactIntent({ type: "booking", location: "booking" });
+              }}
               className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold transition rounded-md  bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               aria-label="Google Kalender – Termin buchen"
             >

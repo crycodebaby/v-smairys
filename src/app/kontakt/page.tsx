@@ -1,100 +1,81 @@
-// src/app/kontakt/page.tsx
-import type { Metadata } from "next";
-import ContactForm from "@/components/contact/ContactForm";
-import BookingCard from "@/components/contact/BookingCard";
-import Link from "next/link";
+import React from 'react';
+import { Section } from '@/components/ui/Section';
+import { Container } from '@/components/ui/Container';
+import { ContactFormBase } from '@/components/forms/ContactFormBase';
+import { Header } from '@/components/layout/Header';
+import { Kicker } from '@/components/ui/Kicker';
+import { TrackedLink } from '@/components/analytics/TrackedLink';
 
-export const metadata: Metadata = {
-  title: "Kontakt – SMAIRYS Netz-Manufaktur",
-  description:
-    "Kontaktieren Sie SMAIRYS für ein fokussiertes Erstgespräch. Schnell, präzise und ohne Verkaufsdruck.",
-  alternates: { canonical: "/kontakt" },
-  openGraph: {
-    title: "Kontakt – SMAIRYS Netz-Manufaktur",
-    description:
-      "Kontaktieren Sie SMAIRYS für ein fokussiertes Erstgespräch. Schnell, präzise und ohne Verkaufsdruck.",
-    url: "/kontakt",
-    type: "website",
-  },
+export const metadata = {
+  title: 'Kontakt aufnehmen',
+  description: 'Starten Sie Ihre Projektanfrage bei der Netz-Manufaktur Smairys.',
 };
 
 export default function KontaktPage() {
   return (
-    <main className="relative isolate">
-      {/* dezente Atmosphäre */}
-      <div aria-hidden className="absolute inset-0 pointer-events-none -z-10">
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.03),transparent_20%,transparent_80%,rgba(0,0,0,0.04))]" />
-        <div className="absolute left-1/2 top-[-6rem] h-[26rem] w-[26rem] -translate-x-1/2 rounded-full blur-3xl bg-[radial-gradient(closest-side,hsl(var(--primary)/0.10),transparent_70%)]" />
-      </div>
-
-      <section className="container py-16 sm:py-24">
-        <header className="max-w-3xl mx-auto text-center">
-          <p className="inline-flex items-center rounded-full border border-border/60 bg-background/60 px-3 py-1 text-[11px] font-medium text-foreground/70">
-            Kontakt
-          </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight font-heading sm:text-5xl">
-            Sprechen wir über Ihr Vorhaben
-          </h1>
-          <p className="max-w-2xl mx-auto mt-3 text-base text-foreground/80 sm:text-lg">
-            Kurz, konkret, wertschöpfend. Kein Verkaufsdruck – nur Klarheit.
-          </p>
-        </header>
-
-        {/* Booking-CTA prominent oben, spannt auf mobilen Geräten über die volle Breite */}
-        <div className="max-w-5xl mx-auto mt-10">
-          <BookingCard />
-        </div>
-
-        {/* 2 Spalten ab md: links Info, rechts Formular */}
-        <div className="grid max-w-5xl grid-cols-1 gap-8 mx-auto mt-8 md:grid-cols-2">
-          {/* Info-Card */}
-          <div className="p-6 border shadow-sm rounded-2xl border-border/60 bg-card/80 backdrop-blur-xl sm:p-7">
-            <h2 className="text-xl font-semibold tracking-tight font-heading">
-              Direkte Kontaktwege
-            </h2>
-            <ul className="mt-4 space-y-3 text-sm text-foreground/80">
-              <li>
-                E-Mail:{" "}
-                <a
-                  href="mailto:robin@smairys-netz-manufaktur.de"
-                  className="underline decoration-foreground/30 underline-offset-4 hover:text-primary"
-                >
-                  robin@smairys-netz-manufaktur.de
-                </a>
-              </li>
-              <li>Telefon: 0160&nbsp;5539220</li>
-              <li>Standort: 66265 Heusweiler (DE)</li>
-            </ul>
-
-            <div className="mt-6 text-sm text-foreground/70">
-              <p>
-                Sie bevorzugen einen festen Termin? Nutzen Sie die Buchung oben
-                oder schreiben Sie kurz Ihr Ziel und Wunschzeitfenster; wir
-                melden uns mit einem Slot.
+    <>
+      <Header />
+      <Section className="bg-background min-h-screen pt-32 pb-16 flex items-center">
+        <Container>
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+            
+            {/* Kontaktinformationen (Sichtbar & Direkt) */}
+            <div className="flex flex-col">
+              <Kicker>Initiative ergreifen</Kicker>
+              <h1 className="text-fluid-h1 font-bold mt-2 leading-[1.05] tracking-tight">
+                Lassen Sie uns über Ihre Architektur sprechen.
+              </h1>
+              <p className="mt-6 text-fluid-p text-muted-foreground leading-relaxed max-w-lg">
+                Wir bewerten Ihr Projektvorhaben unverbindlich und transparent. Hinterlassen Sie Ihre Eckdaten, und wir melden uns zeitnah für eine erste Einschätzung.
               </p>
-              <p className="mt-3">
-                Rechtliches:{" "}
-                <Link
-                  href="/impressum"
-                  className="underline decoration-foreground/30 underline-offset-4 hover:text-primary"
-                >
-                  Impressum
-                </Link>{" "}
-                ·{" "}
-                <Link
-                  href="/datenschutz"
-                  className="underline decoration-foreground/30 underline-offset-4 hover:text-primary"
-                >
-                  Datenschutz
-                </Link>
-              </p>
+
+              <div className="mt-12 flex flex-col gap-8 border-t border-border pt-8">
+                <div>
+                  <h3 className="font-medium text-sm text-muted-foreground tracking-widest uppercase mb-3">Direkter Kontakt</h3>
+                  <div className="flex flex-col gap-2">
+                    <TrackedLink
+                      href="mailto:hallo@smairys.de"
+                      cta="kontakt-mail"
+                      location="kontakt"
+                      intent="email"
+                      className="text-xl font-medium hover:text-primary transition-colors"
+                    >
+                      hallo@smairys.de
+                    </TrackedLink>
+                    <TrackedLink
+                      href="tel:+49123456789"
+                      cta="kontakt-phone"
+                      location="kontakt"
+                      intent="phone"
+                      className="text-xl font-medium hover:text-primary transition-colors"
+                    >
+                      +49 (0) 123 456 789
+                    </TrackedLink>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium text-sm text-muted-foreground tracking-widest uppercase mb-3">Standort</h3>
+                  <address className="not-italic text-lg text-foreground bg-accent/30 p-6 rounded-sm border border-border inline-block">
+                    Smairys Netz-Manufaktur<br/>
+                    Robin Schmeiries<br/>
+                    66822 Lebach<br/>
+                    Saarland, Deutschland
+                  </address>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Formular */}
-          <ContactForm />
-        </div>
-      </section>
-    </main>
+            {/* Formular Integration aus Phase 3.5 */}
+            <div className="bg-card text-card-foreground p-8 md:p-12 rounded-sm border border-border/50 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+              <h2 className="text-2xl font-bold mb-8">Projektanfrage starten</h2>
+              <ContactFormBase page_type="contact_page" />
+            </div>
+
+          </div>
+        </Container>
+      </Section>
+    </>
   );
 }
