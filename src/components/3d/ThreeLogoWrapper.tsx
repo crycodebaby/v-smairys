@@ -2,9 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 
-// Wir nutzen dynamisches Laden für ThreeJS um LCP nicht zu blockieren
-// import dynamic from 'next/dynamic';
-// const Scene = dynamic(() => import('./Scene'), { ssr: false });
+// Wir nutzen progressives Laden für ThreeJS/3D, um LCP nicht zu blockieren.
 
 export function ThreeLogoWrapper() {
   const [shouldLoad3D, setShouldLoad3D] = useState(false);

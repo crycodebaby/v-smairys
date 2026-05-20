@@ -80,9 +80,10 @@ function bufferToBase64Url(buffer: ArrayBuffer): string {
   for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
-  const base64 = typeof btoa !== "undefined"
-    ? btoa(binary)
-    : Buffer.from(binary, "binary").toString("base64");
+  // `intern-session.ts` wird auch von `src/middleware.ts` importiert.
+  // Middleware läuft in der Edge-Runtime; Node-APIs wie `Buffer` dürfen hier
+  // nicht referenziert werden, auch nicht als Fallback.
+  const base64 = btoa(binary);
   return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
