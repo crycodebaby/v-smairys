@@ -23,7 +23,9 @@
 
 - [ ] DevTools → Network: auf `/intern/marketing` darf **kein** Request an `plausible.io/api/event` rausgehen
 - [ ] DevTools → Network: auf `/kundenlogin` darf **kein** Request an `plausible.io/api/event` rausgehen
+- [ ] DevTools → Application → Local Storage: nach `?utm_source=test` auf `/intern/marketing` wird **kein** `smairys_first_touch_v2` geschrieben
 - [ ] Auf der Startseite `/` werden Pageviews und Events gefeuert (sichtbar in Plausible Realtime)
+- [ ] Marketing-Footer ist auf `/intern/*` und `/kundenlogin` **nicht** sichtbar
 
 ## Marketing-Dashboard
 
@@ -34,7 +36,19 @@
 - [ ] „QR-SVG öffnen" liefert ein druckbares SVG (Content-Type `image/svg+xml`)
 - [ ] Großer QR-Code wird inline angezeigt
 - [ ] Druck-Checkliste: Haken bleiben nach Reload erhalten (localStorage)
-- [ ] Debug-Karte: ADMIN_DASHBOARD_PIN = ja · NEXT_PUBLIC_PLAUSIBLE_DOMAIN = ja · Kampagnen geladen = 1
+- [ ] Debug-Karte ist standardmäßig eingeklappt, Chevron öffnet die Sektion
+- [ ] Debug-Karte zeigt nur: `ADMIN_DASHBOARD_PIN` (Pflicht), `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_PLAUSIBLE_SRC`, `ADMIN_DASHBOARD_SECRET` (alle optional) – keine Supabase-Variablen
+- [ ] Master-Detail: Klick auf eine Kampagne in der Liste lädt das Detail mit `animate-panel-in`-Transition
+
+## Responsive QA
+
+- [ ] Mobile (~390 px): `/kundenlogin` PIN-Tastatur passt ohne horizontalen Scroll
+- [ ] Mobile (~390 px): `/intern/marketing` zeigt Liste über Detail, QR-Code skaliert proportional
+- [ ] iPad Portrait (768 px): Master-Detail steht in 2 Spalten, QR liegt unter dem Hero
+- [ ] iPad Pro Landscape (1366 px): QR liegt rechts neben dem Hero (`md:grid-cols-[1fr_15rem]`/`lg:1fr_18rem`)
+- [ ] Desktop (≥ 1440 px): Container bricht auf `max-w-7xl`, Layout bleibt zentriert
+- [ ] Keine ausgewaschenen Buttons – Glass-Tiles haben Top-Highlight + Hover-Chroma sichtbar
+- [ ] Header-Kundenlogin-Pille: Lock-Icon sichtbar, auf Mobile Label „Login", auf `sm+` „Kundenlogin"
 
 ## Visitenkarten-Test (Druckfreigabe)
 

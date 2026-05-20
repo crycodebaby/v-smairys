@@ -19,9 +19,15 @@ import { hasConsent, getConsentState } from '../consent/consent-helper';
 import { getAttributionData } from '../attribution/attribution';
 import { trackGtmEvent } from './gtm';
 import { trackPlausibleEvent } from './plausible';
+import { isAnalyticsExcludedPath } from '../analytics-config';
 
 export function dispatchEvent(basePayload: Partial<TrackingPayload> & { event_name: TrackingPayload['event_name'] }) {
   if (typeof window === 'undefined') return;
+
+  // Defense in Depth: keine Marketing-Events von internen Routen, auch dann
+  // nicht, wenn jemand versehentlich einen TrackedButton im Dashboard verwendet.
+  // `trackPlausibleEvent` prüft das ebenfalls; hier blocken wir zusätzlich GTM.
+  if (isAnalyticsExcludedPath(window.location.pathname)) return;
 
   const authData = getAttributionData();
   const consent = getConsentState();

@@ -2,20 +2,22 @@
 
 import { useEffect } from "react";
 import { captureAttribution } from "@/lib/attribution/attribution";
+import { isAnalyticsExcludedPath } from "@/lib/analytics-config";
 
 /**
  * Triggert die First-/Last-Touch-Erfassung beim ersten Mount des Layouts.
  *
  * - Reines clientseitiges Hilfs-Mount, rendert nichts.
- * - Läuft genau einmal pro Pageload. Bei Soft-Navigations (Next.js App
- *   Router) bleibt das Layout gemountet, wir hängen daher zusätzlich an
- *   `popstate` und `pushState` (über visibilitychange-Heuristik), um neue
- *   UTM-Parameter bei interner Navigation nicht zu verpassen.
- *   Da App-Router-Navigation typischerweise UTMs nicht intern routet,
- *   reicht in 99 % der Fälle der initiale Mount.
+ * - Läuft genau einmal pro Pageload.
+ * - **No-op auf internen Routen** (`/intern/*`, `/kundenlogin`, `/login`).
+ *   Verhindert, dass jemand mit `?utm_*` auf /intern/marketing landet und
+ *   damit die First-Touch-Attribution eines Leads überschreibt. Defense
+ *   in Depth – die `data-exclude`-Plausible-Liste ist semantisch dieselbe.
  */
 export function AttributionCapture() {
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isAnalyticsExcludedPath(window.location.pathname)) return;
     captureAttribution();
   }, []);
 

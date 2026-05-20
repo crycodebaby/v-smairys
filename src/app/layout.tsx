@@ -65,6 +65,7 @@ export const metadata: Metadata = {
 }
 
 import { Footer } from "@/components/layout/Footer"
+import { ConditionalFooter } from "@/components/layout/ConditionalFooter"
 import { PlausibleAnalytics } from "@/components/analytics/PlausibleAnalytics"
 import { AttributionCapture } from "@/components/analytics/AttributionCapture"
 
@@ -81,7 +82,9 @@ export default function RootLayout({
     <html lang="de" className="scroll-smooth">
       <body className={`${inter.className} min-h-screen antialiased flex flex-col`}>
         <main className="flex-1">{children}</main>
-        <Footer />
+        <ConditionalFooter>
+          <Footer />
+        </ConditionalFooter>
         <AttributionCapture />
         <PlausibleAnalytics />
       </body>

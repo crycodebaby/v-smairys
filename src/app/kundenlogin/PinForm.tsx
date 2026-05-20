@@ -4,10 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { PinDots } from "@/components/ui/glass/PinDots";
 import { PinKeypad } from "@/components/ui/glass/PinKeypad";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
-import {
-  loginWithPin,
-  type LoginActionResult,
-} from "./actions";
+import { loginWithPin, type LoginActionResult } from "./actions";
 
 type PinFormProps = {
   pinLength: number;
@@ -15,37 +12,39 @@ type PinFormProps = {
   next: string;
 };
 
+type Phase = "idle" | "submitting" | "success" | "error";
+
 export function PinForm({ pinLength, next }: PinFormProps) {
   const [pin, setPin] = useState("");
-  const [shake, setShake] = useState(false);
+  const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const shakeTimer = useRef<number | null>(null);
+  const successTimer = useRef<number | null>(null);
 
-  // PIN nach erfolgreichem Submit nicht behalten.
   useEffect(() => {
     return () => {
-      if (shakeTimer.current !== null) {
-        window.clearTimeout(shakeTimer.current);
-      }
+      if (shakeTimer.current !== null) window.clearTimeout(shakeTimer.current);
+      if (successTimer.current !== null) window.clearTimeout(successTimer.current);
     };
   }, []);
 
-  function triggerShake() {
-    setShake(true);
-    if (shakeTimer.current !== null) {
-      window.clearTimeout(shakeTimer.current);
-    }
+  function triggerError(message: string) {
+    setPhase("error");
+    setError(message);
+    if (shakeTimer.current !== null) window.clearTimeout(shakeTimer.current);
     shakeTimer.current = window.setTimeout(() => {
-      setShake(false);
-    }, 500);
+      setPhase((p) => (p === "error" ? "idle" : p));
+    }, 600);
   }
 
   function submitPin(currentPin: string) {
     if (currentPin.length !== pinLength) return;
-    if (pending) return;
+    if (pending || phase === "success") return;
 
     setError(null);
+    setPhase("submitting");
+
     startTransition(async () => {
       const formData = new FormData();
       formData.append("pin", currentPin);
@@ -55,70 +54,71 @@ export function PinForm({ pinLength, next }: PinFormProps) {
       try {
         result = await loginWithPin(null, formData);
       } catch (err) {
-        // Wenn `redirect()` aus der Server Action throwt, fängt Next das normal
-        // selbst ab – dieser Block wird nur bei echten Fehlern erreicht.
-        // Wir loggen bewusst nichts mit PII.
         if (process.env.NODE_ENV === "development") {
           console.error("[kundenlogin] Server Action error", err);
         }
-        triggerShake();
         setPin("");
-        setError("Anmeldung fehlgeschlagen. Bitte erneut versuchen.");
+        triggerError("Anmeldung fehlgeschlagen. Bitte erneut versuchen.");
         return;
       }
 
       if (result.ok) {
-        // Im Erfolgsfall hat die Server Action bereits via redirect()
-        // weiternavigiert. Falls wir doch hier landen, hart navigieren.
-        window.location.href = next;
+        // Erfolgs-Animation kurz zeigen, dann hart navigieren.
+        // (Der redirect aus der Server Action sollte das eigentlich schon
+        // tun, aber wir setzen einen Fallback.)
+        setPhase("success");
+        if (successTimer.current !== null) window.clearTimeout(successTimer.current);
+        successTimer.current = window.setTimeout(() => {
+          window.location.href = next;
+        }, 500);
         return;
       }
 
-      triggerShake();
       setPin("");
-
       switch (result.reason) {
-        case "rate-limited":
-          {
-            const minutes = result.retryAfterSeconds
-              ? Math.max(1, Math.ceil(result.retryAfterSeconds / 60))
-              : 15;
-            setError(
-              `Zu viele Versuche. Bitte in etwa ${minutes} Minute${minutes === 1 ? "" : "n"} erneut versuchen.`
-            );
-          }
+        case "rate-limited": {
+          const minutes = result.retryAfterSeconds
+            ? Math.max(1, Math.ceil(result.retryAfterSeconds / 60))
+            : 15;
+          triggerError(
+            `Zu viele Versuche. Bitte in etwa ${minutes} Minute${minutes === 1 ? "" : "n"} erneut versuchen.`
+          );
           break;
+        }
         case "not-configured":
-          setError("Login ist serverseitig nicht konfiguriert.");
+          triggerError("Login ist serverseitig nicht konfiguriert.");
           break;
         case "missing":
         case "invalid":
         default:
-          setError("PIN nicht korrekt.");
+          triggerError("PIN nicht korrekt.");
       }
     });
   }
 
   function appendDigit(digit: string) {
-    if (pending) return;
+    if (pending || phase === "success") return;
     if (pin.length >= pinLength) return;
-    const next = pin + digit;
-    setPin(next);
-    if (next.length === pinLength) {
-      submitPin(next);
+    const nextValue = pin + digit;
+    setPin(nextValue);
+    setPhase("idle");
+    setError(null);
+    if (nextValue.length === pinLength) {
+      submitPin(nextValue);
     }
   }
 
   function backspace() {
-    if (pending) return;
+    if (pending || phase === "success") return;
     setPin((p) => p.slice(0, -1));
+    setPhase("idle");
     setError(null);
   }
 
-  // Tastatur-Support (Desktop): 0-9 hinzufügen, Backspace löschen.
+  // Desktop-Tastatur-Support: 0-9, Backspace, Enter.
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (pending) return;
+      if (pending || phase === "success") return;
       if (event.key >= "0" && event.key <= "9") {
         event.preventDefault();
         appendDigit(event.key);
@@ -134,43 +134,55 @@ export function PinForm({ pinLength, next }: PinFormProps) {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // pending/pin in Closures gefangen – State wird in Handler-Body neu gelesen.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pin, pending, pinLength]);
+  }, [pin, pending, pinLength, phase]);
+
+  const showShake = phase === "error";
+  const showSuccess = phase === "success";
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-7">
       <div className="flex flex-col items-center gap-3">
-        <PinDots filled={pin.length} length={pinLength} shake={shake} />
+        <PinDots
+          filled={showSuccess ? pinLength : pin.length}
+          length={pinLength}
+          shake={showShake}
+          success={showSuccess}
+        />
         <p
-          className={`min-h-[1.25rem] text-sm transition-opacity ${
-            error ? "opacity-100" : "opacity-0"
-          } ${error ? "text-red-300" : "text-foreground/60"}`}
+          className={
+            "min-h-[1.25rem] text-sm transition-opacity duration-200 " +
+            (error
+              ? "text-rose-200 opacity-100"
+              : phase === "success"
+                ? "text-emerald-200 opacity-100"
+                : "text-foreground/60 opacity-0")
+          }
           aria-live="polite"
         >
-          {error ?? " "}
+          {phase === "success" ? "Willkommen zurück." : (error ?? " ")}
         </p>
       </div>
 
       <PinKeypad
         onDigit={appendDigit}
         onBackspace={backspace}
-        disabled={pending}
+        disabled={pending || phase === "success"}
       />
 
-      <div className="flex items-center gap-3">
-        <GlassButton
-          type="button"
-          size="sm"
-          onClick={() => {
-            setPin("");
-            setError(null);
-          }}
-          disabled={pending || pin.length === 0}
-        >
-          Zurücksetzen
-        </GlassButton>
-      </div>
+      <GlassButton
+        type="button"
+        variant="subtle"
+        size="sm"
+        onClick={() => {
+          setPin("");
+          setError(null);
+          setPhase("idle");
+        }}
+        disabled={pending || phase === "success" || pin.length === 0}
+      >
+        Eingabe leeren
+      </GlassButton>
     </div>
   );
 }

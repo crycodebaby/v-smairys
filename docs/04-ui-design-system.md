@@ -43,9 +43,44 @@ Varianten via `emphasis`:
 
 ### `GlassButton`
 
-Glass-Optik, abgerundet-`full`. Zwei Varianten (`subtle`, `solid`), drei Größen
-(`sm`, `md`, `lg`). Kein eigenes Tracking. Wer Tracking will, nutzt
-`TrackedButton` aus `src/components/ui/TrackedButton.tsx`.
+Glass-Optik, abgerundet-`full`. Vier Varianten:
+- `subtle` – dezent, sekundäre Aktionen (Default).
+- `solid` – stärkerer Akzent, primärer CTA innerhalb einer Glas-Oberfläche.
+- `ghost` – nur Hover-Glow, kein dauerhafter Hintergrund.
+- `tonal` – heller, z. B. für Detail-Toolbar.
+
+Drei Größen: `sm`, `md`, `lg`. Optionaler `leadingIcon`-Slot.
+
+Microinteractions: Hover-Chroma-Glow (Fuchsia/Sky/Violet), Pressed-Skalierung,
+Focus-Ring. Kein eigenes Tracking. Wer Tracking will, nutzt `TrackedButton`
+(`src/components/ui/TrackedButton.tsx`) – dieser ist auf internen Routen no-op.
+
+### `StatusChip`
+
+Status-Pille für Dashboard-Listen und Cards.
+
+```tsx
+<StatusChip variant="active" withDot>Live</StatusChip>
+```
+
+Varianten: `draft`, `active`, `paused`, `archived`, `info`, `warning`, `danger`,
+`neutral`. Sizes: `sm` (Default), `md`. `withDot`: blinkender Live-Indikator,
+ideal für `active`-Status.
+
+### `Toolbar` + `ToolbarBrand`
+
+Sticky-fähige Glas-TopBar mit Brand-, Title-, Description- und Actions-Slot.
+`ToolbarBrand` rendert ein quadratisches Logo-Tile + zwei Textzeilen (Label
+groß-uppercase, Sublabel normal). Description ist auf Mobile ausgeblendet.
+
+```tsx
+<Toolbar
+  brand={<ToolbarBrand label="Smairys · Intern" sublabel="Marketing" />}
+  title="Kampagnen-Dashboard"
+  description="Zentrale Übersicht für QR, UTM, Druck-Workflows"
+  actions={<>…</>}
+/>
+```
 
 ### `PinDots`
 
@@ -67,10 +102,27 @@ Tastatur-Bindings macht der Aufrufer (siehe `app/kundenlogin/PinForm.tsx`).
 
 ## CopyButton (`src/components/ui/CopyButton.tsx`)
 
-- `variant="plain"` (Default) – schlicht, mit Border.
-- `variant="glass"` – passt zur Glass-Optik.
-- 2 Sekunden Erfolgs-Feedback, dann Reset.
+- `variant="plain"` – schlicht, mit Border (klassisch).
+- `variant="glass"` (Default) – passt zur Glass-Optik.
+- `variant="tonal"` – stärker betont, z. B. für Primärkopie im Hero.
+- Sizes: `xs`, `sm` (Default), `md`.
+- Optional `leadingIcon`.
+- 2 Sekunden Erfolgs-Feedback (Check-Icon + "Kopiert"), dann Reset.
 - Fallback ohne Clipboard-API über versteckte Textarea.
+
+## Chroma-Stage (`.chroma-stage`)
+
+Utility-Klasse in `globals.css` für Hero-Container mit lebendigem
+Light-Blob-Hintergrund (drei langsam driftende Radial-Gradienten in
+Violet/Cyan/Pink). Bewegung respektiert `prefers-reduced-motion`. Bewusst
+sparsam einsetzen – aktuell nur `/kundenlogin` und `/intern/marketing`.
+
+## ConditionalFooter (`src/components/layout/ConditionalFooter.tsx`)
+
+Wrapper im Root-Layout, der den `<Footer />` per `usePathname()` auf
+`/kundenlogin` und `/intern/*` ausblendet. Verwendet die zentrale
+Exclusion-Liste aus `lib/analytics-config.ts`. `<Footer />` bleibt Server
+Component – die Children werden über den Slot übergeben.
 
 ## Tracking-Komponenten (öffentlich)
 

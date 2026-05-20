@@ -19,13 +19,15 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 - `src/lib/analytics.ts` – typisierter Plausible-Helper.
 - `src/lib/analytics-config.ts` – Liste der von Plausible auszuschließenden Pfade.
 - `src/lib/attribution/attribution.ts` – First-Touch (localStorage) + Last-Touch (sessionStorage).
-- `src/components/ui/glass/` – wiederverwendbare Liquid-Glass-Primitive (`GlassPanel`, `GlassButton`, `GlassCard`, `PinDots`, `PinKeypad`).
+- `src/components/ui/glass/` – wiederverwendbare Liquid-Glass-Primitive (`GlassPanel`, `GlassButton`, `GlassCard`, `StatusChip`, `Toolbar`, `ToolbarBrand`, `PinDots`, `PinKeypad`).
 - `src/components/ui/CopyButton.tsx` – Clipboard-Helper für Dashboard & intern.
 - `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`DebugCard`, `PrintChecklist`).
+- `src/components/layout/ConditionalFooter.tsx` – versteckt den Marketing-Footer auf `/intern/*` und `/kundenlogin`, wiederverwendet `analytics-config`-Liste.
+- `src/app/intern/marketing/_components/` – Master-Detail-Shell des Dashboards (`MarketingDashboard`, `CampaignList`, `CampaignDetail`). Private Folder → nie als Route.
 
 ## Interner Zugang
 
-- Öffentlicher Einstieg: `/kundenlogin` (Link unauffällig im Header).
+- Öffentlicher Einstieg: Kundenlogin-Pille im `Header` (`src/components/layout/Header.tsx`), `prefetch={false}`, kein Tracking, Lock-Icon + Chroma-Hover. Auf Mobile zeigt sie nur „Login", auf `sm+` den vollen Text „Kundenlogin".
 - Auth-Mechanik: PIN-Eingabe → Server Action `loginWithPin` → HMAC-Cookie `smairys_intern_session` (httpOnly, secure in prod, sameSite=lax, 7 Tage).
 - Geschützt: alles unter `/intern/*` (via Middleware).
 - Dashboard (Marketing): `/intern/marketing`.
@@ -39,7 +41,11 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 
 - Plausible-Snippet liegt im Root-Layout (`<PlausibleAnalytics />`).
 - Standard-Skript ist `https://plausible.io/js/script.exclusions.js` mit `data-exclude="/intern/*, /kundenlogin, /login"`.
-- Zusätzlich: `lib/analytics.ts` und `lib/tracking/plausible.ts` no-open Events auf den ausgeschlossenen Pfaden.
+- Defense in Depth: drei Layer prüfen die Exclusion-Liste:
+  1. `lib/analytics.ts` → `trackEvent` (no-op bei excluded path)
+  2. `lib/tracking/plausible.ts` → `trackPlausibleEvent` (no-op)
+  3. `lib/tracking/events.ts` → `dispatchEvent` (no-op, blockt auch GTM)
+- Auch die Attribution-Erfassung (`AttributionCapture`) ist auf internen Routen no-op.
 - **Niemals PII (E-Mail, Name, Telefon, IP) als Plausible-Prop senden.** Properties sind ausschließlich kategoriale Werte.
 - Attribution für Lead-Submits läuft separat (siehe `docs/01-marketing-dashboard.md`).
 
