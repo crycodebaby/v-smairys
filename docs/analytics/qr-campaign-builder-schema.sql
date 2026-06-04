@@ -76,12 +76,18 @@ create index if not exists marketing_campaigns_utm_campaign_idx
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
+security invoker
+set search_path = ''
 as $$
 begin
   new.updated_at = now();
   return new;
 end;
 $$;
+
+revoke execute on function public.set_updated_at() from anon;
+revoke execute on function public.set_updated_at() from authenticated;
+revoke execute on function public.set_updated_at() from public;
 
 drop trigger if exists marketing_campaigns_set_updated_at
   on public.marketing_campaigns;
@@ -118,6 +124,11 @@ as $$
     count = public.qr_redirect_daily_counts.count + 1,
     updated_at = now();
 $$;
+
+-- Datensparsame Zähl-RPC nicht öffentlich aufrufbar machen.
+revoke execute on function public.increment_qr_redirect_daily_count(text) from anon;
+revoke execute on function public.increment_qr_redirect_daily_count(text) from authenticated;
+revoke execute on function public.increment_qr_redirect_daily_count(text) from public;
 
 alter table public.marketing_campaigns enable row level security;
 alter table public.qr_redirect_daily_counts enable row level security;

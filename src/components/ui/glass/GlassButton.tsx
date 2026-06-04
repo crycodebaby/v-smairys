@@ -18,7 +18,7 @@ import React from "react";
  * Reine UI-Primitive – kein Tracking eingebaut.
  */
 export type GlassButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "subtle" | "solid" | "ghost" | "tonal";
+  variant?: "subtle" | "solid" | "ghost" | "tonal" | "accent";
   size?: "sm" | "md" | "lg";
   /** Optional: Inhalt links vor dem Label (Icon). */
   leadingIcon?: React.ReactNode;
@@ -39,6 +39,9 @@ const VARIANT = {
     "bg-transparent hover:bg-white/[0.06] border border-transparent hover:border-white/10 text-foreground/80",
   tonal:
     "bg-white/[0.10] hover:bg-white/[0.16] border border-white/15 hover:border-white/25 text-foreground backdrop-blur-xl",
+  accent:
+    "bg-[hsl(var(--brand)/0.16)] hover:bg-[hsl(var(--brand)/0.24)] border border-[hsl(var(--brand)/0.45)] hover:border-[hsl(var(--brand)/0.6)] text-foreground backdrop-blur-xl " +
+    "shadow-[0_8px_28px_-14px_hsl(var(--brand-glow)/0.8)]",
 } as const;
 
 export const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>(
@@ -60,14 +63,25 @@ export const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>
         {...props}
       >
         {/* Chroma-Glow: erscheint nur beim Hover. Drei farbige Punkte unter
-            dem Button, weichgezeichnet → wirkt wie iridescent light leak. */}
+            dem Button, weichgezeichnet → wirkt wie iridescent light leak.
+            Accent-Variante nutzt warmes Brand-Licht statt RGB. */}
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-active:opacity-100"
         >
-          <span className="absolute -left-6 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-fuchsia-500/40 blur-2xl" />
-          <span className="absolute left-1/2 top-1/2 h-16 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-400/30 blur-2xl" />
-          <span className="absolute -right-6 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-violet-400/40 blur-2xl" />
+          {variant === "accent" ? (
+            <>
+              <span className="absolute -left-6 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-[hsl(var(--brand-glow)/0.5)] blur-2xl" />
+              <span className="absolute left-1/2 top-1/2 h-16 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(var(--brand-soft)/0.4)] blur-2xl" />
+              <span className="absolute -right-6 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-[hsl(var(--brand)/0.45)] blur-2xl" />
+            </>
+          ) : (
+            <>
+              <span className="absolute -left-6 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-fuchsia-500/40 blur-2xl" />
+              <span className="absolute left-1/2 top-1/2 h-16 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-400/30 blur-2xl" />
+              <span className="absolute -right-6 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-violet-400/40 blur-2xl" />
+            </>
+          )}
         </span>
         {/* Top-Highlight Hairline */}
         <span

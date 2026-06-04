@@ -23,7 +23,8 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 - `src/lib/attribution/attribution.ts` – First-Touch (localStorage) + Last-Touch (sessionStorage).
 - `src/components/ui/glass/` – wiederverwendbare Liquid-Glass-Primitive (`GlassPanel`, `GlassButton`, `GlassCard`, `StatusChip`, `Toolbar`, `ToolbarBrand`, `PinDots`, `PinKeypad`).
 - `src/components/ui/CopyButton.tsx` – Clipboard-Helper für Dashboard & intern.
-- `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`DebugCard`, `PrintChecklist`, `TestChecklist`).
+- `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`SystemStatusDialog`, `PrintChecklist`, `TestChecklist`).
+- `src/components/ui/glass/` zusätzlich: `GlassSheet` (Dialog/Sheet), `GlassSegmented`, `GlassListbox`, `ChipGroup` – ersetzen native Selects im Dashboard.
 - `src/components/layout/ConditionalFooter.tsx` – versteckt den Marketing-Footer auf `/intern/*` und `/kundenlogin`, wiederverwendet `analytics-config`-Liste.
 - `src/app/intern/marketing/_components/` – Master-Detail-Shell des Dashboards (`MarketingDashboard`, `CampaignList`, `CampaignDetail`). Private Folder → nie als Route.
 

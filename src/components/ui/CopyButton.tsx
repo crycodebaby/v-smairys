@@ -83,11 +83,13 @@ export function CopyButton({
       type="button"
       onClick={handleCopy}
       aria-label={ariaLabel ?? label}
+      data-copied={copied ? "true" : undefined}
       className={
         "group relative inline-flex select-none items-center justify-center font-medium " +
         "transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out " +
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 " +
         "active:scale-[0.97] disabled:opacity-50 " +
+        (copied ? "animate-copy-pulse border-emerald-400/40 bg-emerald-400/[0.12] text-emerald-50 " : "") +
         `${VARIANT[variant]} ${SIZE[size]} ${className}`
       }
     >

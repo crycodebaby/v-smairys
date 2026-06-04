@@ -116,6 +116,21 @@
     /* Subtle Liquid Glass Effect */
   }
 
+  /* ─── Interne Dashboard-Typografie (Geist / Geist Mono) ──────────────────
+     Nur auf internen Routen aktiv (Wrapper trägt `.intern-typography` plus
+     die Font-Variablen). Öffentliche Website bleibt auf Inter. */
+  .intern-typography {
+    font-family: var(--font-intern-sans), system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.011em;
+  }
+  .intern-typography .font-mono,
+  .intern-typography code,
+  .intern-typography kbd,
+  .intern-typography samp,
+  .intern-typography pre {
+    font-family: var(--font-intern-mono), ui-monospace, SFMono-Regular, monospace;
+  }
+
   /* ─── Liquid-Glass Surfaces ─────────────────────────────────────────────
      Für die internen Apple-inspirierten Glas-Flächen.
      Wir kombinieren: leichte Tinte (bg), tiefer Blur, ein inset-Highlight
@@ -256,6 +271,58 @@
   }
   .animate-panel-in {
     animation: panel-in 0.32s cubic-bezier(.22,.61,.36,1) both;
+  }
+
+  /* Sheet/Dialog: schnelles, hochwertiges Auftauchen (skaliert leicht hoch). */
+  @keyframes sheet-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-sheet-in {
+    animation: sheet-in 0.22s cubic-bezier(.22,.61,.36,1) both;
+  }
+  @keyframes backdrop-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .animate-backdrop-in {
+    animation: backdrop-in 0.2s ease-out both;
+  }
+
+  /* Copy-Success: kurzer grün-gläserner Puls. */
+  @keyframes copy-pulse {
+    0%   { box-shadow: 0 0 0 0 hsl(155 80% 55% / 0.0); }
+    35%  { box-shadow: 0 0 0 4px hsl(155 80% 55% / 0.28), 0 0 20px 2px hsl(155 80% 50% / 0.30); }
+    100% { box-shadow: 0 0 0 0 hsl(155 80% 55% / 0.0); }
+  }
+  .animate-copy-pulse {
+    animation: copy-pulse 0.6s cubic-bezier(.22,.61,.36,1) both;
+  }
+
+  /* Warmer Brand-Glow für ausgewählte/aktive Controls (#d47115). */
+  .brand-selected {
+    border-color: hsl(var(--brand) / 0.55) !important;
+    background-color: hsl(var(--brand) / 0.14) !important;
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.18),
+      0 6px 22px -12px hsl(var(--brand-glow) / 0.75);
+  }
+
+  /* Reduced Motion: alle dekorativen Animationen ruhigstellen. */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-panel-in,
+    .animate-sheet-in,
+    .animate-backdrop-in,
+    .animate-copy-pulse,
+    .animate-pin-shake,
+    .animate-pin-success,
+    .chroma-stage::before,
+    .chroma-stage::after {
+      animation: none !important;
+    }
+    * {
+      scroll-behavior: auto !important;
+    }
   }
 
   /* ─── Brand-Akzent Utilities ────────────────────────────────────────────

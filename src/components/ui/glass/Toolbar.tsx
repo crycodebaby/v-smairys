@@ -62,16 +62,21 @@ export function Toolbar({
 export function ToolbarBrand({
   label,
   sublabel,
+  logo,
 }: {
   label: string;
   sublabel?: string;
+  /** Optionaler Logo-Slot. Fällt sonst auf den generischen „S"-Tile zurück. */
+  logo?: React.ReactNode;
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-white text-background shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
-        <span className="absolute inset-0 -z-0 bg-gradient-to-br from-white via-zinc-100 to-zinc-300" />
-        <span className="relative z-10 text-[15px] font-bold tracking-tighter">S</span>
-      </span>
+      {logo ?? (
+        <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-white text-background shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
+          <span className="absolute inset-0 -z-0 bg-gradient-to-br from-white via-zinc-100 to-zinc-300" />
+          <span className="relative z-10 text-[15px] font-bold tracking-tighter">S</span>
+        </span>
+      )}
       <div className="hidden sm:block">
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground/55">
           {label}

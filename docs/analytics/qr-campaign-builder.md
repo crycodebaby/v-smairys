@@ -65,6 +65,25 @@ Lokal in `.env.local` (nicht committen):
 
 Siehe auch `.env.example`.
 
+### Vercel ENV (Pflicht für Live/Preview)
+
+Damit `/intern/marketing` und `/go/[slug]` Supabase nutzen (statt statischem
+Fallback), müssen in Vercel folgende Variablen gesetzt sein:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY` (Server-only; niemals als `NEXT_PUBLIC_*`)
+
+Schritte:
+
+1. Vercel → Project → Settings → Environment Variables.
+2. Beide Variablen für **Production** **und** **Preview** anlegen.
+3. Nach dem Setzen **Redeploy** auslösen (ENV-Änderungen greifen erst beim
+   nächsten Build/Deploy).
+4. `.env.local` bleibt lokal und wird **nie committet** (steht in `.gitignore`).
+
+Ohne diese ENV läuft die App im sichtbaren statischen Fallback; CRUD ist dann
+deaktiviert.
+
 ## Manuelle Schritte (einmalig)
 
 1. Supabase-Projekt verlinken, Env Vars in Vercel + lokal setzen
@@ -88,6 +107,34 @@ Siehe auch `.env.example`.
 - Filter: Top Sources → Campaigns nach `utm_campaign`
 
 Details: `docs/analytics/plausible-setup.md`, `docs/analytics/plausible-goals.md`
+
+## Query-Schutz / Performance
+
+- Kampagnen werden **einmal serverseitig** pro Request in `page.tsx`
+  (`listMarketingCampaigns`) geladen – kein Client-Fetch, keine `useEffect`-Loops.
+- Suche und Status-Filter laufen **rein clientseitig** über die bereits
+  geladene Liste (`useMemo`), also **keine DB-Abfrage pro Tastendruck**.
+- Server Actions (`actions.ts`) validieren Inputs serverseitig und prüfen die
+  PIN-Session (`requireInternSession`) bei Create/Edit/Archive.
+- Slug/`utm_campaign` werden serverseitig per `slugify` normalisiert
+  (reparierend statt nur ablehnend).
+- Service Role bleibt server-only (`src/lib/supabase/server.ts`,
+  `import "server-only"`); alle DB-Zugriffe sind in
+  `src/lib/marketing-campaigns-db.ts` zentralisiert.
+- Keine rekursiven oder wiederholten DB-Zugriffe im Dashboard-Render.
+
+## UI / Builder
+
+- IA: linke Sidebar (Neue Kampagne, Suche, Status-Filter, Liste), rechts oben
+  das Print-Asset-Kit, darunter Druck-/Test-Checkliste.
+- Builder ist ein Glass-Sheet (kein Dauerformular im Layout) mit Presets für
+  Medium/Thema/Region/Jahr/Version; Slug + UTM werden automatisch abgeleitet
+  und sind manuell überschreibbar.
+- Native Selects ersetzt durch Glass-Komponenten: Status = Segmented Control,
+  Zielseite/UTM-Medium = Glass-Listbox, Presets = Chip-Auswahl.
+- Systemstatus liegt im Glass-Dialog (Button „Systemstatus"); ein dezenter
+  Deployment-/Versionshinweis steht im Footer (`VERCEL_ENV`,
+  `VERCEL_GIT_COMMIT_REF`, `VERCEL_GIT_COMMIT_SHA`; Fallback `local`).
 
 ## Fallback
 

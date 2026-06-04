@@ -167,6 +167,25 @@ export function isKebabCase(value: string): boolean {
   return KEBAB_CASE_REGEX.test(value);
 }
 
+/**
+ * Normalisiert beliebigen Text zu lowercase-kebab-case.
+ * Deutsche Umlaute werden transliteriert (ä→ae, ö→oe, ü→ue, ß→ss).
+ * Reparierend gedacht: liefert immer einen gültigen kebab-Wert (ggf. leer).
+ */
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+}
+
 export function isInternalCampaignDestination(path: string): boolean {
   return (
     path === "/intern" ||

@@ -13,7 +13,11 @@ import {
   INTERN_SESSION_COOKIE,
   verifySessionToken,
 } from "@/lib/auth/intern-session";
-import type { CampaignStatus, UtmMedium } from "@/lib/marketing-campaigns";
+import {
+  slugify,
+  type CampaignStatus,
+  type UtmMedium,
+} from "@/lib/marketing-campaigns";
 
 export type CampaignActionState = {
   ok: boolean;
@@ -103,15 +107,21 @@ function parseCampaignInput(formData: FormData): MarketingCampaignInput {
     throw new Error("destination_path muss mit `/` beginnen.");
   }
 
+  const slug = slugify(readRequired(formData, "slug"));
+  const utmCampaign = slugify(readRequired(formData, "utm_campaign"));
+  if (!slug) {
+    throw new Error("Slug ergibt nach Normalisierung keinen gültigen Wert.");
+  }
+
   return {
     internal_name: readRequired(formData, "internal_name"),
     external_title: readRequired(formData, "external_title"),
-    slug: readRequired(formData, "slug"),
+    slug,
     status: readStatus(formData),
     destination_path: destination as `/${string}`,
     utm_source: readRequired(formData, "utm_source"),
     utm_medium: readUtmMedium(formData),
-    utm_campaign: readRequired(formData, "utm_campaign"),
+    utm_campaign: utmCampaign || slug,
     utm_content: readRequired(formData, "utm_content"),
     utm_term: readOptional(formData, "utm_term"),
     medium_label: readOptional(formData, "medium_label"),

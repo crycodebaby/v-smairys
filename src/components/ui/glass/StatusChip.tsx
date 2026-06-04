@@ -38,9 +38,9 @@ const VARIANT_STYLES: Record<
   { wrap: string; text: string; dot: string }
 > = {
   draft: {
-    wrap: "border-amber-400/30 bg-amber-400/10",
-    text: "text-amber-100",
-    dot: "bg-amber-300",
+    wrap: "border-slate-300/25 bg-slate-200/[0.07]",
+    text: "text-slate-100",
+    dot: "bg-slate-300",
   },
   active: {
     wrap: "border-emerald-400/30 bg-emerald-400/10",
@@ -48,14 +48,14 @@ const VARIANT_STYLES: Record<
     dot: "bg-emerald-300",
   },
   paused: {
-    wrap: "border-orange-400/30 bg-orange-400/10",
-    text: "text-orange-100",
-    dot: "bg-orange-300",
+    wrap: "border-amber-400/35 bg-amber-400/10",
+    text: "text-amber-100",
+    dot: "bg-amber-300",
   },
   archived: {
-    wrap: "border-zinc-400/30 bg-zinc-400/10",
-    text: "text-zinc-200",
-    dot: "bg-zinc-300",
+    wrap: "border-violet-400/25 bg-violet-400/[0.08]",
+    text: "text-violet-100/90",
+    dot: "bg-violet-300",
   },
   info: {
     wrap: "border-sky-400/30 bg-sky-400/10",

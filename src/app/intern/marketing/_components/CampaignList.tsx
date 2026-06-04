@@ -2,12 +2,17 @@
 
 import React, { useMemo, useState } from "react";
 import { StatusChip, type StatusChipVariant } from "@/components/ui/glass/StatusChip";
+import { GlassButton } from "@/components/ui/glass/GlassButton";
 import type { CampaignSummary } from "./types";
+
+type StatusFilter = "all" | CampaignSummary["status"];
 
 type CampaignListProps = {
   campaigns: readonly CampaignSummary[];
   selectedSlug: string | null;
   onSelect: (slug: string) => void;
+  onNew?: () => void;
+  canCreate?: boolean;
 };
 
 const STATUS_VARIANT_MAP: Record<CampaignSummary["status"], StatusChipVariant> = {
@@ -24,35 +29,55 @@ const STATUS_LABEL: Record<CampaignSummary["status"], string> = {
   archived: "Archiv",
 };
 
+const FILTER_OPTIONS: { id: StatusFilter; label: string }[] = [
+  { id: "all", label: "Alle" },
+  { id: "active", label: "Live" },
+  { id: "draft", label: "Entwurf" },
+  { id: "paused", label: "Pause" },
+  { id: "archived", label: "Archiv" },
+];
+
 /**
- * Linke Spalte: einfache Suche nach Name, Slug, Region oder Stadt.
+ * Linke Spalte: + Neue Kampagne, clientseitige Suche (Name, Slug, Region,
+ * Stadt) und Status-Filter über bereits geladene Kampagnen. Keine DB-Abfrage
+ * pro Tastendruck – es wird ausschließlich die geladene Liste gefiltert.
  */
 export function CampaignList({
   campaigns,
   selectedSlug,
   onSelect,
+  onNew,
+  canCreate = false,
 }: CampaignListProps) {
   const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<StatusFilter>("all");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return campaigns;
     return campaigns.filter((c) => {
-      const hay = [
-        c.slug,
-        c.internalName,
-        c.externalTitle,
-        c.region ?? "",
-        c.city ?? "",
-      ]
+      if (filter !== "all" && c.status !== filter) return false;
+      if (!q) return true;
+      const hay = [c.slug, c.internalName, c.externalTitle, c.region ?? "", c.city ?? ""]
         .join(" ")
         .toLowerCase();
       return hay.includes(q);
     });
-  }, [campaigns, query]);
+  }, [campaigns, query, filter]);
 
   return (
     <div className="flex h-full flex-col gap-3">
+      <GlassButton
+        type="button"
+        size="sm"
+        variant="solid"
+        onClick={onNew}
+        disabled={!canCreate}
+        className="w-full"
+        leadingIcon={<PlusIcon />}
+      >
+        Neue Kampagne
+      </GlassButton>
+
       <div className="relative">
         <SearchIcon className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground/45" />
         <input
@@ -68,6 +93,28 @@ export function CampaignList({
             "focus:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
           }
         />
+      </div>
+
+      <div className="flex flex-wrap gap-1">
+        {FILTER_OPTIONS.map((opt) => {
+          const isActive = opt.id === filter;
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => setFilter(opt.id)}
+              aria-pressed={isActive}
+              className={
+                "rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors duration-200 " +
+                (isActive
+                  ? "border-white/30 bg-white/15 text-foreground"
+                  : "border-white/10 bg-white/[0.04] text-foreground/65 hover:border-white/20 hover:text-foreground")
+              }
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="-mx-1 flex flex-1 flex-col gap-1.5 overflow-y-auto px-1">
@@ -149,6 +196,14 @@ export function CampaignList({
         {filtered.length} von {campaigns.length} Kampagnen
       </p>
     </div>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" d="M8 3.5v9M3.5 8h9" />
+    </svg>
   );
 }
 
