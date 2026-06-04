@@ -2,9 +2,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { trackContactIntent, trackCtaClick } from "@/lib/analytics";
-
-const CAL_URL = "https://calendar.app.google/xZDxJVbdPxonZAqh7";
+import { CalendarBookingButton } from "./ContactActions";
 
 /** Minimalistisches Google-Calendar-Icon als Inline-SVG (Markenfarben angedeutet) */
 function GoogleCalendarIcon({ className }: { className?: string }) {
@@ -75,26 +73,16 @@ export default function BookingCard() {
           </ul>
 
           <div className="mt-5">
-            <a
-              href={CAL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                trackCtaClick({
-                  cta: "booking-google-calendar",
-                  location: "booking",
-                });
-                trackContactIntent({ type: "booking", location: "booking" });
-              }}
+            <CalendarBookingButton
+              location="booking"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold transition rounded-md  bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-              aria-label="Google Kalender – Termin buchen"
             >
               Im Google Kalender buchen
               <span
                 aria-hidden
                 className="inline-block h-[1.15em] w-[1.15em] rounded-[4px] bg-white/20"
               />
-            </a>
+            </CalendarBookingButton>
           </div>
         </div>
       </div>

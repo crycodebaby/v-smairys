@@ -1,5 +1,12 @@
+import { getConsentState } from '../consent/consent-helper';
+import { getAttributionData } from '../attribution/attribution';
+import { trackGtmEvent } from './gtm';
+import { trackPlausibleEvent } from './plausible';
+import { isAnalyticsExcludedPath } from '../analytics-config';
+import { type TrackingEventName } from './event-names';
+
 export type TrackingPayload = {
-  event_name: 'cta_click' | 'form_start' | 'form_submit_success' | 'form_submit_error' | 'page_view' | 'scroll_depth';
+  event_name: TrackingEventName;
   page_type: string;
   page_path: string;
   cta_id?: string;
@@ -11,15 +18,11 @@ export type TrackingPayload = {
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
   referrer?: string;
   consent_state: 'granted' | 'denied' | 'pending';
 };
-
-import { hasConsent, getConsentState } from '../consent/consent-helper';
-import { getAttributionData } from '../attribution/attribution';
-import { trackGtmEvent } from './gtm';
-import { trackPlausibleEvent } from './plausible';
-import { isAnalyticsExcludedPath } from '../analytics-config';
 
 export function dispatchEvent(basePayload: Partial<TrackingPayload> & { event_name: TrackingPayload['event_name'] }) {
   if (typeof window === 'undefined') return;

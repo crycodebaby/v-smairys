@@ -196,7 +196,8 @@ export function CampaignDetail({ vm }: CampaignDetailProps) {
               und nach <code className="rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[11px] text-foreground/85">{campaign.utm_campaign}</code> filtern.
               Conversions ergeben sich aus den Goals
               <code className="ml-1 rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[11px] text-foreground/85">form_submit_success</code> und
-              <code className="ml-1 rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[11px] text-foreground/85">Contact Intent</code>.
+              <code className="ml-1 rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[11px] text-foreground/85">phone_click</code> /
+              <code className="ml-1 rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[11px] text-foreground/85">calendar_click</code>.
             </p>
           </GlassCard>
 

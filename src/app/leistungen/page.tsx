@@ -4,6 +4,9 @@ import ServicesTOC from "@/components/leistungen/ServicesTOC";
 import ServiceSection from "@/components/leistungen/ServiceSection";
 import BookingCard from "@/components/contact/BookingCard";
 import Link from "next/link";
+import { Header } from "@/components/layout/Header";
+import { Container } from "@/components/ui/Container";
+import { BackdropIcons } from "@/components/backdrop/BackdropIcons";
 
 export const metadata: Metadata = {
   title: "Leistungen – SMAIRYS Netz-Manufaktur",
@@ -14,49 +17,58 @@ export const metadata: Metadata = {
 
 export default function LeistungenPage() {
   return (
-    <main className="relative">
-      {/* Hero */}
-      <section className="container relative py-16 isolate sm:py-24">
-        {/* dezente Marken-Glows */}
-        <div aria-hidden className="absolute inset-0 pointer-events-none -z-10">
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.03),transparent_18%,transparent_82%,rgba(0,0,0,0.04))]" />
-          <div className="absolute left-1/2 top-[-5rem] h-[28rem] w-[28rem] -translate-x-1/2 rounded-full blur-3xl bg-[radial-gradient(closest-side,hsl(var(--primary)/0.12),transparent_70%)]" />
-          <div className="absolute right-1/3 bottom-[-8rem] h-[26rem] w-[26rem] rounded-full blur-3xl bg-[radial-gradient(closest-side,hsl(var(--primary)/0.10),transparent_75%)]" />
-        </div>
+    <>
+      <Header />
+      <main className="relative">
+        {/* Hero */}
+        <section className="relative isolate overflow-hidden pt-24 pb-12 sm:pt-32 sm:pb-20">
+          {/* dezente Marken-Glows */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.03),transparent_18%,transparent_82%,rgba(0,0,0,0.04))]" />
+            <div className="absolute left-1/2 top-[-5rem] h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--brand-glow)/0.16),transparent_70%)] blur-3xl" />
+            <div className="absolute bottom-[-8rem] right-1/3 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(closest-side,hsl(var(--brand-glow)/0.10),transparent_75%)] blur-3xl" />
+          </div>
 
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="inline-flex items-center rounded-full border border-border/60 bg-background/60 px-3 py-1 text-[11px] font-medium text-foreground/70">
-            Leistungen
-          </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight font-heading sm:text-5xl">
-            Was Sie mit SMAIRYS erreichen
-          </h1>
-          <p className="max-w-2xl mx-auto mt-4 text-base text-foreground/80 sm:text-lg">
-            Keine Massenware. Handgeschriebene Websites mit klarer Struktur,
-            hoher Geschwindigkeit und verlässlicher Betreuung. Für Marken, die
-            wachsen wollen.
-          </p>
-        </div>
+          {/* Tiefenschärfe: Programmier-Icons */}
+          <BackdropIcons preset="tech" showFrom="sm" />
 
-        {/* Desktop: sticky Inhaltsverzeichnis */}
-        <div className="hidden mt-10 lg:block">
-          <ServicesTOC
-            items={[
-              { id: "service-web", label: "Website & Markendesign" },
-              { id: "service-jpp", label: "JPP-Check (Performance)" },
-              { id: "service-seo", label: "SEO & Sichtbarkeit" },
-              { id: "service-hosting", label: "Hosting & Instandhaltung" },
-            ]}
-          />
-        </div>
-      </section>
+          <Container size="wide" className="relative z-10">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="inline-flex items-center rounded-full border border-border/60 bg-background/60 px-3 py-1 text-[11px] font-medium text-foreground/70">
+                Leistungen
+              </p>
+              <h1 className="font-heading mt-4 text-3xl font-bold tracking-tight sm:text-5xl">
+                Was Sie mit SMAIRYS erreichen
+              </h1>
+              <p className="mx-auto mt-4 max-w-2xl text-base text-foreground/80 sm:text-lg">
+                Keine Massenware. Handgeschriebene Websites mit klarer Struktur,
+                hoher Geschwindigkeit und verlässlicher Betreuung. Für Marken, die
+                wachsen wollen.
+              </p>
+            </div>
 
-      {/* Google-Kalender Buchungs-CTA */}
-      <section className="container mb-10 -mt-2 sm:mb-14">
-        <div className="max-w-5xl mx-auto">
-          <BookingCard />
-        </div>
-      </section>
+            {/* Desktop: sticky Inhaltsverzeichnis */}
+            <div className="mt-10 hidden lg:block">
+              <ServicesTOC
+                items={[
+                  { id: "service-web", label: "Website & Markendesign" },
+                  { id: "service-jpp", label: "JPP-Check (Performance)" },
+                  { id: "service-seo", label: "SEO & Sichtbarkeit" },
+                  { id: "service-hosting", label: "Hosting & Instandhaltung" },
+                ]}
+              />
+            </div>
+          </Container>
+        </section>
+
+        {/* Google-Kalender Buchungs-CTA */}
+        <section className="-mt-2 mb-10 sm:mb-14">
+          <Container size="wide">
+            <div className="mx-auto max-w-5xl">
+              <BookingCard />
+            </div>
+          </Container>
+        </section>
 
       {/* Sections */}
       <ServiceSection
@@ -129,43 +141,44 @@ export default function LeistungenPage() {
         variant="hosting"
       />
 
-      {/* Abschluss-CTA mit klarer Wahl */}
-      <section className="container py-16 sm:py-24">
-        <div className="grid max-w-5xl grid-cols-1 gap-8 mx-auto md:grid-cols-2">
-          {/* Sofort buchen */}
-          <BookingCard />
+        {/* Abschluss-CTA mit klarer Wahl */}
+        <section className="py-12 sm:py-20 lg:py-24">
+          <Container size="wide">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
+              <BookingCard />
 
-          {/* Gespräch klassisch starten */}
-          <div className="p-8 text-center border shadow-sm rounded-2xl border-border/60 bg-background/50 backdrop-blur-xl">
-            <h2 className="text-2xl font-bold tracking-tight font-heading sm:text-3xl">
-              Ihre Marke verdient mehr als eine Website
-            </h2>
-            <p className="max-w-xl mx-auto mt-3 text-foreground/80">
-              SMAIRYS ist Ihr Partner für digitale Substanz. Mit Feingefühl,
-              Präzision und dem Anspruch, dass jede Zeile Code eine Aufgabe hat.
-            </p>
+              <div className="rounded-2xl border border-border/60 bg-background/50 p-6 text-center shadow-sm backdrop-blur-xl sm:p-8">
+                <h2 className="font-heading text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
+                  Ihre Marke verdient mehr als eine Website
+                </h2>
+                <p className="mx-auto mt-3 max-w-xl text-sm text-foreground/80 sm:text-base">
+                  SMAIRYS ist Ihr Partner für digitale Substanz. Mit Feingefühl,
+                  Präzision und dem Anspruch, dass jede Zeile Code eine Aufgabe hat.
+                </p>
 
-            <div className="flex flex-col items-center justify-center gap-3 mt-6 sm:flex-row">
-              <Link
-                href="/#kontakt"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition rounded-md bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/40"
-              >
-                Erstgespräch anfragen
-              </Link>
-              <Link
-                href="/#testimonials"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition border rounded-md border-border/60 bg-background/70 text-foreground hover:border-foreground/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/40"
-              >
-                Ergebnisse ansehen
-              </Link>
+                <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+                  <Link
+                    href="/#kontakt"
+                    className="inline-flex items-center justify-center rounded-md bg-brand px-6 py-3 text-sm font-semibold text-brand-foreground shadow-[0_10px_28px_-12px_hsl(var(--brand-glow)/0.7)] transition hover:bg-brand-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-glow"
+                  >
+                    Erstgespräch anfragen
+                  </Link>
+                  <Link
+                    href="/projekte"
+                    className="inline-flex items-center justify-center rounded-md border border-border/60 bg-background/70 px-6 py-3 text-sm font-semibold text-foreground transition hover:border-foreground/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-glow"
+                  >
+                    Ergebnisse ansehen
+                  </Link>
+                </div>
+
+                <p className="mx-auto mt-3 max-w-xs text-[11px] leading-snug text-foreground/65">
+                  100&nbsp;% strategisch · 0&nbsp;% Verkaufsdruck
+                </p>
+              </div>
             </div>
-
-            <p className="mx-auto mt-3 max-w-xs text-[11px] leading-snug text-foreground/65">
-              100&nbsp;% strategisch · 0&nbsp;% Verkaufsdruck
-            </p>
-          </div>
-        </div>
-      </section>
-    </main>
+          </Container>
+        </section>
+      </main>
+    </>
   );
 }

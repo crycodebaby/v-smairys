@@ -2,22 +2,24 @@
 
 import React from "react";
 import {
+  trackCalendarClick,
   trackCtaClick,
-  trackContactIntent,
+  trackEmailClick,
+  trackPhoneClick,
   trackAndNavigate,
   type CtaIdentifier,
   type CtaLocation,
-  type ContactIntentType,
 } from "@/lib/analytics";
+import { TRACKING_EVENTS } from "@/lib/tracking/event-names";
 
 type CommonProps = {
   cta: CtaIdentifier;
   location: CtaLocation;
   /**
-   * Wenn gesetzt, wird zusätzlich ein "Contact Intent" Event mit diesem Typ
-   * gefeuert. Sinnvoll bei mailto/tel/Booking-Links.
+   * Wenn gesetzt, wird statt eines generischen `cta_click` genau das passende
+   * Business-Event gefeuert. Keine Doppelzählung.
    */
-  intent?: ContactIntentType;
+  intent?: "phone" | "email" | "calendar";
 };
 
 export type TrackedLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> &
@@ -26,8 +28,9 @@ export type TrackedLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> &
 /**
  * `<a>`-Wrapper mit Plausible-Tracking.
  *
- * - Feuert immer ein "CTA Click" Event mit `cta` + `location`.
- * - Optional zusätzlich "Contact Intent" mit `type` + `location`.
+ * - Feuert für normale Links `cta_click` mit `cta` + `location`.
+ * - Feuert für Kontaktaktionen genau ein Business-Event:
+ *   `phone_click`, `email_click` oder `calendar_click`.
  * - mailto:/tel:/externe Links: verwendet `trackAndNavigate`, damit das Event
  *   sicher vor der Navigation rausgeht, aber kein "hängender" Klick entsteht.
  * - Für Modifier-Keys / Mittelklick wird der Browser-Default respektiert.
@@ -50,12 +53,14 @@ export function TrackedLink({
       href.startsWith("sms:"));
 
   const handleClick: React.MouseEventHandler<HTMLAnchorElement> = (event) => {
-    if (intent) {
-      trackContactIntent({ type: intent, location });
-    }
-
-    if (isSpecialScheme) {
-      trackAndNavigate(event, "CTA Click", { cta, location });
+    if (intent === "phone") {
+      trackAndNavigate(event, TRACKING_EVENTS.PHONE_CLICK, { location });
+    } else if (intent === "email") {
+      trackAndNavigate(event, TRACKING_EVENTS.EMAIL_CLICK, { location });
+    } else if (intent === "calendar") {
+      trackCalendarClick({ location });
+    } else if (isSpecialScheme) {
+      trackAndNavigate(event, TRACKING_EVENTS.CTA_CLICK, { cta, location });
     } else {
       trackCtaClick({ cta, location });
     }

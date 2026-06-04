@@ -4,6 +4,7 @@ import { Container } from '../ui/Container';
 import { Card } from '../ui/Card';
 import { Kicker } from '../ui/Kicker';
 import { Button } from '../ui/Button';
+import { Reveal } from '../motion/Reveal';
 
 export function ServicesSection() {
   const services = [
@@ -14,6 +15,7 @@ export function ServicesSection() {
       description: 'Hochperformante, conversion-optimierte Webseiten als zentraler Vertriebskanal. Millisekunden-Ladezeiten und perfekte technische Architektur.',
       ctaLabel: 'Webentwicklung anfragen',
       ctaId: 'CTA_SERVICES_WEB',
+      href: '/leistungen/webseiten',
     },
     {
       id: 'seo',
@@ -22,6 +24,7 @@ export function ServicesSection() {
       description: 'Strukturierter Aufbau organischer Reichweite. Lokale und nationale Sichtbarkeit für relevante, hochqualifizierte Suchanfragen.',
       ctaLabel: 'SEO-Audit anfordern',
       ctaId: 'CTA_SERVICES_SEO',
+      href: '/leistungen/seo',
     },
     {
       id: 'ads',
@@ -30,55 +33,78 @@ export function ServicesSection() {
       description: 'Profitables Lead-Management. Wir entwickeln Ads-Kampagnen, die genau Ihre Zielgruppe ansprechen und Budgets präzise skalieren.',
       ctaLabel: 'Kampagne planen',
       ctaId: 'CTA_SERVICES_ADS',
+      href: '/leistungen/google-ads',
     }
   ];
 
   return (
     <Section className="bg-background" id="leistungen">
       <Container>
-        <div className="mb-16 md:mb-24">
-          <Kicker>Kernkompetenzen</Kicker>
-          <h2 className="text-fluid-h2 font-bold text-foreground max-w-2xl mt-4 leading-tight">
+        <Reveal as="div" className="mb-10 sm:mb-16 lg:mb-24">
+          <Kicker accent="brand">Kernkompetenzen</Kicker>
+          <h2 className="mt-4 max-w-2xl text-fluid-h2 font-bold leading-tight text-foreground">
             Wir kompromittieren nicht bei Qualität. Drei Disziplinen. Exzellent umgesetzt.
           </h2>
-        </div>
+        </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {services.map((svc) => (
-            <Card 
-              key={svc.id} 
-              className="flex flex-col group relative overflow-hidden bg-card hover:bg-card/80 transition-all duration-500"
-            >
-              {/* Subtle liquid glass hover effect as requested */}
-              <div className="absolute inset-0 bg-primary/5 transition-opacity duration-500 opacity-0 group-hover:opacity-100 mix-blend-screen pointer-events-none" />
-              
-              <div className="flex-1 relative z-10">
-                <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                  {svc.title}
+        {/*
+         * Responsive Grid:
+         *  - Mobile (≤ 640): 1 Spalte, voller Fokus pro Karte
+         *  - iPad Portrait (640–1024): 1 Spalte – die Karten haben viel Text,
+         *    auf iPad portrait würden 3 nebeneinander zu schmal und reißerisch
+         *  - iPad Landscape / Laptop (≥ 1024): 3 Spalten als finales Layout
+         */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
+          {services.map((svc, idx) => (
+            <Reveal key={svc.id} delay={idx * 120}>
+              <Card
+                className="group relative flex h-full flex-col overflow-hidden bg-card/70 transition-all duration-500 hover:-translate-y-0.5 hover:border-brand/40"
+              >
+                {/* Top-Hairline */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
+                />
+                {/* Brand-Glow nur bei Hover, sehr dezent */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  style={{
+                    background:
+                      "radial-gradient(140% 80% at 50% 0%, hsl(var(--brand-glow) / 0.14), transparent 70%)",
+                  }}
+                />
+
+                <div className="relative z-10 flex-1">
+                  <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                    <span className="brand-dot" aria-hidden="true" />
+                    {svc.title}
+                  </div>
+                  <h3 className="mb-6 mt-3 text-2xl font-bold text-foreground">
+                    {svc.subtitle}
+                  </h3>
+                  <p className="mb-8 leading-relaxed text-muted-foreground">
+                    {svc.description}
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-6">
-                  {svc.subtitle}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed mb-8">
-                  {svc.description}
-                </p>
-              </div>
 
-              <div className="mt-auto relative z-10 pt-6 border-t border-border/50">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between px-0 hover:bg-transparent hover:text-foreground text-muted-foreground font-semibold uppercase tracking-wider text-sm group/btn"
-                  cta_id={svc.ctaId}
-                  cta_label={svc.ctaLabel}
-                  cta_position="services_grid"
-                  page_type="homepage"
-                  service_name={svc.title}
-                >
-                  <span>{svc.ctaLabel}</span>
-                  <span className="transform transition-transform group-hover/btn:translate-x-2">→</span>
-                </Button>
-              </div>
-            </Card>
+                <div className="relative z-10 mt-auto border-t border-border/50 pt-6">
+                  <Button
+                    variant="ghost"
+                    href={svc.href}
+                    className="w-full justify-between px-0 hover:bg-transparent hover:text-brand-soft text-muted-foreground font-semibold uppercase tracking-wider text-sm group/btn"
+                    cta_id={svc.ctaId}
+                    cta_label={svc.ctaLabel}
+                    cta_position="services_grid"
+                    page_type="homepage"
+                    service_name={svc.title}
+                  >
+                    <span>{svc.ctaLabel}</span>
+                    <span className="transform transition-transform group-hover/btn:translate-x-2">→</span>
+                  </Button>
+                </div>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </Container>

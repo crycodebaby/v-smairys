@@ -85,7 +85,11 @@ First-Touch in localStorage  +  Last-Touch in sessionStorage
 Optional: Lead-Submit (ContactFormBase)
    │  attribution.first + attribution.last in Payload
    ▼
-/api/contact  →  Server-Log "NEUER LEAD" mit Attribution-Block
+/api/contact  →  Zod-Validierung + Rate-Limit
+   │  ├─ Server-Log "NEUER LEAD" mit Attribution-Block (ohne PII)
+   │  └─ serverseitige Weiterleitung an Formcarry (FORMCARRY_ENDPOINT)
+   ▼
+Formcarry-Dashboard / Mail (Lead inkl. UTM/Attribution)
 ```
 
 ## Plausible-Auswertung

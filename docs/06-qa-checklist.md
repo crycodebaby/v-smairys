@@ -8,6 +8,50 @@
 - [ ] `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` gesetzt
 - [ ] `NEXT_PUBLIC_PLAUSIBLE_SRC` zeigt auf eine `script.exclusions.js`-Variante
 - [ ] `NEXT_PUBLIC_SITE_URL` gesetzt (sonst nutzt der QR-Code `https://smairys.de` als Fallback)
+- [ ] `FORMCARRY_ENDPOINT` gesetzt (server-only, **kein** `NEXT_PUBLIC_`) – Wert: `https://formcarry.com/s/JOH5HI9XWVI`
+
+## Kontaktformular → Formcarry (kanonischer Lead-Flow)
+
+Kanonischer Pfad: `ContactFormBase` → `POST /api/contact` → Formcarry. Es gibt
+**keinen** clientseitigen Direkt-Post mehr.
+
+- [ ] DevTools → Network: Formular-Submit geht an `/api/contact` (POST), **nicht** direkt an `formcarry.com`
+- [ ] Quelltext/JS-Bundle: kein clientseitiger `formcarry.com`-Request (Search im Sources-Tab nach `formcarry`)
+- [ ] Gültiger Submit → UI zeigt Success-Panel („Vielen Dank.")
+- [ ] Pflichtfeld fehlt / ungültige E-Mail → 400, UI zeigt Fehler-Alert, kein Erfolg
+- [ ] Honeypot (`honeypot`) gefüllt → Submit wird abgelehnt (kein Lead)
+- [ ] Rate-Limit: > 5 Submits/Minute pro IP → 429 mit Hinweistext
+- [ ] `FORMCARRY_ENDPOINT` fehlt/leer → API antwortet 502, UI zeigt sichere Fehlermeldung, Server-Log: `FORMCARRY_ENDPOINT ist nicht gesetzt`
+- [ ] Formcarry-Fehler (z. B. falscher Endpoint) → 502 + **redacted** Server-Log (nur HTTP-Status/Reason, **kein** Name/E-Mail/Telefon)
+- [ ] Server-Log enthält **keine** PII (Name/E-Mail/Telefon) – nur Service/Budget/Attribution-Block
+- [ ] Tracking-Events feuern weiterhin: `form_start`, `form_submit_success`, `form_submit_error`
+- [ ] **Manueller End-to-End-Test (echter Lead):** Submit → Eintrag erscheint im Formcarry-Dashboard inkl. UTM/Attribution-Felder
+- [ ] Lead nach QR-Scan: First-/Last-Touch-UTMs (`utm_source=visitenkarte`, `utm_campaign=…`) landen im Formcarry-Eintrag
+
+## CTA-Navigation (öffentliche Seiten)
+
+Primäre Conversion = **Erstgespräch buchen**. Buchungslink zentral in
+`SITE.booking.calendarUrl` (`https://calendar.app.google/PAdzgiQrN6h5RmqY8`).
+Jeder öffentliche CTA muss navigieren **und** weiterhin tracken.
+
+- [ ] **Booking-Link öffnet korrekt**: alle Primär-CTAs öffnen die Google-Calendar-URL in neuem Tab (`target="_blank"`, `rel="noopener noreferrer"`)
+- [ ] **Header primär „Kontakt aufnehmen"**: öffnet Booking-Link – bzw. `/#kontakt`, falls `booking.enabled = false`
+- [ ] **Header „Kundenlogin"-Pille**: routet weiterhin nach `/kundenlogin` (kein Tracking)
+- [ ] **Hero primär „Projektanfrage starten"**: öffnet Booking-Link
+- [ ] **Hero sekundär „Unsere Expertise"**: navigiert nach `/leistungen`
+- [ ] **Service-Detail-Hero** (`/leistungen/webseiten`, `/leistungen/seo`): Primär-CTA öffnet Booking-Link
+- [ ] **SEO „Reporting-Ansatz ansehen"**: scrollt zur seiteneigenen Form-Sektion `#anfrage` (kein toter Anker)
+- [ ] **Services-Karten** (Startseite): führen nach `/leistungen/webseiten` · `/leistungen/seo` · `/leistungen/google-ads`
+- [ ] **Kontakt-Sektion**: Anker `#kontakt` existiert auf der Startseite; Scroll-Ziel sichtbar
+- [ ] **`/leistungen`-Übersicht**: „Erstgespräch anfragen" + Service-Kacheln → `/#kontakt`; „Ergebnisse ansehen" → `/projekte` (kein toter `#testimonials`-Anker mehr); BookingCard → Booking-Link
+- [ ] **Keine toten Anker**: jedes `#`-Ziel (`#kontakt`, `#anfrage`) existiert auf der jeweiligen Seite
+- [ ] **Footer-CTAs**: `mailto:`/`tel:` aus Footer + `ContactInfoCard` funktionieren (Contact-Intent-Event feuert)
+- [ ] **Mobile-CTA**: Drawer zeigt „Erstgespräch buchen" (Booking, neuer Tab) als Primär-CTA + Telefon (`tel:`) + „Anfrage schreiben" (`mailto:`)
+- [ ] Kein öffentlicher CTA mit `href="#"`, leerem `href` oder reinem `<button>` ohne Aktion
+- [ ] Tastatur: alle CTAs fokussierbar und per Enter auslösbar; externe Links mit sichtbarem Fokusring
+- [ ] **Tracking feuert weiter**: `cta_click` (Header/Hero/Services) + `Contact Intent` (Booking/`tel:`/`mailto:`) auf `/`; **keine** Events auf `/intern/*` oder `/kundenlogin`
+- [ ] **Kontaktformular** postet weiterhin über `ContactFormBase → /api/contact` (Formcarry-Flow unverändert)
+- [ ] **CEO-Portrait**: lädt auf Startseite (`TrustSection`) und `/ueber-uns` ohne Verzerrung; Alt-Text „Robin Schmeiries, Inhaber der Smairys Netz-Manufaktur"
 
 ## Login / interner Bereich
 

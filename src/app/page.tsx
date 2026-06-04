@@ -4,21 +4,25 @@ import { FilterSection } from '@/components/sections/FilterSection';
 import { ServicesSection } from '@/components/sections/ServicesSection';
 import { TrustSection } from '@/components/sections/TrustSection';
 import { ProcessSection } from '@/components/sections/ProcessSection';
-import { CtaSection } from '@/components/sections/CtaSection';
+import { SocialProofSection } from '@/components/socialproof/SocialProofSection';
+import { ContactFormSection } from '@/components/contact/ContactFormSection';
 
 export default function Home() {
   return (
     <>
       <Header />
-      <main className="flex flex-col w-full">
+      <main className="flex w-full flex-col">
         <Hero />
+        <SocialProofSection />
         <FilterSection />
         <ServicesSection />
         <TrustSection />
         <ProcessSection />
-        <CtaSection />
+        <ContactFormSection
+          pageType="homepage_invert_cta"
+          contactLocation="homepage"
+        />
       </main>
-      {/* Footer kommt in einem späteren Modul */}
     </>
   );
 }

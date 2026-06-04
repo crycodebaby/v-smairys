@@ -56,9 +56,14 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 
 ## Docs
 
+- `docs/README.md` – Doku-Index / Einstieg.
 - `docs/01-marketing-dashboard.md` – Marketing-Dashboard & QR-Workflow.
+- `docs/02-positioning-conversion.md` – Positionierung, Pakete, Conversion-Strategie.
+- `docs/03-seo-content-architecture.md` – SEO-Fokus (Website-Erstellung) & Seitenarchitektur.
 - `docs/04-ui-design-system.md` – Glass-Komponenten & Conventions.
+- `docs/05-frontend-implementation-plan.md` – Priorisierter Umsetzungsplan (Phasen).
 - `docs/06-qa-checklist.md` – QA-Checkliste vor Deploy/Druck.
+- `docs/audits/seo-conversion-audit.md` – Technisches Inventar / Audit (Bestand).
 
 ## Don'ts
 

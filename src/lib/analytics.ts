@@ -15,6 +15,10 @@
  */
 
 import { isAnalyticsExcludedPath } from "./analytics-config";
+import {
+  TRACKING_EVENTS,
+  type TrackingEventName,
+} from "./tracking/event-names";
 
 // ─── Typen für window.plausible ─────────────────────────────────────────────
 
@@ -57,6 +61,7 @@ export type CtaLocation =
   | "filter"
   | "final-cta"
   | "kontakt"
+  | "homepage"
   | "booking"
   | "reporting"
   | "leistungen";
@@ -81,12 +86,13 @@ export type CtaIdentifier =
   | (string & {}); // erlaubt projektspezifische Erweiterung ohne Type-Cast
 
 /**
- * Kontakt-Intent-Typ.
+ * Kontakt-Aktionstyp. Werte werden nicht direkt als Eventname genutzt; die
+ * spezialisierten Helper unten feuern canonical Events.
  */
-export type ContactIntentType = "phone" | "email" | "booking";
+export type ContactActionType = "phone" | "email" | "calendar";
 
 /**
- * Wichtige Section-IDs (für optionales "Section Viewed").
+ * Legacy-Typ für ehemals geplante Section-Events.
  */
 export type SectionId =
   | "hero"
@@ -103,8 +109,7 @@ export type CtaClickProps = {
   location: CtaLocation;
 };
 
-export type ContactIntentProps = {
-  type: ContactIntentType;
+export type ContactActionProps = {
   location: CtaLocation;
 };
 
@@ -137,7 +142,7 @@ export type TrackEventOptions = {
  *   sodass es nachträglich gefeuert wird, sobald das Script lädt.
  */
 export function trackEvent(
-  name: string,
+  name: TrackingEventName,
   props?: PlausibleProps,
   options?: TrackEventOptions
 ): void {
@@ -178,33 +183,43 @@ export function trackCtaClick(
   props: CtaClickProps,
   options?: TrackEventOptions
 ): void {
-  trackEvent("CTA Click", props, options);
+  trackEvent(TRACKING_EVENTS.CTA_CLICK, props, options);
 }
 
-/** Kontaktabsicht (mailto / tel / Booking). */
-export function trackContactIntent(
-  props: ContactIntentProps,
+/** Telefonklick – keine Telefonnummer als Property senden. */
+export function trackPhoneClick(
+  props: ContactActionProps,
   options?: TrackEventOptions
 ): void {
-  trackEvent("Contact Intent", props, options);
+  trackEvent(TRACKING_EVENTS.PHONE_CLICK, props, options);
+}
+
+/** E-Mail-Klick – keine E-Mail-Adresse als Property senden. */
+export function trackEmailClick(
+  props: ContactActionProps,
+  options?: TrackEventOptions
+): void {
+  trackEvent(TRACKING_EVENTS.EMAIL_CLICK, props, options);
+}
+
+/** Terminbuchungsklick – keine Kalender-URL als Property senden. */
+export function trackCalendarClick(
+  props: ContactActionProps,
+  options?: TrackEventOptions
+): void {
+  trackEvent(TRACKING_EVENTS.CALENDAR_CLICK, props, options);
 }
 
 /**
- * Section Viewed (non-interactive).
- *
- * Empfohlene Verwendung über IntersectionObserver:
- *  - nur clientseitig
- *  - nur einmal pro Section + Session
- *  - erst feuern wenn >= 50 % sichtbar und ~1000 ms sichtbar geblieben
+ * Deprecated: `Section Viewed` ist nicht Teil der canonical Event-Taxonomie.
+ * Der Helper bleibt als no-op erhalten, damit versehentliche alte Imports keinen
+ * neuen, nicht dokumentierten Plausible-Goal-Namen erzeugen.
  */
 export function trackSectionViewed(
-  props: SectionViewedProps,
-  options?: TrackEventOptions
+  _props: SectionViewedProps,
+  _options?: TrackEventOptions
 ): void {
-  trackEvent("Section Viewed", props, {
-    interactive: false,
-    ...options,
-  });
+  return;
 }
 
 /**
@@ -218,7 +233,7 @@ export function trackSectionViewed(
  */
 export function trackAndNavigate(
   event: React.MouseEvent<HTMLAnchorElement>,
-  eventName: string,
+  eventName: TrackingEventName,
   props?: PlausibleProps
 ): void {
   if (typeof window === "undefined") return;

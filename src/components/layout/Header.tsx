@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Container } from '../ui/Container';
-import { Button } from '../ui/Button';
+import { Brandmark } from '@/components/brand/Brandmark';
+import { CalendarBookingButton } from '@/components/contact/ContactActions';
+import { SITE } from '@/config/site';
+import { MobileNav } from './MobileNav';
 
 function LockIcon({ className = '' }: { className?: string }) {
   return (
@@ -38,21 +41,34 @@ export function Header() {
       }`}
     >
       <Container className="flex items-center justify-between">
-        <Link 
-          href="/" 
-          className="text-foreground tracking-tighter text-2xl font-bold flex items-center gap-2"
-          aria-label="Smairys Netz-Manufaktur Startseite"
+        <Link
+          href="/"
+          className="group flex items-center gap-2.5 text-foreground"
+          aria-label={`${SITE.legalName} Startseite`}
         >
-          {/* Logo Placeholder (Wird später durch SVG ersetzt) */}
-          <div className="w-8 h-8 bg-foreground rounded-sm" />
-          <span>Smairys</span>
+          <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-md ring-1 ring-white/10 transition-shadow duration-300 group-hover:ring-brand/40">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              style={{
+                background:
+                  "radial-gradient(60% 60% at 50% 0%, hsl(var(--brand-glow) / 0.35), transparent 70%)",
+              }}
+            />
+            <Brandmark variant="mark" surface="dark" size={28} />
+          </span>
+          <span className="text-lg font-semibold tracking-tight sm:text-xl">
+            {SITE.shortName}
+          </span>
         </Link>
-        
-        <nav className="flex items-center gap-4 sm:gap-6 md:gap-8">
-          {/* Minimalistisches Menü für Desktop */}
+
+        <nav className="flex items-center gap-2 sm:gap-4 md:gap-8">
+          {/* Desktop-Menü ab `md`. Auf Mobile/iPad-Portrait übernimmt der
+              MobileNav-Drawer am unteren Ende dieses `nav`. */}
           <div className="hidden md:flex items-center gap-6 text-sm font-medium tracking-wide">
-            <Link href="/leistungen" className="text-muted-foreground hover:text-foreground transition-colors">Leistungen</Link>
-            <Link href="/projekte" className="text-muted-foreground hover:text-foreground transition-colors">Projekte</Link>
+            <NavLink href="/leistungen">Leistungen</NavLink>
+            <NavLink href="/projekte">Projekte</NavLink>
+            <NavLink href="/ueber-uns">Über uns</NavLink>
           </div>
 
           {/*
@@ -98,19 +114,32 @@ export function Header() {
             </span>
           </Link>
 
-          <Button
-            variant={isScrolled ? 'primary' : 'secondary'}
-            size="sm"
-            cta_id="CTA_HEADER_CONTACT"
-            cta_label="Kontakt aufnehmen"
-            cta_position="header"
-            page_type="general"
-            className="hidden sm:inline-flex"
+          <CalendarBookingButton
+            location="header"
+            className="hidden min-h-9 rounded-sm px-4 md:inline-flex"
           >
             Kontakt aufnehmen
-          </Button>
+          </CalendarBookingButton>
+
+          {/* Mobile/Tablet (< md): Hamburger-Drawer. */}
+          <MobileNav />
         </nav>
       </Container>
     </header>
+  );
+}
+
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="group relative text-muted-foreground transition-colors hover:text-foreground"
+    >
+      {children}
+      <span
+        aria-hidden="true"
+        className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-brand to-brand-soft transition-transform duration-300 group-hover:scale-x-100"
+      />
+    </Link>
   );
 }

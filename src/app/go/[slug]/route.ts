@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   buildCampaignDestination,
   getCampaignBySlug,
+  isInternalCampaignDestination,
 } from "@/lib/marketing-campaigns";
 
 /**
@@ -29,6 +30,18 @@ export async function GET(
     if (process.env.NODE_ENV === "development") {
       console.info(
         `[marketing-campaigns] Unbekannter Slug aufgerufen: "${slug}"`
+      );
+    }
+    return new NextResponse("Not Found", {
+      status: 404,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
+  if (isInternalCampaignDestination(campaign.destinationPath)) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        `[marketing-campaigns] Interne Zielroute für Slug blockiert: "${slug}"`
       );
     }
     return new NextResponse("Not Found", {

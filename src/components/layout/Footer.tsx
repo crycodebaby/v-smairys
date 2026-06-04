@@ -1,78 +1,131 @@
-import React from 'react';
-import Link from 'next/link';
-import { Container } from '../ui/Container';
-import { TrackedLink } from '../analytics/TrackedLink';
+import React from "react";
+import Link from "next/link";
+import { Container } from "../ui/Container";
+import { TrackedLink } from "../analytics/TrackedLink";
+import { Brandmark } from "@/components/brand/Brandmark";
+import { SITE } from "@/config/site";
 
 export function Footer() {
   return (
-    <footer className="bg-background border-t border-border pt-16 pb-8 md:pt-24 md:pb-12 text-foreground">
+    <footer className="relative border-t border-border/60 bg-background pt-16 pb-8 text-foreground md:pt-24 md:pb-12">
+      {/* feiner Brand-Akzent oben */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/50 to-transparent"
+      />
+
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
-          
+        <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           <div className="flex flex-col gap-6">
-            <Link href="/" className="font-bold text-xl tracking-tight flex items-center gap-2" aria-label="Startseite">
-              <div className="w-6 h-6 bg-foreground rounded-sm" />
-              Smairys
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-2.5"
+              aria-label={`${SITE.legalName} Startseite`}
+            >
+              <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-md ring-1 ring-white/10 transition-shadow duration-300 group-hover:ring-brand/40">
+                <Brandmark variant="mark" surface="dark" size={28} />
+              </span>
+              <span className="text-lg font-semibold tracking-tight">
+                {SITE.shortName}
+              </span>
             </Link>
-            <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
-              Digitale Maßarbeit für den Mittelstand. Hochwertige Infrastrukturen und messbare Vertriebsprozesse.
+            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+              {SITE.tagline}. Digitale Maßarbeit aus dem Saarland.
             </p>
           </div>
 
           <div className="flex flex-col gap-4">
-            <h4 className="font-medium text-sm tracking-widest uppercase mb-2">Leistungen</h4>
-            <Link href="/leistungen/webseiten" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Next.js Webentwicklung</Link>
-            <Link href="/leistungen/seo" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Premium SEO</Link>
-            <Link href="/leistungen/google-ads" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Google Ads Systematik</Link>
+            <h4 className="mb-2 text-sm font-semibold uppercase tracking-[0.18em]">
+              Leistungen
+            </h4>
+            <FooterLink href="/leistungen/webseiten">Next.js Webentwicklung</FooterLink>
+            <FooterLink href="/leistungen/seo">Premium SEO</FooterLink>
+            <FooterLink href="/leistungen/google-ads">Google Ads Systematik</FooterLink>
           </div>
 
           <div className="flex flex-col gap-4">
-            <h4 className="font-medium text-sm tracking-widest uppercase mb-2">Unternehmen</h4>
-            <Link href="/ueber-uns" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Über uns & Philosophie</Link>
-            <Link href="/projekte" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Projekte</Link>
-            <Link href="/kontakt" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Kontakt aufnehmen</Link>
+            <h4 className="mb-2 text-sm font-semibold uppercase tracking-[0.18em]">
+              Unternehmen
+            </h4>
+            <FooterLink href="/ueber-uns">Über uns &amp; Philosophie</FooterLink>
+            <FooterLink href="/projekte">Projekte</FooterLink>
+            <FooterLink href="/kontakt">Kontakt aufnehmen</FooterLink>
           </div>
 
           <div className="flex flex-col gap-4">
-            <h4 className="font-medium text-sm tracking-widest uppercase mb-2">Smairys Netz-Manufaktur</h4>
-            <address className="not-italic text-sm text-muted-foreground flex flex-col gap-1">
-              <span>Robin Schmeiries</span>
-              <span>66822 Lebach, Saarland</span>
+            <h4 className="mb-2 text-sm font-semibold uppercase tracking-[0.18em]">
+              {SITE.legalName}
+            </h4>
+            <address className="flex flex-col gap-1 text-sm not-italic text-muted-foreground">
+              <span>{SITE.owner.name}</span>
+              <span>{SITE.address.street}</span>
+              <span>
+                {SITE.address.postalCode} {SITE.address.city}
+              </span>
+              <span>
+                {SITE.address.region}, {SITE.address.country}
+              </span>
             </address>
-            <div className="flex flex-col gap-1 mt-2">
+            <div className="mt-2 flex flex-col gap-1">
               <TrackedLink
-                href="mailto:hallo@smairys.de"
+                href={SITE.email.mailto}
                 cta="footer-mail"
                 location="footer"
                 intent="email"
-                className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+                className="text-sm text-muted-foreground transition-colors hover:text-brand-soft"
               >
-                hallo@smairys.de
+                {SITE.email.display}
               </TrackedLink>
               <TrackedLink
-                href="tel:+49123456789"
+                href={SITE.phone.tel}
                 cta="footer-phone"
                 location="footer"
                 intent="phone"
-                className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+                className="text-sm text-muted-foreground transition-colors hover:text-brand-soft"
               >
-                +49 (0) 123 456 789
+                {SITE.phone.display}
               </TrackedLink>
             </div>
           </div>
-
         </div>
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-border/50 text-xs text-muted-foreground">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-8 text-xs text-muted-foreground md:flex-row">
           <div>
-            &copy; {new Date().getFullYear()} Smairys Netz-Manufaktur. Alle Rechte vorbehalten.
+            &copy; {new Date().getFullYear()} {SITE.legalName}. Alle Rechte vorbehalten.
           </div>
           <div className="flex items-center gap-6">
-            <Link href="/impressum" className="hover:text-foreground transition-colors">Impressum</Link>
-            <Link href="/datenschutz" className="hover:text-foreground transition-colors">Datenschutz</Link>
+            <FooterLink href="/impressum" inline>
+              Impressum
+            </FooterLink>
+            <FooterLink href="/datenschutz" inline>
+              Datenschutz
+            </FooterLink>
           </div>
         </div>
       </Container>
     </footer>
+  );
+}
+
+function FooterLink({
+  href,
+  children,
+  inline = false,
+}: {
+  href: string;
+  children: React.ReactNode;
+  inline?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={
+        inline
+          ? "transition-colors hover:text-foreground hover:underline underline-offset-4"
+          : "text-sm text-muted-foreground transition-colors hover:text-foreground"
+      }
+    >
+      {children}
+    </Link>
   );
 }

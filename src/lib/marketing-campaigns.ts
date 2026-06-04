@@ -47,6 +47,8 @@ export interface MarketingCampaign {
   utm_campaign: string;
   /** UTM-Content – Variante/Asset (z. B. `qr-v1`, `headline-a`). */
   utm_content: string;
+  /** Optionales UTM-Term-Feld, nur wenn fachlich benötigt. */
+  utm_term?: string;
   /** ISO-Datum (`YYYY-MM-DD`), optional. Wann ging die Kampagne live? */
   startDate?: string;
   /** Optionale interne Notiz (nur für Devs/Marketing, wird nie an User ausgeliefert). */
@@ -104,6 +106,9 @@ export function buildCampaignDestination(
   url.searchParams.set("utm_medium", campaign.utm_medium);
   url.searchParams.set("utm_campaign", campaign.utm_campaign);
   url.searchParams.set("utm_content", campaign.utm_content);
+  if (campaign.utm_term) {
+    url.searchParams.set("utm_term", campaign.utm_term);
+  }
   return url.toString();
 }
 
@@ -134,6 +139,19 @@ export const KEBAB_CASE_REGEX = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 export function isKebabCase(value: string): boolean {
   return KEBAB_CASE_REGEX.test(value);
+}
+
+export function isInternalCampaignDestination(path: string): boolean {
+  return (
+    path === "/intern" ||
+    path.startsWith("/intern/") ||
+    path === "/kundenlogin" ||
+    path.startsWith("/kundenlogin?") ||
+    path === "/login" ||
+    path.startsWith("/login?") ||
+    path === "/api" ||
+    path.startsWith("/api/")
+  );
 }
 
 /**
@@ -195,6 +213,13 @@ export function validateCampaign(
       field: "destinationPath",
       severity: "error",
       message: "destinationPath muss mit `/` beginnen.",
+    });
+  } else if (isInternalCampaignDestination(campaign.destinationPath)) {
+    issues.push({
+      field: "destinationPath",
+      severity: "error",
+      message:
+        "destinationPath darf keine interne Route sein (`/intern/*`, `/kundenlogin`, `/login`, `/api/*`).",
     });
   }
 

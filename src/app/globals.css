@@ -4,11 +4,9 @@
 
 @layer base {
   :root {
-    /* Pure Black / Off-White Theme (Default Dark-Style or Light style?) */
-    /* The prompt says: "minimalistisch (True Black / Off-White)".
-       Typically B2B premium is True Black root. I will make True Black the default background. */
-    --background: 0 0% 0%; /* True Black Focus */
-    --foreground: 0 0% 98%; /* Off-White Text */
+    /* True Black / Off-White Dark-Theme – B2B Premium Default. */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
 
     /* Subdued grays */
     --card: 0 0% 3%;
@@ -17,15 +15,13 @@
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 98%;
 
-    /* Primary is Off-White for True Black background */
+    /* Primary bleibt Off-White für True-Black-Background. */
     --primary: 0 0% 98%;
     --primary-foreground: 0 0% 0%;
 
-    /* Secondary is a subdued gray */
     --secondary: 0 0% 9%;
     --secondary-foreground: 0 0% 98%;
 
-    /* Muted for borders and subtle text */
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 60%;
 
@@ -39,11 +35,23 @@
     --input: 0 0% 15%;
     --ring: 0 0% 98%;
 
-    --radius: 0.125rem; /* Very sharp, minimal radius */
+    --radius: 0.125rem;
+
+    /* ─── Brand-Tokens (#d47115 = amber/orange, ~28 82% 46%) ─────────────
+       Bewusst gespart in Anwendung: nur Akzent, kein Komplett-Wash. */
+    --brand: 28 82% 46%;
+    --brand-foreground: 0 0% 100%;
+    --brand-soft: 28 90% 60%;        /* hellere Variante für Hover/Highlights */
+    --brand-glow: 28 95% 55%;         /* für Ambient-Glow + Shadows */
+    --brand-deep: 24 80% 32%;         /* dunkler, für Pressed-State / Verläufe */
+
+    /* Glas-Tinten – im Dark-Mode kombinieren wir leichtes Weiß mit einem
+       sehr dezenten Amber-Touch, damit das Glas nicht klinisch wirkt. */
+    --glass-tint: 28 60% 70%;         /* warmer Glas-Touch */
+    --glass-tint-alpha: 0.05;          /* sehr wenig */
   }
 
   .light {
-    /* If light mode is ever toggled, invert the Black/White */
     --background: 0 0% 98%;
     --foreground: 0 0% 0%;
     --card: 0 0% 100%;
@@ -61,6 +69,17 @@
     --border: 0 0% 85%;
     --input: 0 0% 85%;
     --ring: 0 0% 0%;
+
+    /* Brand bleibt identisch – im Light-Mode wird die Tinte aber dunkler
+       gerendert, da der Kontrast zum Background hoch genug ist. */
+    --brand: 24 80% 42%;
+    --brand-foreground: 0 0% 100%;
+    --brand-soft: 28 80% 50%;
+    --brand-glow: 28 85% 55%;
+    --brand-deep: 22 78% 30%;
+
+    --glass-tint: 28 40% 30%;
+    --glass-tint-alpha: 0.04;
   }
 }
 
@@ -69,21 +88,25 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground;
+    @apply bg-background text-foreground antialiased;
+    /* Brand-Selection: zarter Amber-Tint statt weißes Block-Highlight. */
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Typography defaults */
     line-height: 1.6;
   }
-  
+  ::selection {
+    background-color: hsl(var(--brand) / 0.30);
+    color: hsl(var(--foreground));
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight font-medium;
   }
 
-  /* Accessibility Focus States: White, high contrast */
+  /* Accessibility Focus States – Ring auf Brand-Glow für Premium-Anmutung. */
   *:focus-visible {
-    outline: 2px solid hsl(var(--ring));
+    outline: 2px solid hsl(var(--brand-glow));
     outline-offset: 4px;
-    box-shadow: none;
+    box-shadow: 0 0 0 4px hsl(var(--brand-glow) / 0.20);
   }
 }
 
@@ -97,25 +120,38 @@
      Für die internen Apple-inspirierten Glas-Flächen.
      Wir kombinieren: leichte Tinte (bg), tiefer Blur, ein inset-Highlight
      oben, eine inset-Schatten-Andeutung unten, plus ein weicher
-     Außen-Schatten. Das erzeugt das "echte Glas"-Gefühl. */
+     Außen-Schatten. Das erzeugt das "echte Glas"-Gefühl.
+
+     Im Dark-Mode wird zusätzlich ein sehr dezenter, warmer Amber-Touch
+     in das Tinten-Gradient gemischt, damit das Glas nicht klinisch wirkt. */
   .glass-surface {
     background:
-      linear-gradient(180deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0.02));
-    backdrop-filter: blur(28px) saturate(140%);
-    -webkit-backdrop-filter: blur(28px) saturate(140%);
+      linear-gradient(180deg,
+        hsl(0 0% 100% / 0.07),
+        hsl(0 0% 100% / 0.02)),
+      radial-gradient(120% 60% at 50% -10%,
+        hsl(var(--glass-tint) / var(--glass-tint-alpha)),
+        transparent 70%);
+    backdrop-filter: blur(28px) saturate(150%);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.16),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.18),
       inset 0 -1px 0 0 hsl(0 0% 100% / 0.04),
       0 1px 1px 0 hsl(0 0% 0% / 0.30),
       0 22px 60px -20px hsl(0 0% 0% / 0.60);
   }
   .glass-surface-strong {
     background:
-      linear-gradient(180deg, hsl(0 0% 100% / 0.10), hsl(0 0% 100% / 0.03));
-    backdrop-filter: blur(36px) saturate(160%);
-    -webkit-backdrop-filter: blur(36px) saturate(160%);
+      linear-gradient(180deg,
+        hsl(0 0% 100% / 0.12),
+        hsl(0 0% 100% / 0.03)),
+      radial-gradient(120% 60% at 50% -10%,
+        hsl(var(--glass-tint) / calc(var(--glass-tint-alpha) * 1.5)),
+        transparent 70%);
+    backdrop-filter: blur(36px) saturate(170%);
+    -webkit-backdrop-filter: blur(36px) saturate(170%);
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.22),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.24),
       inset 0 -1px 0 0 hsl(0 0% 100% / 0.06),
       0 1px 1px 0 hsl(0 0% 0% / 0.32),
       0 28px 80px -24px hsl(0 0% 0% / 0.70);
@@ -220,6 +256,170 @@
   }
   .animate-panel-in {
     animation: panel-in 0.32s cubic-bezier(.22,.61,.36,1) both;
+  }
+
+  /* ─── Brand-Akzent Utilities ────────────────────────────────────────────
+     Werden sparsam eingesetzt: Underline-Highlights, dünne Linien,
+     Hover-Kanten, kleine Punkte. Niemals ganze Flächen flächig orange. */
+  .brand-underline {
+    background: linear-gradient(90deg, hsl(var(--brand)) 0%, hsl(var(--brand-soft)) 100%);
+    height: 1px;
+    width: 2.5rem;
+    border-radius: 1px;
+  }
+  .brand-line-vertical {
+    background: linear-gradient(180deg, hsl(var(--brand)), hsl(var(--brand-soft)));
+    width: 2px;
+    border-radius: 1px;
+  }
+  .brand-text {
+    color: hsl(var(--brand));
+  }
+  .brand-text-soft {
+    color: hsl(var(--brand-soft));
+  }
+  .brand-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: hsl(var(--brand));
+    box-shadow: 0 0 12px hsl(var(--brand-glow) / 0.55);
+  }
+
+  /* Sanfter Ambient-Glow hinter einer Fläche – ideal hinter Glass-Karten
+     im Dark-Mode, damit das Glas wärmer und "beleuchtet" wirkt. */
+  .ambient-glow-amber {
+    position: relative;
+    isolation: isolate;
+  }
+  .ambient-glow-amber::before {
+    content: "";
+    position: absolute;
+    inset: -40% -10% auto -10%;
+    height: 70%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(50% 60% at 20% 30%,
+        hsl(var(--brand-glow) / 0.25), transparent 70%),
+      radial-gradient(40% 50% at 80% 20%,
+        hsl(28 95% 60% / 0.18), transparent 70%);
+    filter: blur(60px);
+  }
+  .ambient-glow-amber-bottom::after {
+    content: "";
+    position: absolute;
+    inset: auto -10% -40% -10%;
+    height: 60%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(45% 55% at 70% 80%,
+        hsl(var(--brand-deep) / 0.30), transparent 70%);
+    filter: blur(70px);
+  }
+
+  /* ─── Reveal-Animation (Scroll-Microanimation) ─────────────────────────
+     Für Sections, Cards, Logos. Default-Zustand: leicht versetzt + opak 0.
+     `.is-visible` wird vom JS-IntersectionObserver gesetzt. */
+  .reveal-init {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.7s cubic-bezier(.22,.61,.36,1),
+      transform 0.7s cubic-bezier(.22,.61,.36,1);
+    will-change: opacity, transform;
+  }
+  .reveal-init.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Stagger-Variante: kann via inline `style={{ transitionDelay }}` ergänzt
+     werden. Wir geben Klassen mit, damit ein Logo-Strip elegant einläuft. */
+
+  /* Soft-Pulse für Brand-Dots / Status-Indikatoren. */
+  @keyframes brand-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--brand-glow) / 0.55); }
+    50%      { box-shadow: 0 0 0 8px hsl(var(--brand-glow) / 0.00); }
+  }
+  .animate-brand-pulse {
+    animation: brand-pulse 2.4s ease-out infinite;
+  }
+
+  /* Skeleton-Shimmer für ContentPlaceholder. Subtil, kein Disco-Effekt. */
+  @keyframes skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-shimmer {
+    background:
+      linear-gradient(90deg,
+        hsl(0 0% 100% / 0.03) 0%,
+        hsl(0 0% 100% / 0.08) 50%,
+        hsl(0 0% 100% / 0.03) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.8s linear infinite;
+    border-radius: 6px;
+  }
+
+  /* ─── Backdrop-Icon-Drift (Tiefenschärfe-SVG-Hintergrund) ──────────────
+     Drei sehr langsame, weiche Drift-Loops für SVG-Icons, die als
+     Tiefenschärfe-Layer hinter Sections liegen. Werden bewusst auf
+     `transform`-only animiert (GPU-cheap, keine Layout-Trigger).
+     `prefers-reduced-motion` greift global weiter unten. */
+  @keyframes icon-drift-a {
+    0%   { transform: translate3d(0, 0, 0)         rotate(0deg);   }
+    50%  { transform: translate3d(-1.5%, 2%, 0)    rotate(-3deg);  }
+    100% { transform: translate3d(0, 0, 0)         rotate(0deg);   }
+  }
+  @keyframes icon-drift-b {
+    0%   { transform: translate3d(0, 0, 0)         rotate(0deg);   }
+    50%  { transform: translate3d(2%, -1.5%, 0)    rotate(4deg);   }
+    100% { transform: translate3d(0, 0, 0)         rotate(0deg);   }
+  }
+  @keyframes icon-drift-c {
+    0%   { transform: translate3d(0, 0, 0)         rotate(0deg)   scale(1);    }
+    50%  { transform: translate3d(-1%, -2%, 0)     rotate(2deg)   scale(1.04); }
+    100% { transform: translate3d(0, 0, 0)         rotate(0deg)   scale(1);    }
+  }
+  .animate-icon-drift-a { animation: icon-drift-a 18s ease-in-out infinite; }
+  .animate-icon-drift-b { animation: icon-drift-b 22s ease-in-out infinite; }
+  .animate-icon-drift-c { animation: icon-drift-c 26s ease-in-out infinite; }
+
+  /* Tiefenschärfe-Layer pro Icon: weiße Silhouette mit Blur + niedriger
+     Opazität, GPU-freundlich. Die Quell-SVGs sind schwarz – wir invertieren
+     sie via Filter, dann sieht das Icon im Dark-UI wie ein zartes Lichtsignal
+     aus. */
+  .backdrop-icon {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    filter: invert(1) brightness(1.2) blur(0.5px);
+    opacity: 0.06;
+    will-change: transform;
+  }
+  .backdrop-icon--blur-md { filter: invert(1) brightness(1.2) blur(2px);   }
+  .backdrop-icon--blur-lg { filter: invert(1) brightness(1.2) blur(4px);   }
+  .backdrop-icon--blur-xl { filter: invert(1) brightness(1.2) blur(8px);   }
+
+  /* Container für Backdrop-Icons – weiche Rand-Maske, damit Icons elegant
+     in den Section-Hintergrund fließen. */
+  .backdrop-stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    -webkit-mask-image: radial-gradient(120% 100% at 50% 40%, black 55%, transparent 85%);
+            mask-image: radial-gradient(120% 100% at 50% 40%, black 55%, transparent 85%);
+  }
+
+  /* Container-aware Lese-Komfort: wenn eine Section sehr breit ist, lassen
+     wir den Lese-Bereich automatisch dezent dämpfen. Genutzt für lange
+     Paragraphen (z. B. Impressum, Datenschutz). */
+  .prose-container {
+    max-width: 65ch;
   }
 }
 

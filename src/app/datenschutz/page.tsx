@@ -1,6 +1,9 @@
 import React from 'react';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
+import { Header } from '@/components/layout/Header';
+import { Kicker } from '@/components/ui/Kicker';
+import { SITE } from '@/config/site';
 
 export const metadata = {
   title: 'Datenschutzerklärung',
@@ -8,29 +11,46 @@ export const metadata = {
 
 export default function DatenschutzPage() {
   return (
-    <Section className="bg-background min-h-screen pt-32 pb-16">
-      <Container className="max-w-3xl">
-        <h1 className="text-4xl md:text-5xl font-bold mb-12">Datenschutzerklärung</h1>
-        
-        <div className="prose prose-invert prose-neutral max-w-none text-muted-foreground space-y-8 leading-relaxed">
+    <>
+      <Header />
+      <Section className="bg-background min-h-screen pt-32 pb-16">
+        <Container className="max-w-3xl">
+          <Kicker accent="brand">Rechtliches</Kicker>
+          <h1 className="text-fluid-h1 font-bold leading-[1.05] tracking-tight">Datenschutzerklärung</h1>
+
+          <div className="prose prose-invert prose-neutral mt-12 max-w-none space-y-8 leading-relaxed text-muted-foreground">
           <section>
             <h2 className="text-foreground text-xl font-bold mb-4">1. Datenschutz auf einen Blick</h2>
             <p>
-              [PLATZHALTER: FINALE RECHTSTEXTE WERDEN HIER EINGEFÜGT]
+              Diese Datenschutzerklärung informiert Sie über die Verarbeitung personenbezogener Daten
+              beim Besuch unserer Website. Verantwortlich für die Verarbeitung ist die {SITE.legalName},
+              vertreten durch {SITE.owner.name}, {SITE.address.street}, {SITE.address.postalCode}{' '}
+              {SITE.address.city}.
             </p>
           </section>
 
           <section>
             <h2 className="text-foreground text-xl font-bold mb-4">2. Allgemeine Hinweise und Pflichtinformationen</h2>
             <p>
-              [PLATZHALTER: FINALE RECHTSTEXTE WERDEN HIER EINGEFÜGT]
+              Verantwortlicher gemäß Art. 4 Abs. 7 DSGVO ist:
             </p>
+            <address className="not-italic mt-3 text-foreground">
+              {SITE.legalName}<br />
+              {SITE.owner.name}<br />
+              {SITE.address.street}<br />
+              {SITE.address.postalCode} {SITE.address.city}<br />
+              E-Mail: <a href={SITE.email.mailto} className="text-foreground hover:text-brand-soft hover:underline">{SITE.email.display}</a><br />
+              Telefon: <a href={SITE.phone.tel} className="text-foreground hover:text-brand-soft hover:underline">{SITE.phone.display}</a>
+            </address>
           </section>
 
           <section>
             <h2 className="text-foreground text-xl font-bold mb-4">3. Datenerfassung auf dieser Website (Tracking, Analytics)</h2>
             <p>
-              [PLATZHALTER: FINALE RECHTSTEXTE WERDEN HIER EINGEFÜGT]
+              Für die Auswertung unserer Marketing-, Such- und Print-Kampagnen
+              setzen wir eine bewusst cookielose, privatsphärefreundliche
+              Analyse-Lösung ein. Es findet weder ein Cross-Site-Tracking
+              statt, noch werden personenbezogene Profile aufgebaut.
             </p>
 
             <h3 className="text-foreground text-lg font-semibold mt-8 mb-3">3.1 Plausible Analytics</h3>
@@ -72,11 +92,20 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-foreground text-xl font-bold mb-4">4. Ihre Rechte</h2>
             <p>
-              [PLATZHALTER: FINALE RECHTSTEXTE WERDEN HIER EINGEFÜGT]
+              Sie haben jederzeit das Recht auf Auskunft über die zu Ihrer Person gespeicherten
+              Daten (Art. 15 DSGVO), auf Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO),
+              Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO)
+              sowie ein Widerspruchsrecht (Art. 21 DSGVO). Bitte richten Sie Anfragen an{' '}
+              <a href={SITE.email.mailto} className="text-foreground hover:text-brand-soft hover:underline">{SITE.email.display}</a>.
+            </p>
+            <p className="mt-4">
+              Daneben steht Ihnen ein Beschwerderecht bei der zuständigen Datenschutz-Aufsichtsbehörde
+              zu (Art. 77 DSGVO).
             </p>
           </section>
         </div>
-      </Container>
-    </Section>
+        </Container>
+      </Section>
+    </>
   );
 }

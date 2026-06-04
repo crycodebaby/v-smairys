@@ -6,6 +6,8 @@ import { Kicker } from '@/components/ui/Kicker';
 import { Button } from '@/components/ui/Button';
 import { Header } from '@/components/layout/Header';
 import { ContactFormBase } from '@/components/forms/ContactFormBase';
+import { BackdropIcons } from '@/components/backdrop/BackdropIcons';
+import { getPrimaryBookingTarget } from '@/config/site';
 
 // ─── Tracking Konstante ───────────────────────────────────────────────────────
 const PAGE_TYPE = 'service_seo';
@@ -76,6 +78,7 @@ const faqs = [
 
 // ─── Page Component (RSC) ─────────────────────────────────────────────────────
 export default function SEOPage() {
+  const booking = getPrimaryBookingTarget();
   return (
     <>
       <Header />
@@ -84,41 +87,45 @@ export default function SEOPage() {
         {/* ── 1. HERO ────────────────────────────────────────────────────────── */}
         <Section
           isHero
-          className="relative bg-background border-b border-border flex items-center overflow-hidden"
+          className="relative flex items-center overflow-hidden border-b border-border bg-background pt-24 sm:pt-28 md:pt-20"
         >
-          {/* CSS-only Ringe-Akzent (technische Kontinuität zu Webseiten-Seite) */}
           <div
             aria-hidden="true"
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-[65vw] max-w-[900px] aspect-square opacity-[0.03] pointer-events-none"
+            className="pointer-events-none absolute right-[-15%] top-1/2 hidden aspect-square w-[80vw] max-w-[900px] -translate-y-1/2 opacity-[0.04] md:right-0 md:block md:w-[65vw] md:opacity-[0.03]"
           >
-            <div className="w-full h-full border border-foreground rounded-full" />
-            <div className="absolute inset-[10%] border border-foreground rounded-full" />
-            <div className="absolute inset-[20%] border border-foreground rounded-full" />
+            <div className="h-full w-full rounded-full border border-foreground" />
+            <div className="absolute inset-[10%] rounded-full border border-foreground" />
+            <div className="absolute inset-[20%] rounded-full border border-foreground" />
           </div>
 
-          <Container className="relative z-10 grid md:grid-cols-12 gap-8 items-center">
-            <div className="md:col-span-9 lg:col-span-8 flex flex-col items-start gap-8">
+          <BackdropIcons preset="generic" showFrom="sm" />
+
+          <Container size="wide" className="relative z-10 grid items-center gap-8 md:grid-cols-12">
+            <div className="flex flex-col items-start gap-6 sm:gap-8 md:col-span-9 lg:col-span-8">
               <Kicker>Premium SEO</Kicker>
 
               <h1 className="text-fluid-h1 font-bold leading-[1.05] tracking-tight text-foreground">
                 Organisches Wachstum.{' '}
-                <span className="text-muted-foreground font-light">
+                <span className="font-light text-muted-foreground">
                   Ohne Tricks, ohne leere Versprechungen.
                 </span>
               </h1>
 
-              <p className="text-fluid-p text-muted-foreground leading-relaxed max-w-2xl">
+              <p className="max-w-2xl text-fluid-p leading-relaxed text-muted-foreground">
                 Wir machen Ihre Website zum wertvollsten Vertriebsmitarbeiter — durch handwerklich
                 saubere, nachhaltige Suchmaschinenoptimierung, die messbar Leads generiert.
               </p>
 
               <Button
-                variant="primary"
+                variant="brand"
                 size="lg"
+                href={booking.href}
+                external={booking.external}
                 cta_id="CTA_SEO_CONSULT"
                 cta_label="SEO-Audit anfordern"
                 cta_position="hero_primary"
                 page_type={PAGE_TYPE}
+                className="w-full sm:w-auto"
               >
                 SEO-Audit anfordern
               </Button>
@@ -127,19 +134,20 @@ export default function SEOPage() {
         </Section>
 
         {/* ── 2. DIE HARTE WAHRHEIT ──────────────────────────────────────────── */}
-        <Section className="bg-background border-b border-border">
+        <Section className="border-b border-border bg-background">
           <Container>
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-32 items-center">
+            <div className="grid items-center gap-10 md:gap-14 lg:grid-cols-2 lg:gap-24 xl:gap-32">
 
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-5 sm:gap-7">
                 <Kicker>Klare Positionierung</Kicker>
                 <h2 className="text-fluid-h2 font-bold leading-tight text-foreground">
                   Wer schnelle Hacks sucht, ist bei uns falsch.
                 </h2>
-                <div className="space-y-5 text-fluid-p text-muted-foreground leading-relaxed">
+                <div className="space-y-4 text-fluid-p leading-relaxed text-muted-foreground sm:space-y-5">
                   <p>
-                    Agenturen, die Ihnen "100 Backlinks in 30 Tagen" oder "garantierten Platz 1" versprechen,
-                    verkaufen Ihnen Kurzfristrisiken verpackt als Chancen. Googles Algorithmen erkennen
+                    Agenturen, die Ihnen &bdquo;100 Backlinks in 30 Tagen&ldquo; oder
+                    &bdquo;garantierten Platz 1&ldquo; versprechen, verkaufen Ihnen
+                    Kurzfristrisiken verpackt als Chancen. Googles Algorithmen erkennen
                     und bestrafen alle grauen Methoden — und die Rechnung zahlen Sie.
                   </p>
                   <p>
@@ -150,17 +158,21 @@ export default function SEOPage() {
                 </div>
               </div>
 
-              {/* Numerische Kontrastaussage */}
-              <div className="grid grid-cols-2 gap-6">
+              {/* Numerische Kontrastaussage – Stat-Grid */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:gap-6">
                 {[
                   { stat: '~68 %', label: 'aller Online-Erfahrungen beginnen mit einer Suchmaschine' },
                   { stat: '< 1 %', label: 'der Nutzer klickt auf Ergebnisse auf Seite 2 von Google' },
                   { stat: '3–6 M', label: 'bis erste, messbare SEO-Wirkung einsetzt (bei sauberem Fundament)' },
                   { stat: '∞', label: 'organischer Traffic läuft weiter — auch wenn Sie Ihr Ads-Budget stoppen' },
                 ].map((item) => (
-                  <Card key={item.stat} className="flex flex-col gap-4">
-                    <div className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">{item.stat}</div>
-                    <div className="text-sm text-muted-foreground leading-snug">{item.label}</div>
+                  <Card key={item.stat} className="flex flex-col gap-3 sm:gap-4">
+                    <div className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">
+                      {item.stat}
+                    </div>
+                    <div className="text-xs leading-snug text-muted-foreground sm:text-sm">
+                      {item.label}
+                    </div>
                   </Card>
                 ))}
               </div>
@@ -172,22 +184,22 @@ export default function SEOPage() {
         {/* ── 3. DIE 3 SÄULEN ────────────────────────────────────────────────── */}
         <Section className="bg-background">
           <Container>
-            <div className="mb-16">
+            <div className="mb-10 sm:mb-14 lg:mb-16">
               <Kicker>Unsere Methodik</Kicker>
-              <h2 className="text-fluid-h2 font-bold mt-4 leading-tight text-foreground max-w-2xl">
+              <h2 className="mt-4 max-w-2xl text-fluid-h2 font-bold leading-tight text-foreground">
                 Drei Säulen. Ein nachhaltiges Fundament.
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-3">
               {pillars.map((pillar) => (
-                <Card key={pillar.num} className="flex flex-col gap-6">
-                  <span className="font-mono text-4xl font-light text-muted-foreground/50 tracking-tighter">
+                <Card key={pillar.num} className="flex flex-col gap-5 sm:gap-6">
+                  <span className="font-mono text-3xl font-light tracking-tighter text-muted-foreground/50 sm:text-4xl">
                     {pillar.num}
                   </span>
                   <div>
-                    <h3 className="text-lg font-bold text-foreground mb-3">{pillar.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{pillar.desc}</p>
+                    <h3 className="mb-3 text-lg font-bold text-foreground">{pillar.title}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{pillar.desc}</p>
                   </div>
                 </Card>
               ))}
@@ -196,27 +208,28 @@ export default function SEOPage() {
         </Section>
 
         {/* ── 4. TRANSPARENZ & REPORTING ─────────────────────────────────────── */}
-        <Section className="bg-background border-y border-border">
+        <Section className="border-y border-border bg-background">
           <Container>
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-32 items-start">
+            <div className="grid items-start gap-10 md:gap-14 lg:grid-cols-2 lg:gap-24 xl:gap-32">
 
-              <div className="lg:sticky lg:top-32 flex flex-col gap-6">
+              <div className="flex flex-col gap-5 sm:gap-6 lg:sticky lg:top-32">
                 <Kicker>Transparenz & Reporting</Kicker>
                 <h2 className="text-fluid-h2 font-bold leading-tight text-foreground">
                   Sie wissen immer, was mit Ihrem Budget passiert.
                 </h2>
-                <p className="text-fluid-p text-muted-foreground leading-relaxed">
+                <p className="text-fluid-p leading-relaxed text-muted-foreground">
                   Monatliches Reporting ist kein nettes Extra — es ist Grundlage jeder seriösen SEO-Partnerschaft.
                   Wir übersetzen Daten in eindeutige, handlungsrelevante Aussagen.
                 </p>
                 <Button
                   variant="outline"
                   size="md"
+                  href="#anfrage"
                   cta_id="CTA_SEO_REPORTING"
                   cta_label="Reporting-Ansatz ansehen"
                   cta_position="reporting_section"
                   page_type={PAGE_TYPE}
-                  className="w-fit"
+                  className="w-full sm:w-fit"
                 >
                   Mehr erfahren →
                 </Button>
@@ -224,11 +237,11 @@ export default function SEOPage() {
 
               <div className="flex flex-col border-t border-border">
                 {reportingPoints.map((point) => (
-                  <div key={point.label} className="flex flex-col gap-2 py-8 border-b border-border/40 group">
-                    <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                  <div key={point.label} className="group flex flex-col gap-2 border-b border-border/40 py-6 sm:py-8">
+                    <h3 className="text-base font-bold text-foreground transition-colors group-hover:text-brand-soft">
                       {point.label}
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed max-w-md">{point.desc}</p>
+                    <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{point.desc}</p>
                   </div>
                 ))}
               </div>
@@ -239,10 +252,10 @@ export default function SEOPage() {
 
         {/* ── 5. FAQ ─────────────────────────────────────────────────────────── */}
         <Section className="bg-background">
-          <Container className="max-w-4xl">
-            <div className="mb-16">
+          <Container size="tight">
+            <div className="mb-10 sm:mb-14 lg:mb-16">
               <Kicker>Häufige Fragen</Kicker>
-              <h2 className="text-fluid-h2 font-bold mt-4 leading-tight text-foreground">
+              <h2 className="mt-4 text-fluid-h2 font-bold leading-tight text-foreground">
                 Direkte Antworten auf die richtigen Fragen.
               </h2>
             </div>
@@ -251,18 +264,18 @@ export default function SEOPage() {
               {faqs.map((faq, i) => (
                 <details
                   key={i}
-                  className="group border-b border-border py-8 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
+                  className="group cursor-pointer list-none border-b border-border py-6 [&::-webkit-details-marker]:hidden sm:py-8"
                 >
-                  <summary className="flex items-center justify-between gap-6 text-foreground font-semibold text-lg md:text-xl leading-tight select-none">
+                  <summary className="flex select-none items-center justify-between gap-4 text-base font-semibold leading-tight text-foreground sm:gap-6 sm:text-lg md:text-xl">
                     <span>{faq.q}</span>
                     <span
                       aria-hidden="true"
-                      className="shrink-0 text-muted-foreground transition-transform duration-300 group-open:rotate-45 text-2xl leading-none"
+                      className="shrink-0 text-2xl leading-none text-muted-foreground transition-transform duration-300 group-open:rotate-45"
                     >
                       +
                     </span>
                   </summary>
-                  <p className="mt-6 text-muted-foreground leading-relaxed max-w-3xl pt-2">
+                  <p className="mt-5 max-w-3xl pt-2 text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:text-base">
                     {faq.a}
                   </p>
                 </details>
@@ -274,12 +287,12 @@ export default function SEOPage() {
         {/* ── 6. FINAL CTA & FORMULAR ────────────────────────────────────────── */}
         <Section id="anfrage" className="bg-foreground text-background">
           <Container>
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+            <div className="grid items-start gap-10 md:gap-14 lg:grid-cols-2 lg:gap-24">
 
               <div className="flex flex-col">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="h-[1px] w-8 bg-background" />
-                  <span className="text-sm uppercase tracking-widest font-medium opacity-70">
+                <div className="mb-5 flex items-center gap-4 sm:mb-6">
+                  <div className="h-px w-8 bg-background" />
+                  <span className="text-xs font-medium uppercase tracking-widest opacity-70 sm:text-sm">
                     Jetzt anfragen
                   </span>
                 </div>
@@ -288,31 +301,31 @@ export default function SEOPage() {
                   Bereit für nachhaltigen organischen Vertrieb?
                 </h2>
 
-                <p className="mt-8 text-fluid-p opacity-70 leading-relaxed max-w-lg">
+                <p className="mt-6 max-w-lg text-fluid-p leading-relaxed opacity-70 sm:mt-8">
                   Schildern Sie kurz Ihre aktuelle Situation. Wir führen ein kostenloses, technisches
                   SEO-Audit durch und teilen unsere ehrliche Ersteinschätzung — ohne Verkaufsdruck.
                 </p>
 
-                <ul className="mt-12 pt-8 border-t border-background/20 space-y-4 text-sm font-medium opacity-80">
+                <ul className="mt-8 space-y-3 border-t border-background/20 pt-6 text-sm font-medium opacity-80 sm:mt-12 sm:space-y-4 sm:pt-8">
                   <li className="flex items-center gap-3">
-                    <span className="w-1.5 h-1.5 bg-background rounded-sm shrink-0" />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-background" />
                     Technisches SEO-Audit als Projektstart inklusive
                   </li>
                   <li className="flex items-center gap-3">
-                    <span className="w-1.5 h-1.5 bg-background rounded-sm shrink-0" />
-                    Keine "Platz 1"-Versprechen — ehrliche Ersteinschätzung
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-background" />
+                    Keine &bdquo;Platz 1&ldquo;-Versprechen — ehrliche Ersteinschätzung
                   </li>
                   <li className="flex items-center gap-3">
-                    <span className="w-1.5 h-1.5 bg-background rounded-sm shrink-0" />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-background" />
                     Monatliches Reporting ohne Blackbox
                   </li>
                 </ul>
               </div>
 
-              <div className="bg-background text-foreground p-8 md:p-12 rounded-sm shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
-                <h3 className="text-2xl font-bold mb-2">SEO-Audit anfordern</h3>
-                <p className="text-sm text-muted-foreground mb-8">
+              <div className="relative overflow-hidden rounded-sm bg-background p-5 text-foreground shadow-2xl sm:p-8 md:p-12">
+                <div className="absolute left-0 top-0 h-[2px] w-full bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+                <h3 className="mb-2 text-2xl font-bold">SEO-Audit anfordern</h3>
+                <p className="mb-6 text-sm text-muted-foreground sm:mb-8">
                   Wählen Sie <strong>„SEO"</strong> als Leistung und Ihr ungefähres Monatsbudget.
                 </p>
                 <ContactFormBase page_type={PAGE_TYPE} />

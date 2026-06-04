@@ -1,5 +1,6 @@
 import { trackEvent } from "@/lib/analytics";
 import { isAnalyticsExcludedPath } from "@/lib/analytics-config";
+import type { TrackingEventName } from "./event-names";
 
 /**
  * Adapter: leitet alle Events aus der zentralen `dispatchEvent`-Pipeline
@@ -14,7 +15,7 @@ import { isAnalyticsExcludedPath } from "@/lib/analytics-config";
  *  - Falls Plausible nicht geladen ist, ist `trackEvent` ein no-op.
  */
 export function trackPlausibleEvent(
-  payload: Record<string, unknown> & { event_name: string }
+  payload: Record<string, unknown> & { event_name: TrackingEventName }
 ): void {
   if (typeof window === "undefined") return;
   if (isAnalyticsExcludedPath(window.location.pathname)) return;

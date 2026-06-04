@@ -132,9 +132,9 @@ function formatAttributionBlock(
 
 /**
  * Lead-Notification:
- *  - Aktuell: strukturiertes Server-Log mit Attribution-Block.
- *  - Sobald Resend/Mail-Provider angebunden ist, kann hier `sendMail()`
- *    die gleiche Struktur als HTML-/Plain-Text-Mail rausschicken.
+ *  - Strukturiertes Server-Log mit Attribution-Block (KEINE PII).
+ *  - Dient als zweiter, providerunabhängiger Nachweis im Vercel-Log,
+ *    zusätzlich zur Formcarry-Zustellung.
  */
 function logLeadNotification(data: ContactPayload): void {
   const block = [
@@ -153,6 +153,134 @@ function logLeadNotification(data: ContactPayload): void {
   console.info(block);
 }
 
+/** Request-Metadaten, die nicht im Body stecken (aus Headern abgeleitet). */
+type RequestMeta = {
+  user_agent: string;
+  referer: string;
+};
+
+/**
+ * Resultat der Formcarry-Zustellung. `ok=false` führt zu einer sicheren
+ * Client-Fehlermeldung; Details landen ausschließlich (redacted) im Server-Log.
+ */
+type DeliveryResult = { ok: true } | { ok: false; reason: string };
+
+/**
+ * Baut die flache UTM-Sicht für die Formcarry-Übersicht.
+ * Priorität: Last-Touch > First-Touch (analog `getAttributionData`).
+ */
+function flattenAttribution(
+  attribution: ContactPayload['attribution']
+): Record<string, string> {
+  if (!attribution) return {};
+  const { first, last } = attribution;
+  const pick = (key: keyof typeof first) => last[key] ?? first[key];
+
+  const flat: Record<string, string | undefined> = {
+    utm_source: pick('utm_source'),
+    utm_medium: pick('utm_medium'),
+    utm_campaign: pick('utm_campaign'),
+    utm_content: pick('utm_content'),
+    utm_term: pick('utm_term'),
+    first_touch_landing_page: first.landing_page,
+    first_touch_referrer: first.referrer,
+    first_seen_at: first.first_seen_at,
+    last_touch_landing_page: last.landing_page,
+    last_seen_at: last.last_seen_at,
+  };
+
+  return Object.fromEntries(
+    Object.entries(flat).filter(([, v]) => typeof v === 'string' && v !== '')
+  ) as Record<string, string>;
+}
+
+/**
+ * Leitet einen validierten Lead serverseitig an Formcarry weiter.
+ *
+ * - Endpoint kommt ausschließlich aus der Server-ENV `FORMCARRY_ENDPOINT`
+ *   (kein NEXT_PUBLIC_ → nie im Client-Bundle).
+ * - JSON-Payload mit allen Formularfeldern, Attribution (flach + voll) und
+ *   nicht-PII-Metadaten (Page-Path, Referrer, User-Agent, Timestamp).
+ * - Fehler werden NUR redacted geloggt (Status/Reason), niemals der Body
+ *   inkl. PII.
+ */
+async function forwardToFormcarry(
+  data: ContactPayload,
+  meta: RequestMeta
+): Promise<DeliveryResult> {
+  const endpoint = process.env.FORMCARRY_ENDPOINT;
+
+  if (!endpoint) {
+    // Klares Server-Log OHNE PII. Fehlende Config = Zustellung unmöglich.
+    console.error(
+      '[contact] FORMCARRY_ENDPOINT ist nicht gesetzt – Lead konnte nicht zugestellt werden.'
+    );
+    return { ok: false, reason: 'missing_endpoint' };
+  }
+
+  const submittedAt = data.submitted_at ?? new Date().toISOString();
+  const flatAttribution = flattenAttribution(data.attribution);
+
+  const payload = {
+    // Formcarry-Steuerfelder (verbessern Lesbarkeit der Benachrichtigung).
+    _subject: `Neuer Lead: ${data.service} – ${data.name}`,
+    _replyto: data.email,
+
+    // Formularfelder.
+    name: data.name,
+    email: data.email,
+    phone: data.phone ?? '',
+    service: data.service,
+    budget_range: data.budget_range,
+    start_time: data.start_time,
+
+    // Nicht-PII-Metadaten.
+    submitted_at: submittedAt,
+    page_path: data.attribution?.last.landing_page ?? '',
+    referer: meta.referer,
+    user_agent: meta.user_agent,
+
+    // Attribution: flach (Dashboard-freundlich) + vollständig (Audit).
+    ...flatAttribution,
+    attribution: data.attribution ?? null,
+  };
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const json = (await res.json().catch(() => ({}))) as {
+      status?: string;
+      message?: string;
+    };
+
+    // Formcarry liefert bei Erfolg `status: "success"`. Manche Konten
+    // antworten ohne `status`-Feld → bei 2xx ebenfalls als Erfolg werten.
+    if (res.ok && json.status !== 'error') {
+      return { ok: true };
+    }
+
+    // Redacted: nur Status + Formcarry-Statuswort, KEIN Body mit PII.
+    console.error(
+      `[contact] Formcarry-Zustellung fehlgeschlagen (HTTP ${res.status}, status=${
+        json.status ?? 'n/a'
+      }).`
+    );
+    return { ok: false, reason: `formcarry_http_${res.status}` };
+  } catch (err) {
+    // Nur Fehlertyp/-name loggen, niemals den Payload.
+    const reason = err instanceof Error ? err.name : 'unknown';
+    console.error(`[contact] Formcarry-Request-Fehler (${reason}).`);
+    return { ok: false, reason: 'formcarry_network_error' };
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get('x-forwarded-for') || 'unknown';
@@ -168,9 +296,26 @@ export async function POST(req: Request) {
     // Zod Validation & Honeypot Check
     const validatedData = contactSchema.parse(body);
 
-    // Lead-Notification (Server-Log inkl. Attribution).
-    // Sobald Mail-Provider angebunden ist, hier sendLeadEmail(validatedData).
+    // Lead-Notification (Server-Log inkl. Attribution, KEINE PII).
     logLeadNotification(validatedData);
+
+    // Kanonische Zustellung: serverseitig an Formcarry weiterleiten.
+    const meta: RequestMeta = {
+      user_agent: req.headers.get('user-agent') ?? 'unknown',
+      referer: req.headers.get('referer') ?? '',
+    };
+    const delivery = await forwardToFormcarry(validatedData, meta);
+
+    if (!delivery.ok) {
+      // Sichere, generische Client-Meldung – technische Details bleiben im Log.
+      return NextResponse.json(
+        {
+          message:
+            'Ihre Anfrage konnte gerade nicht zugestellt werden. Bitte versuchen Sie es in Kürze erneut oder rufen Sie uns direkt an.',
+        },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json(
       { message: 'Erfolgreich gesendet' },

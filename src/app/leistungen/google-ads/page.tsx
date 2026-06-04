@@ -4,10 +4,23 @@ import { Container } from '@/components/ui/Container';
 import { Header } from '@/components/layout/Header';
 import { Kicker } from '@/components/ui/Kicker';
 
-// 1. Seitenspezifische Metadata
+// 1. Seitenspezifische Metadata.
+//    No-Risk-Fix aus SEO-Audit: solange die Seite nur aus Platzhalter-Sektionen
+//    besteht, wird sie auf `noindex` gestellt. Sie bleibt für Links erreichbar
+//    (`follow: true`), erscheint aber nicht in Google. Sobald echter Content
+//    eingepflegt ist, kann das Robots-Flag entfernt werden.
 export const metadata = {
   title: 'Google Ads Systematik | Profitables B2B Lead-Management',
-  description: 'Wir entwickeln Ads-Kampagnen, die genau Ihre Zielgruppe ansprechen und Budgets präzise skalieren.',
+  description:
+    'Wir entwickeln Ads-Kampagnen, die genau Ihre Zielgruppe ansprechen und Budgets präzise skalieren.',
+  robots: {
+    index: false,
+    follow: true,
+    googleBot: {
+      index: false,
+      follow: true,
+    },
+  },
 };
 
 // 2. Tracking Prep

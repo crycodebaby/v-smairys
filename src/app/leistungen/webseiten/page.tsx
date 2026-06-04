@@ -6,6 +6,8 @@ import { Kicker } from '@/components/ui/Kicker';
 import { Button } from '@/components/ui/Button';
 import { Header } from '@/components/layout/Header';
 import { ContactFormBase } from '@/components/forms/ContactFormBase';
+import { BackdropIcons } from '@/components/backdrop/BackdropIcons';
+import { getPrimaryBookingTarget } from '@/config/site';
 
 // ─── Tracking Konstante (zentral für diese Seite) ────────────────────────────
 const PAGE_TYPE = 'service_web';
@@ -85,6 +87,7 @@ const faqs = [
 
 // ─── Page Component (RSC) ─────────────────────────────────────────────────────
 export default function WebseitenPage() {
+  const booking = getPrimaryBookingTarget();
   return (
     <>
       <Header />
@@ -93,46 +96,53 @@ export default function WebseitenPage() {
         {/* ── 1. HERO ────────────────────────────────────────────────────────── */}
         <Section
           isHero
-          className="relative bg-background border-b border-border flex items-center overflow-hidden"
+          className="relative flex items-center overflow-hidden border-b border-border bg-background pt-24 sm:pt-28 md:pt-20"
         >
-          {/*
-            3D-MARKENREGEL: Wenn ThreeLogoWrapper hier genutzt wird, dann ausschließlich
-            mit opacity-5 + pointer-events-none als Hintergrund-Akzent.
-            Derzeit statische Geometrie gemäß Markenregel (kein visueller Eingriff in Text).
-          */}
+          {/* Konzentrische Linien als ruhiges Hintergrund-Motiv. Auf Mobile
+              versteckt, damit der Text nicht von dekorativer Geometrie
+              eingedrückt wird. */}
           <div
             aria-hidden="true"
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-[65vw] max-w-[900px] aspect-square opacity-[0.03] pointer-events-none"
+            className="pointer-events-none absolute right-[-15%] top-1/2 hidden aspect-square w-[80vw] max-w-[900px] -translate-y-1/2 opacity-[0.04] md:right-0 md:block md:opacity-[0.03] md:w-[65vw]"
           >
-            <div className="w-full h-full border border-foreground rounded-full" />
-            <div className="absolute inset-[10%] border border-foreground rounded-full" />
-            <div className="absolute inset-[20%] border border-foreground rounded-full" />
+            <div className="h-full w-full rounded-full border border-foreground" />
+            <div className="absolute inset-[10%] rounded-full border border-foreground" />
+            <div className="absolute inset-[20%] rounded-full border border-foreground" />
           </div>
 
-          <Container className="relative z-10 grid md:grid-cols-12 gap-8 items-center">
-            <div className="md:col-span-9 lg:col-span-8 flex flex-col items-start gap-8">
+          {/* Tiefenschärfe: Programmier-Icons, ab `sm` sichtbar */}
+          <BackdropIcons preset="tech" showFrom="sm" />
+
+          <Container
+            size="wide"
+            className="relative z-10 grid items-center gap-8 md:grid-cols-12"
+          >
+            <div className="flex flex-col items-start gap-6 sm:gap-8 md:col-span-9 lg:col-span-8">
               <Kicker>Next.js Webentwicklung</Kicker>
 
               <h1 className="text-fluid-h1 font-bold leading-[1.05] tracking-tight text-foreground">
                 Ihre digitale Infrastruktur.{' '}
-                <span className="text-muted-foreground font-light">
+                <span className="font-light text-muted-foreground">
                   Handgebaut, sicher und vollständig betreut.
                 </span>
               </h1>
 
-              <p className="text-fluid-p text-muted-foreground leading-relaxed max-w-2xl">
+              <p className="max-w-2xl text-fluid-p leading-relaxed text-muted-foreground">
                 Wir liefern keine „schönen Webseiten" — wir entwickeln vollständige digitale
                 Infrastrukturen. Code, Hosting, E-Mail, Wartung. Alles aus einer Hand. Alles auf
                 technisch höchstem Niveau.
               </p>
 
               <Button
-                variant="primary"
+                variant="brand"
                 size="lg"
+                href={booking.href}
+                external={booking.external}
                 cta_id="CTA_WEB_CONSULT"
                 cta_label="Projektanfrage starten"
                 cta_position="hero_primary"
                 page_type={PAGE_TYPE}
+                className="w-full sm:w-auto"
               >
                 Projektanfrage starten
               </Button>
@@ -143,22 +153,22 @@ export default function WebseitenPage() {
         {/* ── 2. RUNDUM-SORGLOS PARADIGMA ────────────────────────────────────── */}
         <Section className="bg-background">
           <Container>
-            <div className="mb-16">
+            <div className="mb-10 sm:mb-14 lg:mb-16">
               <Kicker>Das Rundum-Sorglos-Paradigma</Kicker>
-              <h2 className="text-fluid-h2 font-bold mt-4 leading-tight text-foreground max-w-2xl">
+              <h2 className="mt-4 max-w-2xl text-fluid-h2 font-bold leading-tight text-foreground">
                 Vier Säulen. Eine Verantwortung.
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
               {pillars.map((pillar) => (
-                <Card key={pillar.num} className="flex flex-col gap-6">
-                  <span className="font-mono text-4xl font-light text-muted-foreground/50 tracking-tighter">
+                <Card key={pillar.num} className="flex flex-col gap-5 sm:gap-6">
+                  <span className="font-mono text-3xl font-light tracking-tighter text-muted-foreground/50 sm:text-4xl">
                     {pillar.num}
                   </span>
                   <div>
-                    <h3 className="text-lg font-bold text-foreground mb-3">{pillar.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{pillar.desc}</p>
+                    <h3 className="mb-3 text-lg font-bold text-foreground">{pillar.title}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{pillar.desc}</p>
                   </div>
                 </Card>
               ))}
@@ -167,46 +177,59 @@ export default function WebseitenPage() {
         </Section>
 
         {/* ── 3. HANDWERK vs. MASSENWARE ─────────────────────────────────────── */}
-        <Section className="bg-background border-y border-border">
+        <Section className="border-y border-border bg-background">
           <Container>
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-32 items-start">
+            <div className="grid items-start gap-10 md:gap-14 lg:grid-cols-2 lg:gap-24 xl:gap-32">
 
               {/* Linke Spalte: Intro */}
-              <div className="lg:sticky lg:top-32 flex flex-col gap-6">
+              <div className="flex flex-col gap-5 sm:gap-6 lg:sticky lg:top-32">
                 <Kicker>Handwerk vs. Massenware</Kicker>
                 <h2 className="text-fluid-h2 font-bold leading-tight text-foreground">
                   Warum echter Code den Unterschied macht.
                 </h2>
-                <p className="text-fluid-p text-muted-foreground leading-relaxed">
+                <p className="text-fluid-p leading-relaxed text-muted-foreground">
                   WordPress und Wix lösen ein Problem — für Hobbyprojekte. Für professionellen B2B-Vertrieb
                   sind sie strukturelle Handicaps: langsam, angreifbar und schwer skalierbar.
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
                   Unsere Next.js-Architektur rendert Seiten auf Edge-Servern in unter einer Sekunde,
                   besitzt keine angreifbare Admin-Oberfläche und wächst nahtlos mit Ihrem Unternehmen.
                   Das ist kein Marketing-Versprechen — das sind messbare, technische Fakten.
                 </p>
               </div>
 
-              {/* Rechte Spalte: Vergleichs-Tabelle */}
+              {/*
+               * Rechte Spalte: Vergleichs-Tabelle
+               *
+               * Mobile (<640): jede Zeile wird zur eigenen Karte (vertikales
+               * Stack), Header-Zeile ausgeblendet.
+               * Ab `sm`: klassische 3-Spalten-Tabelle.
+               */}
               <div className="border-t border-border">
-                {/* Header Row */}
-                <div className="grid grid-cols-3 gap-4 py-4 border-b border-border/40">
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground/60 font-medium">Kriterium</div>
-                  <div className="text-xs uppercase tracking-widest text-foreground font-medium">Smairys Code</div>
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground/60 font-medium">Baukästen</div>
+                <div className="hidden grid-cols-3 gap-4 border-b border-border/40 py-4 sm:grid">
+                  <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60">Kriterium</div>
+                  <div className="text-xs font-medium uppercase tracking-widest text-foreground">Smairys Code</div>
+                  <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60">Baukästen</div>
                 </div>
 
                 {comparisons.map((row) => (
                   <div
                     key={row.label}
-                    className="grid grid-cols-3 gap-4 py-5 border-b border-border/30 items-start group"
+                    className="group flex flex-col gap-3 border-b border-border/30 py-5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4"
                   >
-                    <div className="text-sm font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-soft sm:text-sm sm:font-semibold sm:normal-case sm:tracking-normal sm:text-muted-foreground sm:transition-colors sm:group-hover:text-foreground">
                       {row.label}
                     </div>
-                    <div className="text-sm text-foreground leading-snug">{row.craft}</div>
-                    <div className="text-sm text-muted-foreground/60 leading-snug line-through decoration-muted-foreground/30">
+                    <div className="text-sm leading-snug text-foreground">
+                      <span className="mr-1 inline-block text-[10px] font-semibold uppercase tracking-widest text-foreground/60 sm:hidden">
+                        Smairys
+                      </span>
+                      {row.craft}
+                    </div>
+                    <div className="text-sm leading-snug text-muted-foreground/60 line-through decoration-muted-foreground/30">
+                      <span className="mr-1 inline-block text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 no-underline sm:hidden">
+                        Baukasten
+                      </span>
                       {row.mass}
                     </div>
                   </div>
@@ -218,10 +241,10 @@ export default function WebseitenPage() {
 
         {/* ── 4. FAQ ─────────────────────────────────────────────────────────── */}
         <Section className="bg-background">
-          <Container className="max-w-4xl">
-            <div className="mb-16">
+          <Container size="tight">
+            <div className="mb-10 sm:mb-14 lg:mb-16">
               <Kicker>Häufige Fragen</Kicker>
-              <h2 className="text-fluid-h2 font-bold mt-4 leading-tight text-foreground">
+              <h2 className="mt-4 text-fluid-h2 font-bold leading-tight text-foreground">
                 Klare Antworten auf harte Einwände.
               </h2>
             </div>
@@ -230,18 +253,18 @@ export default function WebseitenPage() {
               {faqs.map((faq, i) => (
                 <details
                   key={i}
-                  className="group border-b border-border py-8 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
+                  className="group cursor-pointer list-none border-b border-border py-6 [&::-webkit-details-marker]:hidden sm:py-8"
                 >
-                  <summary className="flex items-center justify-between gap-6 text-foreground font-semibold text-lg md:text-xl leading-tight select-none">
+                  <summary className="flex select-none items-center justify-between gap-4 text-base font-semibold leading-tight text-foreground sm:gap-6 sm:text-lg md:text-xl">
                     <span>{faq.q}</span>
                     <span
                       aria-hidden="true"
-                      className="shrink-0 text-muted-foreground transition-transform duration-300 group-open:rotate-45 text-2xl leading-none"
+                      className="shrink-0 text-2xl leading-none text-muted-foreground transition-transform duration-300 group-open:rotate-45"
                     >
                       +
                     </span>
                   </summary>
-                  <p className="mt-6 text-muted-foreground leading-relaxed max-w-3xl pt-2">
+                  <p className="mt-5 max-w-3xl pt-2 text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:text-base">
                     {faq.a}
                   </p>
                 </details>
@@ -253,13 +276,12 @@ export default function WebseitenPage() {
         {/* ── 5. FINAL CTA & FORMULAR ────────────────────────────────────────── */}
         <Section id="anfrage" className="bg-foreground text-background">
           <Container>
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+            <div className="grid items-start gap-10 md:gap-14 lg:grid-cols-2 lg:gap-24">
 
               <div className="flex flex-col">
-                {/* Inline Kicker (Off-White Variante) */}
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="h-[1px] w-8 bg-background" />
-                  <span className="text-sm uppercase tracking-widest font-medium opacity-70">
+                <div className="mb-5 flex items-center gap-4 sm:mb-6">
+                  <div className="h-px w-8 bg-background" />
+                  <span className="text-xs font-medium uppercase tracking-widest opacity-70 sm:text-sm">
                     Jetzt anfragen
                   </span>
                 </div>
@@ -268,37 +290,35 @@ export default function WebseitenPage() {
                   Bereit für Ihre neue digitale Infrastruktur?
                 </h2>
 
-                <p className="mt-8 text-fluid-p opacity-70 leading-relaxed max-w-lg">
+                <p className="mt-6 max-w-lg text-fluid-p leading-relaxed opacity-70 sm:mt-8">
                   Schildern Sie uns kurz Ihr Vorhaben. Wir prüfen, ob Ihr Projekt zu unserem
                   Anforderungsprofil passt und melden uns innerhalb von 24 Stunden mit einer
                   unverbindlichen Ersteinschätzung.
                 </p>
 
-                <ul className="mt-12 pt-8 border-t border-background/20 space-y-4 text-sm font-medium opacity-80">
+                <ul className="mt-8 space-y-3 border-t border-background/20 pt-6 text-sm font-medium opacity-80 sm:mt-12 sm:space-y-4 sm:pt-8">
                   <li className="flex items-center gap-3">
-                    <span className="w-1.5 h-1.5 bg-background rounded-sm shrink-0" />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-background" />
                     Keine Agenturfloskeln — direkte, technische Ersteinschätzung
                   </li>
                   <li className="flex items-center gap-3">
-                    <span className="w-1.5 h-1.5 bg-background rounded-sm shrink-0" />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-background" />
                     Angebot erst nach gemeinsamem Briefing, nicht aus der Schublade
                   </li>
                   <li className="flex items-center gap-3">
-                    <span className="w-1.5 h-1.5 bg-background rounded-sm shrink-0" />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-background" />
                     100 % DSGVO-konforme Infrastruktur von Anfang an
                   </li>
                 </ul>
               </div>
 
-              {/* Formular — ContactFormBase aus Phase 3.5 ──────────────────── */}
-              <div className="bg-background text-foreground p-8 md:p-12 rounded-sm shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
-                <h3 className="text-2xl font-bold mb-2">Projektanfrage starten</h3>
-                <p className="text-sm text-muted-foreground mb-8">
+              <div className="relative overflow-hidden rounded-sm bg-background p-5 text-foreground shadow-2xl sm:p-8 md:p-12">
+                <div className="absolute left-0 top-0 h-[2px] w-full bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+                <h3 className="mb-2 text-2xl font-bold">Projektanfrage starten</h3>
+                <p className="mb-6 text-sm text-muted-foreground sm:mb-8">
                   Wählen Sie <strong>„Webseiten"</strong> als Leistung und Ihr ungefähres Budget.
                   Wir melden uns zeitnah.
                 </p>
-                {/* Tracking page_type wird korrekt durchgereicht */}
                 <ContactFormBase page_type={PAGE_TYPE} />
               </div>
 
