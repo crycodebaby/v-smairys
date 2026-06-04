@@ -10,6 +10,8 @@ type EnvSnapshot = {
   hasPlausibleDomain: boolean;
   hasPlausibleSrc: boolean;
   hasSiteUrl: boolean;
+  hasSupabaseUrl: boolean;
+  hasSupabaseServiceRole: boolean;
 };
 
 type DebugCardProps = {
@@ -76,6 +78,18 @@ export function DebugCard({
       required: false,
       present: env.hasExplicitSecret,
       hint: "Optional: ohne wird das HMAC-Secret aus dem PIN abgeleitet.",
+    },
+    {
+      label: "SUPABASE_URL / NEXT_PUBLIC_SUPABASE_URL",
+      required: false,
+      present: env.hasSupabaseUrl,
+      hint: "Erforderlich für persistente QR-Kampagnen.",
+    },
+    {
+      label: "SUPABASE_SERVICE_ROLE_KEY",
+      required: false,
+      present: env.hasSupabaseServiceRole,
+      hint: "Server-only. Niemals im Client verwenden.",
     },
   ];
 

@@ -11,13 +11,17 @@ Voraussetzung im Code (bereits erledigt):
 - Auf `/intern/*`, `/kundenlogin`, `/login` wird das Snippet **nicht gerendert**.
 - ENV: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` muss gesetzt sein (z. B. `smairys.de`),
   sonst lädt Plausible gar nicht.
+- Kampagnen-Stammdaten liegen in **Supabase** (`/intern/marketing`); Besucher
+  und Conversions ausschließlich in **Plausible** – das Dashboard zeigt keine
+  Analytics-Zahlen und nutzt keine Plausible-API.
 
 ---
 
 ## 1. QR-Kampagnen in Plausible finden
 
 Eine Kampagne ist über ihre UTM-Parameter identifizierbar. Für
-`vk-sommer-saarmitte-2026` (siehe `src/lib/marketing-campaigns.ts`):
+`vk-sommer-saarmitte-2026` (Supabase oder statischer Fallback, siehe
+`docs/analytics/qr-campaign-builder.md`):
 
 | Parameter | Wert |
 | --- | --- |
@@ -186,3 +190,29 @@ Zukunftssicher ergänzend im Plausible-Dashboard:
 
 So werden interne Pageviews serverseitig bei Plausible geblockt – unabhängig
 davon, welche Script-Variante geladen wird. (Bis zu 30 Page-Patterns möglich.)
+
+---
+
+## 9. QR-Redirect-Zählung vs. Plausible
+
+Das interne Dashboard kann zusätzlich eine technische Redirect-Zählung anzeigen,
+wenn Supabase konfiguriert ist:
+
+- `QR-Aufrufe heute`
+- `QR-Aufrufe letzte 7 Tage`
+- `QR-Aufrufe gesamt`
+
+Diese Zählung ist **nicht** gleich Websitebesuch. Sie zählt nur, wie oft der
+Shortlink `/go/[slug]` technisch aufgerufen wurde. Es werden keine IP-Adressen,
+keine User-Agents und keine Fingerprints gespeichert – nur
+`campaign_slug`, `date`, `count`.
+
+Plausible bleibt die Quelle für:
+
+- echte Websitebesuche
+- Sources/Campaigns
+- Conversions/Goals
+- Realtime-Validierung
+
+Plausible Business ist dafür weiterhin keine Voraussetzung. Business wird erst
+interessant, wenn du Custom-Property-Breakdowns oder Funnels brauchst.

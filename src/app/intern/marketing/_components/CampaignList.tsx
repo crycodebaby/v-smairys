@@ -24,23 +24,8 @@ const STATUS_LABEL: Record<CampaignSummary["status"], string> = {
   archived: "Archiv",
 };
 
-type StatusFilter = "all" | CampaignSummary["status"];
-
-const FILTER_OPTIONS: Array<{ id: StatusFilter; label: string }> = [
-  { id: "all", label: "Alle" },
-  { id: "active", label: "Live" },
-  { id: "draft", label: "Entwurf" },
-  { id: "paused", label: "Pause" },
-  { id: "archived", label: "Archiv" },
-];
-
 /**
- * Linke Spalte des Master-Detail-Layouts.
- *
- * - Kompakte Such- + Filter-Leiste
- * - Liste mit Status-Chip, internem Namen, Startdatum
- * - Aktive Auswahl optisch hervorgehoben (Inner-Highlight + Akzent-Border)
- * - Bei Auswahl: visuelles Press-Feedback
+ * Linke Spalte: einfache Suche nach Name, Slug, Region oder Stadt.
  */
 export function CampaignList({
   campaigns,
@@ -48,36 +33,33 @@ export function CampaignList({
   onSelect,
 }: CampaignListProps) {
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<StatusFilter>("all");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    if (!q) return campaigns;
     return campaigns.filter((c) => {
-      if (filter !== "all" && c.status !== filter) return false;
-      if (!q) return true;
       const hay = [
         c.slug,
         c.internalName,
         c.externalTitle,
-        c.utm_source,
-        c.utm_campaign,
+        c.region ?? "",
+        c.city ?? "",
       ]
         .join(" ")
         .toLowerCase();
       return hay.includes(q);
     });
-  }, [campaigns, query, filter]);
+  }, [campaigns, query]);
 
   return (
     <div className="flex h-full flex-col gap-3">
-      {/* Search */}
       <div className="relative">
         <SearchIcon className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground/45" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Kampagne suchen"
+          placeholder="Name, Slug, Region, Stadt"
           aria-label="Kampagne suchen"
           className={
             "block h-9 w-full rounded-full border border-white/10 bg-white/[0.05] pl-8 pr-3 " +
@@ -88,39 +70,11 @@ export function CampaignList({
         />
       </div>
 
-      {/* Filter */}
-      <div className="flex flex-wrap gap-1">
-        {FILTER_OPTIONS.map((opt) => {
-          const isActive = opt.id === filter;
-          return (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => setFilter(opt.id)}
-              aria-pressed={isActive}
-              className={
-                "rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors duration-200 " +
-                (isActive
-                  ? "border-white/30 bg-white/15 text-foreground"
-                  : "border-white/10 bg-white/[0.04] text-foreground/65 hover:border-white/20 hover:text-foreground")
-              }
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Liste */}
       <div className="-mx-1 flex flex-1 flex-col gap-1.5 overflow-y-auto px-1">
         {filtered.length === 0 ? (
           <div className="mt-6 rounded-lg border border-dashed border-white/10 px-4 py-6 text-center">
-            <p className="text-sm font-medium text-foreground/75">
-              Keine Kampagne gefunden
-            </p>
-            <p className="mt-1 text-xs text-foreground/50">
-              Filter ändern oder Suche leeren.
-            </p>
+            <p className="text-sm font-medium text-foreground/75">Keine Kampagne gefunden</p>
+            <p className="mt-1 text-xs text-foreground/50">Suche anpassen oder leeren.</p>
           </div>
         ) : (
           filtered.map((c) => {
@@ -140,7 +94,6 @@ export function CampaignList({
                     : "border-white/10 bg-white/[0.035] hover:border-white/20 hover:bg-white/[0.06]")
                 }
               >
-                {/* Akzent-Strich links bei Selektion */}
                 {isSelected && (
                   <span
                     aria-hidden="true"
@@ -166,7 +119,11 @@ export function CampaignList({
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2 text-[11px] text-foreground/55">
                   <span className="truncate font-mono">{c.slug}</span>
-                  {c.startDate && <span>{c.startDate}</span>}
+                  {(c.region || c.city) && (
+                    <span className="truncate">
+                      {[c.region, c.city].filter(Boolean).join(" · ")}
+                    </span>
+                  )}
                 </div>
                 {c.issueCount > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">

@@ -29,6 +29,8 @@ export type UtmMedium =
 export type CampaignStatus = "draft" | "active" | "paused" | "archived";
 
 export interface MarketingCampaign {
+  /** DB-ID, nur bei Supabase-Kampagnen vorhanden. Statische Fallbacks haben keine ID. */
+  id?: string;
   /** Kurzer, URL-sicherer Slug. Erscheint in der öffentlichen URL `/go/<slug>`. */
   slug: string;
   /** Interner technischer Kampagnenname für Reporting & Doku. */
@@ -49,10 +51,23 @@ export interface MarketingCampaign {
   utm_content: string;
   /** Optionales UTM-Term-Feld, nur wenn fachlich benötigt. */
   utm_term?: string;
+  /** Print-Medium (z. B. Visitenkarte, Flyer). */
+  medium_label?: string;
+  /** Region (z. B. Saarland). */
+  region?: string;
+  /** Stadt/Ort, optional. */
+  city?: string;
+  /** Kampagnenjahr für Print-Briefing. */
+  year?: number;
+  /** Asset-Version (z. B. v1). */
+  version?: string;
   /** ISO-Datum (`YYYY-MM-DD`), optional. Wann ging die Kampagne live? */
   startDate?: string;
   /** Optionale interne Notiz (nur für Devs/Marketing, wird nie an User ausgeliefert). */
   notes?: string;
+  /** DB-Zeitstempel, nur bei Supabase-Kampagnen vorhanden. */
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
@@ -70,11 +85,22 @@ export const MARKETING_CAMPAIGNS = [
     utm_medium: "print",
     utm_campaign: "vk-sommer-saarmitte-2026",
     utm_content: "qr-v1",
+    medium_label: "Visitenkarte",
+    region: "Saarland",
+    year: 2026,
+    version: "v1",
     startDate: "2026-05-20",
     notes:
       "Erste Visitenkartenauflage, QR-Code Variante 1. Verteilung Saarland-Mitte, Sommer 2026.",
   },
 ] as const satisfies readonly MarketingCampaign[];
+
+/** Öffentliche Zielseiten für das Dashboard (keine internen Routen). */
+export const CAMPAIGN_DESTINATION_PATHS = [
+  { path: "/", label: "Startseite" },
+  { path: "/kontakt", label: "Kontakt" },
+  { path: "/website-erstellen", label: "Website-Erstellung" },
+] as const;
 
 /**
  * Strikt-typisierter Lookup-Slug. Nützlich, wenn intern eine Kampagne
@@ -273,4 +299,20 @@ export function validateCampaign(
  */
 export function getSiteOrigin(): string {
   return process.env.NEXT_PUBLIC_SITE_URL || "https://smairys.de";
+}
+
+/**
+ * Mehrzeilige Plausible-Filterwerte zum Kopieren (keine API, nur Text).
+ */
+export function buildPlausibleSearchValues(campaign: MarketingCampaign): string {
+  const lines = [
+    `utm_campaign: ${campaign.utm_campaign}`,
+    `utm_source: ${campaign.utm_source}`,
+    `utm_medium: ${campaign.utm_medium}`,
+    `utm_content: ${campaign.utm_content}`,
+  ];
+  if (campaign.utm_term) {
+    lines.push(`utm_term: ${campaign.utm_term}`);
+  }
+  return lines.join("\n");
 }

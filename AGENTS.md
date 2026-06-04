@@ -15,13 +15,15 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 - `src/app/` – App Router. Öffentliche Seiten + `/intern/*` (geschützt) + `/kundenlogin`.
 - `src/middleware.ts` – schützt `/intern/*` durch PIN-Session-Cookie.
 - `src/lib/auth/` – PIN-Session (HMAC-signiertes Cookie, Web-Crypto, Edge-kompatibel) + Rate-Limit.
-- `src/lib/marketing-campaigns.ts` – zentrale Kampagnen-Registry (typisierter `as const satisfies`-Block).
+- `src/lib/marketing-campaigns.ts` – Kampagnen-Typen, URL-Builder, Validierung; statischer Notfall-Fallback.
+- `src/lib/marketing-campaigns-db.ts` – Supabase CRUD (Service Role, server-only).
+- `src/lib/supabase/server.ts` – serverseitiger Supabase-Client (niemals im Browser).
 - `src/lib/analytics.ts` – typisierter Plausible-Helper.
 - `src/lib/analytics-config.ts` – Liste der von Plausible auszuschließenden Pfade.
 - `src/lib/attribution/attribution.ts` – First-Touch (localStorage) + Last-Touch (sessionStorage).
 - `src/components/ui/glass/` – wiederverwendbare Liquid-Glass-Primitive (`GlassPanel`, `GlassButton`, `GlassCard`, `StatusChip`, `Toolbar`, `ToolbarBrand`, `PinDots`, `PinKeypad`).
 - `src/components/ui/CopyButton.tsx` – Clipboard-Helper für Dashboard & intern.
-- `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`DebugCard`, `PrintChecklist`).
+- `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`DebugCard`, `PrintChecklist`, `TestChecklist`).
 - `src/components/layout/ConditionalFooter.tsx` – versteckt den Marketing-Footer auf `/intern/*` und `/kundenlogin`, wiederverwendet `analytics-config`-Liste.
 - `src/app/intern/marketing/_components/` – Master-Detail-Shell des Dashboards (`MarketingDashboard`, `CampaignList`, `CampaignDetail`). Private Folder → nie als Route.
 
@@ -30,7 +32,9 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 - Öffentlicher Einstieg: Kundenlogin-Pille im `Header` (`src/components/layout/Header.tsx`), `prefetch={false}`, kein Tracking, Lock-Icon + Chroma-Hover. Auf Mobile zeigt sie nur „Login", auf `sm+` den vollen Text „Kundenlogin".
 - Auth-Mechanik: PIN-Eingabe → Server Action `loginWithPin` → HMAC-Cookie `smairys_intern_session` (httpOnly, secure in prod, sameSite=lax, 7 Tage).
 - Geschützt: alles unter `/intern/*` (via Middleware).
-- Dashboard (Marketing): `/intern/marketing`.
+- Dashboard (Marketing): `/intern/marketing` – Kampagnen in Supabase; Plausible für Zahlen/Conversions (kein Dashboard-Analytics).
+- Supabase Env (siehe `.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Service Role nur serverseitig).
+- QR-Kurzlinks: `/go/[slug]` (Supabase-first, nur `active`).
 - ENV-Variablen für den Login (siehe `.env.example`):
   - `ADMIN_DASHBOARD_PIN` – 4-stellige Ziffernfolge (PFLICHT).
   - `ADMIN_DASHBOARD_SECRET` – optional, ≥ 16 Zeichen. Wenn leer, wird das HMAC-Secret deterministisch aus dem PIN abgeleitet.

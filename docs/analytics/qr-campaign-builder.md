@@ -1,72 +1,99 @@
-# QR Campaign Builder Status
+# QR Campaign Builder
 
-## Aktueller Stand
+## Zielbild
 
-1. Kampagnen werden aktuell **statisch aus Code** geladen:
-   `src/lib/marketing-campaigns.ts`.
-2. `/intern/marketing` hat bereits eine interne, PIN-geschützte
-   Listen-/Detail-UI mit QR-Code, Shortlink, UTM-Zielvorschau, Copy-Buttons,
-   Plausible-Link und Validierungshinweisen.
-3. Es gibt noch **keine UI zum Erstellen** neuer Kampagnen.
-4. Es gibt noch **keine UI zum Bearbeiten, Pausieren oder Archivieren**.
-5. Es gibt noch **keine Persistenz** für Kampagnen außerhalb des Codes.
-6. Es gibt noch **keine eigene Redirect-Zählung**. Plausible bleibt die Quelle
-   für echte Websitebesuche und Conversions.
-7. Supabase ist im aktuellen Code nicht angebunden. Es gibt keine
-   Supabase-Client-Erzeugung, keine Supabase-ENV-Konfiguration und keine
-   Tabellenzugriffe.
+Das interne Marketing Control Center unter `/intern/marketing` verwaltet
+Print-/QR-Kampagnen. **Plausible** bleibt die einzige Quelle für Besucher,
+Kampagnen-Auswertung und Conversions. Das Dashboard baut **kein** eigenes
+Analytics-System und zeigt **keine** Besucherzahlen.
 
-## Warum noch kein Fake-Builder implementiert wurde
+## Architektur
 
-Ein Campaign Builder ohne echte serverseitige Speicherung würde Robin eine
-Scheinsicherheit geben: Kampagnen könnten im Browser angelegt wirken, wären
-aber nach Reload/Deploy weg und würden nicht von `/go/[slug]` oder der QR-Route
-aufgelöst. Deshalb wurde bewusst **keine localStorage-Persistenz** und kein
-halb angebundener Builder gebaut.
+| Schicht | Aufgabe |
+|--------|---------|
+| Supabase `marketing_campaigns` | Persistente Kampagnen (CRUD) |
+| `/go/[slug]` | 307-Redirect mit UTMs (nur `active`) |
+| Plausible | Pageviews, Sources/Campaigns, Goals |
+| Statischer Fallback | Nur wenn Supabase Env fehlt oder DB nicht erreichbar |
 
-## Nächster technischer Schritt
+- Kein Supabase Auth, kein CRM, kein Kundenportal
+- Service Role Key nur serverseitig (`src/lib/supabase/server.ts`)
+- PIN-Schutz über Middleware für `/intern/*`
+- MCP/Supabase: zuerst lesen, Migrationen nur gezielt ausführen
 
-1. Supabase-Projekt anbinden (serverseitig, keine Service-Credentials im Client).
-2. Schema aus `docs/analytics/qr-campaign-builder-schema.sql` ausführen.
-3. Serverfunktionen für Create/Update/Archive implementieren, nur hinter
-   `/intern/*` und PIN-Session.
-4. `/intern/marketing`, `/go/[slug]` und die QR-SVG-Route auf DB-Lookups
-   umstellen, mit Code-Registry höchstens als Migration/Seed.
-5. Optional `qr_redirect_daily_counts` in `/go/[slug]` inkrementieren.
+## Dashboard-Funktionen (MVP)
 
-## MVP-Felder
+1. Kampagne erstellen / bearbeiten / archivieren
+2. Status: `draft`, `active`, `paused`, `archived`
+3. Shortlink `/go/<slug>`, UTM-Ziel-URL, QR-SVG, QR-PNG
+4. Copy: Shortlink, UTM-Ziel, Plausible-Suchwerte (Text, keine API)
+5. Druck- und Test-Checkliste (localStorage, nur UI-Hilfe)
+6. Einfache Suche: Name, Slug, Region, Stadt
+7. Zielseite aus vordefinierten öffentlichen Pfaden wählen
 
-- `internal_name`
-- `external_title`
-- `slug`
-- `status` (`draft`, `active`, `paused`, `archived`)
-- `destination_path`
-- `utm_source`
-- `utm_medium` (Default `print`)
-- `utm_campaign`
-- `utm_content`
-- `utm_term` optional
-- `notes` optional
+## Supabase-Schema
 
-## Validierungsregeln
+SQL: `docs/analytics/qr-campaign-builder-schema.sql`
 
-- `slug` lowercase-kebab-case
-- `utm_campaign` lowercase-kebab-case
-- Pflichtfelder nicht leer
-- `destination_path` relativ mit `/`
-- keine internen Ziele: `/intern/*`, `/kundenlogin`, `/login`, `/api/*`
-- `active` nur bei validen Pflichtfeldern
+Tabellen:
 
-## Redirect-Zählung
+- `marketing_campaigns` (Pflicht für MVP)
+- `qr_redirect_daily_counts` (optional, nicht im Dashboard; keine IP/UA)
 
-Die vorbereitete Tabelle `qr_redirect_daily_counts` zählt nur technische
-Shortlink-Nutzung aggregiert pro `slug` und `date`.
+RLS ist aktiv, ohne öffentliche Policies – Zugriff nur über Service Role.
 
-Nicht speichern:
+### MVP-Felder `marketing_campaigns`
 
-- keine IP
-- kein User-Agent
-- kein Fingerprint
-- keine personenbezogenen Profile
+- `internal_name`, `external_title`, `slug` (unique)
+- `status`, `destination_path`
+- `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`
+- `medium_label`, `region`, `city`, `year`, `version`, `notes`
 
-Plausible bleibt maßgeblich für Besucher, Quellen, Kampagnen und Conversions.
+### Validierung (DB + App)
+
+- `slug` und `utm_campaign`: lowercase-kebab-case
+- `destination_path` relativ, nicht `/intern*`, `/kundenlogin*`, `/login*`
+- `active` nur mit vollständigen Pflichtfeldern inkl. `utm_content`
+
+## Env-Variablen
+
+Lokal in `.env.local` (nicht committen):
+
+- `NEXT_PUBLIC_SUPABASE_URL` (Pflicht)
+- `SUPABASE_SERVICE_ROLE_KEY` (Pflicht, nur Server)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (optional, wird vom MVP nicht genutzt)
+
+Siehe auch `.env.example`.
+
+## Manuelle Schritte (einmalig)
+
+1. Supabase-Projekt verlinken, Env Vars in Vercel + lokal setzen
+2. Migration ausführen (SQL Editor oder MCP `apply_migration`)
+3. Seed-Kampagne per Upsert auf `slug` (oder Dashboard anlegen)
+4. `npm run build`, deploy, `/intern/marketing` testen
+
+## Redirect `/go/[slug]`
+
+- Supabase-first, sonst statischer Fallback
+- Nur `status = active` → 307 mit UTMs
+- `draft` / `paused` / `archived` → 404
+- Interne Ziele werden blockiert
+- Keine Redirect-Zählung im MVP (Plausible zählt Besuche)
+
+## Plausible
+
+- Keine Plausible-API im Dashboard
+- Business-Plan für MVP **nicht** nötig
+- Goals: `form_submit_success`, `phone_click`, `calendar_click`, …
+- Filter: Top Sources → Campaigns nach `utm_campaign`
+
+Details: `docs/analytics/plausible-setup.md`, `docs/analytics/plausible-goals.md`
+
+## Fallback
+
+Wenn Supabase nicht konfiguriert ist oder die DB nicht erreichbar:
+
+- Dashboard zeigt einen sichtbaren Hinweis und nutzt `MARKETING_CAMPAIGNS`
+  aus `src/lib/marketing-campaigns.ts`
+- CRUD ist deaktiviert
+- `/go/[slug]` nutzt ebenfalls den statischen Fallback

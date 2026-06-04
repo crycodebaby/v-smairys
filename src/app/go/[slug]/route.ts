@@ -4,6 +4,10 @@ import {
   getCampaignBySlug,
   isInternalCampaignDestination,
 } from "@/lib/marketing-campaigns";
+import {
+  getMarketingCampaignBySlug as getDbCampaignBySlug,
+  isSupabaseServerConfigured,
+} from "@/lib/marketing-campaigns-db";
 
 /**
  * GET /go/[slug]
@@ -24,7 +28,10 @@ export async function GET(
 ): Promise<NextResponse> {
   const { slug } = await context.params;
 
-  const campaign = getCampaignBySlug(slug);
+  const supabaseConfigured = isSupabaseServerConfigured();
+  const campaign = supabaseConfigured
+    ? await loadDbCampaign(slug)
+    : getCampaignBySlug(slug);
 
   if (!campaign) {
     if (process.env.NODE_ENV === "development") {
@@ -32,6 +39,13 @@ export async function GET(
         `[marketing-campaigns] Unbekannter Slug aufgerufen: "${slug}"`
       );
     }
+    return new NextResponse("Not Found", {
+      status: 404,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
+  if (campaign.status !== "active") {
     return new NextResponse("Not Found", {
       status: 404,
       headers: { "Cache-Control": "no-store" },
@@ -80,3 +94,17 @@ export async function GET(
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+async function loadDbCampaign(slug: string) {
+  try {
+    return await getDbCampaignBySlug(slug);
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[marketing-campaigns] DB-Kampagne konnte nicht geladen werden", {
+        slug,
+        error: error instanceof Error ? error.message : "unknown",
+      });
+    }
+    return undefined;
+  }
+}

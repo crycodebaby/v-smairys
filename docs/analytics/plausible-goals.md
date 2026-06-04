@@ -22,6 +22,11 @@ sind exakt und case-sensitiv.
 | --- | --- |
 | `qr_redirect` | Reservierter Name für eine mögliche spätere serverseitige Shortlink-Nutzung. Aktuell bleibt Plausible Quelle für echte Websitebesuche und Conversions; die vorbereitete DB-Zählung wäre nur technisch aggregiert pro Slug/Tag. |
 
+Hinweis: Die aktuell implementierte Supabase-Redirect-Zählung sendet kein
+Plausible-Event `qr_redirect`. Sie zählt serverseitig nur
+`campaign_slug`/`date`/`count`. Plausible bleibt für Websitebesuche und
+Conversions zuständig.
+
 ## Entfernte Legacy-Namen
 
 Nicht mehr als Goal anlegen und nach der Umstellung nicht mehr im Code feuern:

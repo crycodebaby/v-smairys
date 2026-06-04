@@ -8,7 +8,9 @@ import { StatusChip } from "@/components/ui/glass/StatusChip";
 import { DebugCard } from "@/components/intern/DebugCard";
 import { CampaignList } from "./CampaignList";
 import { CampaignDetail } from "./CampaignDetail";
+import { CampaignForm } from "./CampaignForm";
 import type { CampaignDetail as CampaignDetailVM, CampaignSummary } from "./types";
+import type { CampaignActionState } from "../actions";
 
 type EnvSnapshot = {
   pinConfigured: boolean;
@@ -16,7 +18,14 @@ type EnvSnapshot = {
   hasPlausibleDomain: boolean;
   hasPlausibleSrc: boolean;
   hasSiteUrl: boolean;
+  hasSupabaseUrl: boolean;
+  hasSupabaseServiceRole: boolean;
 };
+
+type CampaignFormAction = (
+  prevState: CampaignActionState,
+  formData: FormData
+) => Promise<CampaignActionState>;
 
 type MarketingDashboardProps = {
   campaigns: readonly CampaignDetailVM[];
@@ -28,6 +37,14 @@ type MarketingDashboardProps = {
   };
   /** Server Action: löscht Cookie + Redirect. */
   logoutAction: () => Promise<void>;
+  createAction: CampaignFormAction;
+  updateAction: CampaignFormAction;
+  archiveAction: CampaignFormAction;
+  dbState: {
+    configured: boolean;
+    source: "supabase" | "static";
+    error?: string;
+  };
 };
 
 /**
@@ -43,6 +60,10 @@ export function MarketingDashboard({
   env,
   totals,
   logoutAction,
+  createAction,
+  updateAction,
+  archiveAction,
+  dbState,
 }: MarketingDashboardProps) {
   const [selectedSlug, setSelectedSlug] = useState<string | null>(
     campaigns[0]?.campaign.slug ?? null
@@ -51,17 +72,20 @@ export function MarketingDashboard({
   // Summary-Liste für die Kampagnenliste (preiswert; läuft nur bei Mount).
   const summaries: readonly CampaignSummary[] = useMemo(
     () =>
-      campaigns.map(({ campaign, issues }) => ({
+      campaigns.map(({ campaign, issues, source }) => ({
+        id: campaign.id,
         slug: campaign.slug,
         internalName: campaign.internalName,
         externalTitle: campaign.externalTitle,
         status: campaign.status,
-        startDate: campaign.startDate,
+        region: campaign.region,
+        city: campaign.city,
         utm_source: campaign.utm_source,
         utm_campaign: campaign.utm_campaign,
         issueCount: issues.length,
         errorCount: issues.filter((i) => i.severity === "error").length,
         warningCount: issues.filter((i) => i.severity === "warning").length,
+        source,
       })),
     [campaigns]
   );
@@ -131,8 +155,45 @@ export function MarketingDashboard({
 
           {/* Rechte Spalte */}
           <main className="flex flex-col gap-5">
+            {dbState.error && (
+              <GlassPanel emphasis="subtle" className="border-amber-400/25 px-4 py-3">
+                <p className="text-sm font-medium text-amber-100">
+                  Supabase-Fallback aktiv
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-foreground/65">
+                  {dbState.error}
+                </p>
+              </GlassPanel>
+            )}
+
+            <CampaignForm
+              mode="create"
+              action={createAction}
+              disabled={dbState.source !== "supabase"}
+              disabledReason={
+                dbState.source !== "supabase"
+                  ? "Erstellen ist erst aktiv, wenn Supabase Env Vars gesetzt sind und das SQL-Schema ausgeführt wurde."
+                  : undefined
+              }
+            />
+
             {selected ? (
-              <CampaignDetail vm={selected} />
+              <>
+                <CampaignDetail vm={selected} />
+                <CampaignForm
+                  key={selected.campaign.id ?? selected.campaign.slug}
+                  mode="edit"
+                  campaign={selected.campaign}
+                  action={updateAction}
+                  archiveAction={archiveAction}
+                  disabled={selected.source !== "supabase" || !selected.campaign.id}
+                  disabledReason={
+                    selected.source !== "supabase" || !selected.campaign.id
+                      ? "Diese Kampagne kommt aus dem statischen Fallback und kann hier nicht gespeichert werden."
+                      : undefined
+                  }
+                />
+              </>
             ) : (
               <EmptyDetail count={campaigns.length} />
             )}
@@ -165,8 +226,8 @@ function EmptyDetail({ count }: { count: number }) {
       </p>
       <p className="mx-auto mt-2 max-w-md text-xs text-foreground/55">
         {count === 0
-          ? "Trage eine Kampagne in src/lib/marketing-campaigns.ts ein – danach erscheint sie hier."
-          : "Wähle links eine Kampagne aus, um Details, QR-Code und Druck-Checkliste anzuzeigen."}
+          ? "Lege eine Kampagne über das Formular an (Supabase muss konfiguriert sein)."
+          : "Wähle links eine Kampagne für QR, Links und Checklisten."}
       </p>
     </GlassPanel>
   );
