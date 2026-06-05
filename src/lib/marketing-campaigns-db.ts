@@ -155,6 +155,7 @@ export async function updateMarketingCampaign(
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
+    .is("deleted_at", null)
     .select(CAMPAIGN_SELECT)
     .single();
 
@@ -167,17 +168,24 @@ export async function updateMarketingCampaign(
 
 export async function archiveMarketingCampaign(id: string): Promise<void> {
   const supabase = createSupabaseServerClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("marketing_campaigns")
     .update({
       status: "archived",
       archived_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
-    .eq("id", id);
+    .eq("id", id)
+    .is("deleted_at", null)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     throw new Error(`Kampagne konnte nicht archiviert werden: ${error.message}`);
+  }
+
+  if (!data) {
+    throw new Error("Kampagne wurde nicht gefunden oder ist bereits gelöscht.");
   }
 }
 

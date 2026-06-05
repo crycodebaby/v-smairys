@@ -1,21 +1,25 @@
 "use client";
 
 import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
-import { Environment, Lightformer } from "@react-three/drei";
-import { EffectComposer, SMAA, Bloom } from "@react-three/postprocessing";
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { Edges, Environment } from "@react-three/drei";
+import { EffectComposer, SMAA } from "@react-three/postprocessing";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import * as THREE from "three";
 import { useTheme } from "next-themes";
 import useInView from "@/components/leistungen/useInView";
 
 type Variant = "web" | "jpp" | "seo" | "hosting";
 
-/** Smairys Brand – warmes Amber/Kupfer (#d47115 Familie) */
-const BRAND_AMBER = "#d47115";
-const BRAND_GLOW = "#ffdcb8";
-const BRAND_DEEP = "#6b3a12";
+/** Kupfer-Akzent nur auf Kantenlinien – nicht auf der Fläche. */
+const EDGE_ACCENT = "#d47115";
 
-/** Smooth damping */
 const damp = (v: number, t: number, k: number, dt: number) =>
   v + (t - v) * (1 - Math.exp(-k * dt));
 
@@ -32,86 +36,82 @@ function useReducedMotion(): boolean {
   return reduced;
 }
 
+type SculpturePalette = {
+  body: string;
+  edge: string;
+  ground: string;
+};
+
 /**
- * Edles „Smoked Amber Glass“ – kein kaltes Grau mehr.
- * Weniger Transmission (verhindert matschiges Durchscheinen auf True-Black),
- * starker Clearcoat, warme Attenuation + dezentes Emissive.
+ * Brutalist „Matte Stone“ – unglasiertes Off-White auf True-Black.
+ * Kein Lack, kein Glas, keine Transmission. Akzent nur über Edges-Linien.
  */
-function usePremiumSculptureMaterial(
-  theme?: string
-): THREE.MeshPhysicalMaterial {
-  const isLight = theme === "light";
+function useSculpturePalette(theme?: string): SculpturePalette {
+  return useMemo(() => {
+    if (theme === "light") {
+      return {
+        body: "#2a2a2a",
+        edge: EDGE_ACCENT,
+        ground: "#e8e8e8",
+      };
+    }
+    return {
+      body: "#e8e6e1",
+      edge: EDGE_ACCENT,
+      ground: "#0c0c0c",
+    };
+  }, [theme]);
+}
 
-  const palette = useMemo(
-    () => ({
-      base: new THREE.Color(isLight ? "#3d2e1f" : "#fff3e6"),
-      attenuation: new THREE.Color(isLight ? "#8b5a2b" : BRAND_AMBER),
-      emissive: new THREE.Color(BRAND_AMBER),
-      sheen: new THREE.Color(BRAND_GLOW),
-    }),
-    [isLight]
-  );
+type SculptedMeshProps = {
+  children: ReactNode;
+  bodyColor: string;
+  edgeColor: string;
+  position?: [number, number, number];
+};
 
+/** Matte Volumen-Form + architektonische Kupfer-Kanten (drei Edges). */
+function SculptedMesh({
+  children,
+  bodyColor,
+  edgeColor,
+  position,
+}: SculptedMeshProps) {
   const mat = useMemo(
     () =>
-      new THREE.MeshPhysicalMaterial({
-        color: palette.base,
-        metalness: isLight ? 0.18 : 0.42,
-        roughness: 0.14,
-        clearcoat: 1,
-        clearcoatRoughness: 0.05,
-        transmission: isLight ? 0.22 : 0.1,
-        thickness: 1.4,
-        ior: 1.52,
-        attenuationColor: palette.attenuation,
-        attenuationDistance: 2.8,
-        emissive: palette.emissive,
-        emissiveIntensity: isLight ? 0.025 : 0.07,
-        sheen: 0.55,
-        sheenRoughness: 0.28,
-        sheenColor: palette.sheen,
-        transparent: true,
-        opacity: 1,
-        envMapIntensity: isLight ? 1.15 : 1.75,
-        reflectivity: 0.92,
+      new THREE.MeshStandardMaterial({
+        color: new THREE.Color(bodyColor),
+        roughness: 1,
+        metalness: 0,
+        envMapIntensity: 0.12,
+        flatShading: false,
       }),
-    [palette, isLight]
+    [bodyColor]
   );
 
   useEffect(() => () => mat.dispose(), [mat]);
-  return mat;
-}
 
-/** Warmer Hintergrund-Glow – gibt Transmission etwas Edles zum Brechern. */
-function WarmBackdrop() {
   return (
-    <mesh position={[0, 0, -1.8]} scale={[4.5, 4.5, 1]}>
-      <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial color={BRAND_DEEP} transparent opacity={0.35} />
+    <mesh position={position} material={mat}>
+      {children}
+      <Edges
+        color={edgeColor}
+        threshold={14}
+        linewidth={1}
+        opacity={0.55}
+        transparent
+        renderOrder={1}
+      />
     </mesh>
   );
 }
 
-/** Dezente Rand-Aura (Backside) – Kupfer-Kante statt grauer Silhouette. */
-function EdgeAura({ variant }: { variant: Variant }) {
-  const scale = variant === "hosting" ? 1.06 : 1.04;
-  const mat = useMemo(
-    () =>
-      new THREE.MeshBasicMaterial({
-        color: new THREE.Color(BRAND_AMBER),
-        transparent: true,
-        opacity: 0.07,
-        side: THREE.BackSide,
-        depthWrite: false,
-      }),
-    []
-  );
-
-  useEffect(() => () => mat.dispose(), [mat]);
-
+/** Dezenter Boden-Schatten – neutral, kein Farbglow. */
+function ContactGround({ color }: { color: string }) {
   return (
-    <mesh scale={scale} material={mat}>
-      <icosahedronGeometry args={[1.05, 1]} />
+    <mesh position={[0, -1.35, -0.6]} rotation={[-Math.PI / 2.2, 0, 0]}>
+      <circleGeometry args={[1.35, 48]} />
+      <meshBasicMaterial color={color} transparent opacity={0.55} />
     </mesh>
   );
 }
@@ -129,12 +129,12 @@ function isPointerCaptureElement(
 
 type SculptureProps = {
   variant: Variant;
-  mat: THREE.MeshPhysicalMaterial;
+  palette: SculpturePalette;
   active: boolean;
   reduced: boolean;
 };
 
-function Sculpture({ variant, mat, active, reduced }: SculptureProps) {
+function Sculpture({ variant, palette, active, reduced }: SculptureProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [dragging, setDragging] = useState(false);
   const target = useRef<{ rx: number; ry: number }>({ rx: -0.2, ry: 0.0 });
@@ -176,73 +176,99 @@ function Sculpture({ variant, mat, active, reduced }: SculptureProps) {
 
   const onPointerMove = (e: ThreeEvent<PointerEvent>) => {
     if (!dragging) return;
-    const dx = e.movementX ?? 0;
-    const dy = e.movementY ?? 0;
-    target.current.ry += dx * 0.01;
-    target.current.rx += dy * 0.01;
+    target.current.ry += (e.movementX ?? 0) * 0.01;
+    target.current.rx += (e.movementY ?? 0) * 0.01;
     target.current.rx = Math.max(-1.2, Math.min(0.6, target.current.rx));
   };
 
   const seg = 80;
+  const { body, edge } = palette;
 
   return (
     <group
       ref={groupRef}
-      position={[0, 0, 0]}
       onPointerDown={onPointerDown}
       onPointerUp={endDrag}
       onPointerLeave={endDrag}
       onPointerMove={onPointerMove}
     >
-      <EdgeAura variant={variant} />
+      <ContactGround color={palette.ground} />
 
       {variant === "web" && (
         <>
-          <mesh material={mat}>
+          <SculptedMesh bodyColor={body} edgeColor={edge}>
             <torusKnotGeometry args={[0.6, 0.16, seg, 14]} />
-          </mesh>
-          <mesh material={mat} position={[0, -0.62, 0]}>
+          </SculptedMesh>
+          <SculptedMesh
+            bodyColor={body}
+            edgeColor={edge}
+            position={[0, -0.62, 0]}
+          >
             <torusGeometry args={[0.55, 0.06, 18, 100]} />
-          </mesh>
+          </SculptedMesh>
         </>
       )}
 
       {variant === "jpp" && (
         <group>
-          <mesh material={mat} position={[0, 0.22, 0]}>
+          <SculptedMesh
+            bodyColor={body}
+            edgeColor={edge}
+            position={[0, 0.22, 0]}
+          >
             <boxGeometry args={[1.0, 0.12, 0.62]} />
-          </mesh>
-          <mesh material={mat} position={[0, 0.02, 0]}>
+          </SculptedMesh>
+          <SculptedMesh
+            bodyColor={body}
+            edgeColor={edge}
+            position={[0, 0.02, 0]}
+          >
             <boxGeometry args={[1.18, 0.12, 0.82]} />
-          </mesh>
-          <mesh material={mat} position={[0, -0.18, 0]}>
+          </SculptedMesh>
+          <SculptedMesh
+            bodyColor={body}
+            edgeColor={edge}
+            position={[0, -0.18, 0]}
+          >
             <boxGeometry args={[1.36, 0.12, 1.02]} />
-          </mesh>
+          </SculptedMesh>
         </group>
       )}
 
       {variant === "seo" && (
         <group>
-          <mesh material={mat}>
+          <SculptedMesh bodyColor={body} edgeColor={edge}>
             <cylinderGeometry args={[0.1, 0.1, 1.5, 24]} />
-          </mesh>
-          <mesh material={mat} position={[0, 0.45, 0]}>
+          </SculptedMesh>
+          <SculptedMesh
+            bodyColor={body}
+            edgeColor={edge}
+            position={[0, 0.45, 0]}
+          >
             <torusGeometry args={[0.2, 0.03, 16, 64]} />
-          </mesh>
-          <mesh material={mat} position={[0, -0.45, 0]}>
+          </SculptedMesh>
+          <SculptedMesh
+            bodyColor={body}
+            edgeColor={edge}
+            position={[0, -0.45, 0]}
+          >
             <torusGeometry args={[0.24, 0.03, 16, 64]} />
-          </mesh>
+          </SculptedMesh>
         </group>
       )}
 
       {variant === "hosting" && (
         <group>
-          <mesh material={mat}>
+          <SculptedMesh bodyColor={body} edgeColor={edge}>
             <octahedronGeometry args={[0.7, 0]} />
-          </mesh>
-          <mesh material={mat} position={[0, -0.9, 0]}>
+          </SculptedMesh>
+          <SculptedMesh
+            bodyColor={body}
+            edgeColor={edge}
+            position={[0, -0.9, 0]}
+          >
             <boxGeometry args={[1.6, 0.08, 1.6]} />
-          </mesh>
+          </SculptedMesh>
         </group>
       )}
     </group>
@@ -263,7 +289,7 @@ export default function ServiceFigure3D({
   });
 
   const reduced = useReducedMotion();
-  const mat = usePremiumSculptureMaterial(resolvedTheme);
+  const palette = useSculpturePalette(resolvedTheme);
   const frameloop: "always" | "demand" | "never" = inView ? "always" : "demand";
 
   const [dprMax, setDprMax] = useState(2);
@@ -282,16 +308,10 @@ export default function ServiceFigure3D({
       ].join(" ")}
       aria-hidden
     >
-      {/* CSS-Ambient – warmes Licht hinter dem Canvas */}
+      {/* Neutraler Studio-Hintergrund – kein Amber-Glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10"
-        style={{
-          background: [
-            "radial-gradient(ellipse 70% 55% at 50% 42%, hsl(28 82% 46% / 0.14), transparent 72%)",
-            "radial-gradient(ellipse 50% 40% at 72% 68%, hsl(28 95% 55% / 0.08), transparent 70%)",
-          ].join(", "),
-        }}
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_65%_50%_at_50%_45%,hsl(0_0%_100%/0.04),transparent_70%)]"
       />
 
       <Canvas
@@ -307,61 +327,35 @@ export default function ServiceFigure3D({
         onCreated={(state) => {
           state.gl.setClearColor(0x000000, 0);
           state.gl.toneMapping = THREE.ACESFilmicToneMapping;
-          state.gl.toneMappingExposure = 1.12;
+          state.gl.toneMappingExposure = 1.0;
         }}
       >
-        <ambientLight intensity={0.18} color="#fff0e0" />
-
+        {/* Weiches Studio-Licht – neutral, nicht farbig */}
+        <ambientLight intensity={0.55} color="#fafafa" />
         <directionalLight
-          position={[2.5, 2.5, 3]}
-          intensity={1.15}
-          color={BRAND_GLOW}
+          position={[3, 4, 5]}
+          intensity={0.85}
+          color="#ffffff"
         />
         <directionalLight
-          position={[-2, 0.5, 2]}
-          intensity={0.55}
-          color={BRAND_AMBER}
-        />
-        <pointLight
-          position={[0, -1.5, 2]}
+          position={[-3, 1, 2]}
           intensity={0.35}
-          color={BRAND_AMBER}
-          distance={8}
+          color="#f0f0f0"
+        />
+        <hemisphereLight
+          args={["#ffffff", "#1a1a1a", 0.4]}
         />
 
-        <WarmBackdrop />
-
-        <Environment background={false} resolution={256}>
-          <Lightformer
-            form="rect"
-            intensity={1.1}
-            color={BRAND_GLOW}
-            scale={[5, 1.4, 1]}
-            position={[0, 2.2, 3]}
-            rotation={[-0.15, 0, 0]}
-          />
-          <Lightformer
-            form="ring"
-            intensity={0.45}
-            color={BRAND_AMBER}
-            scale={2.2}
-            position={[1.8, -0.5, 1.5]}
-            rotation={[0.4, 0.2, 0]}
-          />
-        </Environment>
+        {/* Neutrales Environment, sehr dezent */}
+        <Environment preset="studio" environmentIntensity={0.25} />
 
         <EffectComposer>
           <SMAA />
-          <Bloom
-            intensity={0.14}
-            luminanceThreshold={0.42}
-            luminanceSmoothing={0.85}
-          />
         </EffectComposer>
 
         <Sculpture
           variant={variant}
-          mat={mat}
+          palette={palette}
           active={inView}
           reduced={reduced}
         />

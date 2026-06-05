@@ -12,7 +12,7 @@ import { LEISTUNGEN_NAV_ITEMS } from "@/config/leistungen-services";
 export const metadata: Metadata = {
   title: "Leistungen – SMAIRYS Netz-Manufaktur",
   description:
-    "Website-Programmierung, JPP-Check, SEO und Hosting. Handgefertigt für Marken, die wachsen wollen.",
+    "Handgearbeitete Premium-Websites, schnelle Ladezeiten, deutsches Hosting und Cybersicherheit für Zertifikate, Domain und E-Mail.",
   alternates: { canonical: "/leistungen" },
 };
 
@@ -40,9 +40,8 @@ export default function LeistungenPage() {
                 Was Sie mit SMAIRYS erreichen
               </h1>
               <p className="mx-auto mt-4 max-w-2xl text-base text-foreground/80 sm:text-lg">
-                Keine Massenware. Handgeschriebene Websites mit klarer Struktur,
-                hoher Geschwindigkeit und verlässlicher Betreuung. Für Marken, die
-                wachsen wollen.
+                Handgearbeitete Premium-Websites, schnelle Ladezeiten und
+                deutsches Hosting mit Cybersicherheit – ohne Massenware.
               </p>
             </div>
           </Container>
@@ -67,17 +66,15 @@ export default function LeistungenPage() {
             <div className="min-w-0">
               <ServiceSection
                 id="service-web"
-                eyebrow="Website-Programmierung & Markendesign"
-                title="Ihre Marke verdient mehr als einen Baukasten"
+                eyebrow="Premium Webdesign"
+                title="Handgearbeitete Websites statt Baukasten"
                 bullets={[
-                  "Next.js-Basis und handgeschriebener Code. Schnell, langlebig, vertrauensbildend.",
-                  "Unverwechselbares Design und klare Informationsarchitektur.",
-                  "Ein Auftritt, der in Sekunden Vertrauen weckt.",
+                  "Individuell entwickelt – kein Template, kein Massenprodukt.",
+                  "Schnelle Ladezeiten und saubere technische Basis.",
+                  "Ein Auftritt, der Vertrauen schafft und Anfragen bringt.",
                 ]}
                 body={[
-                  "Jede Firma hat eine Geschichte. Viele Websites erzählen sie nicht.",
-                  "Ich entwickle digitale Auftritte, die Werte sichtbar machen. Klar, eigenständig und hochwertig bis ins Detail.",
-                  "Das Ergebnis fühlt sich an wie ein Maßanzug, der sitzt.",
+                  "Ihre Website soll wie Ihr Unternehmen wirken: hochwertig, klar und überzeugend – bis ins Detail handgefertigt.",
                 ]}
                 cta={{ label: "Projekt besprechen", href: "/#kontakt" }}
                 variant="web"
@@ -85,34 +82,31 @@ export default function LeistungenPage() {
 
               <ServiceSection
                 id="service-jpp"
-                eyebrow="JPP-Check (JavaScript Potential & Performance)"
-                title="Leistung sichtbar machen und freisetzen"
+                eyebrow="Geschwindigkeit & Performance"
+                title="Schnell laden, überzeugen bleiben"
                 bullets={[
-                  "Klare Zahlen zu Ladezeit, Struktur und Reichweite.",
-                  "Priorisierte Maßnahmen mit Wirkung statt langer Listen.",
-                  "Fokus auf Wachstum: Sichtbarkeit, Conversion, Umsatz.",
+                  "Ladezeiten und Performance klar auf den Punkt.",
+                  "Priorisierte Maßnahmen – ohne Technik-Blabla.",
+                  "Ideal vor einem Relaunch oder als schneller Check.",
                 ]}
                 body={[
-                  "Viele Websites laufen, aber nicht auf Drehzahl.",
-                  "Der JPP-Bericht zeigt, welches Potenzial in Ihrer Seite steckt und was Sie gewinnen, wenn sie technisch sauber arbeitet.",
+                  "Eine langsame Website kostet Vertrauen und Anfragen. Wir zeigen, wo es hakt – und was sich lohnt.",
                 ]}
-                note="Ideal als Startpunkt oder Audit vor einem Relaunch."
-                cta={{ label: "JPP-Check anfragen", href: "/#kontakt" }}
+                cta={{ label: "Performance prüfen", href: "/#kontakt" }}
                 variant="jpp"
               />
 
               <ServiceSection
                 id="service-seo"
                 eyebrow="SEO & Sichtbarkeit"
-                title="Gesehen werden. Gefunden werden. Gewählt werden."
+                title="Gefunden werden, wenn es zählt"
                 bullets={[
-                  "Technisch sauber: Core Web Vitals, Struktur, Markup.",
-                  "Texte, die wirklich beantworten und führen.",
-                  "Mehr Anfragen und Relevanz ohne Werbebudget.",
+                  "Saubere Struktur und Inhalte, die Kunden suchen.",
+                  "Lokale Sichtbarkeit für Ihre Zielgruppe.",
+                  "Mehr relevante Anfragen ohne Werbebudget.",
                 ]}
                 body={[
-                  "Sichtbarkeit entsteht durch Struktur, Klarheit und Vertrauen.",
-                  "SEO bedeutet: Ihre Marke wird zur Antwort auf die Fragen Ihrer Zielgruppe.",
+                  "Gute Rankings entstehen aus Klarheit, Vertrauen und einer Website, die wirklich antwortet.",
                 ]}
                 cta={{ label: "Sichtbarkeit verbessern", href: "/#kontakt" }}
                 variant="seo"
@@ -120,16 +114,15 @@ export default function LeistungenPage() {
 
               <ServiceSection
                 id="service-hosting"
-                eyebrow="Hosting & Instandhaltung"
-                title="Ihre Website läuft – sicher und schnell"
+                eyebrow="Hosting & Sicherheit"
+                title="Deutsches Hosting. Sicher betrieben."
                 bullets={[
-                  "DSGVO-konformes Hosting mit Zertifikaten und Updates.",
-                  "Wachstum ohne Stillstand: Inhalte, Seiten, Funktionen.",
-                  "Monitoring und Pflege, damit Technik kein Thema ist.",
+                  "Hosting in Deutschland – DSGVO-konform und zuverlässig.",
+                  "Cybersicherheit: SSL-Zertifikate, Domain-Schutz und Updates.",
+                  "E-Mail-Spam-Absicherung für Ihre geschäftliche Kommunikation.",
                 ]}
                 body={[
-                  "Wenn Ihr Geschäft läuft, sollte Ihre Website kein Risiko sein.",
-                  "SMAIRYS sorgt dafür, dass Ihre digitale Basis mitwächst.",
+                  "Ihre Website läuft schnell, bleibt geschützt und wächst mit – ohne dass Sie sich um Technik kümmern müssen.",
                 ]}
                 cta={{ label: "Betreuung sichern", href: "/#kontakt" }}
                 variant="hosting"
@@ -156,8 +149,8 @@ export default function LeistungenPage() {
                   Ihre Marke verdient mehr als eine Website
                 </h2>
                 <p className="mx-auto mt-3 max-w-xl text-sm text-foreground/80 sm:text-base">
-                  SMAIRYS ist Ihr Partner für digitale Substanz. Mit Feingefühl,
-                  Präzision und dem Anspruch, dass jede Zeile Code eine Aufgabe hat.
+                  Premium-Websites, schnelle Performance und sicheres deutsches
+                  Hosting – aus einer Hand.
                 </p>
 
                 <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">

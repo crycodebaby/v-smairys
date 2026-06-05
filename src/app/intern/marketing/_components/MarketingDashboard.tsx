@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { GlassPanel } from "@/components/ui/glass/GlassPanel";
 import { GlassSheet } from "@/components/ui/glass/GlassSheet";
 import { BrandMark } from "@/components/intern/BrandMark";
@@ -107,6 +107,11 @@ export function MarketingDashboard({
     () => campaigns.find((c) => c.campaign.slug === selectedSlug) ?? null,
     [campaigns, selectedSlug]
   );
+
+  useEffect(() => {
+    if (selectedSlug && selected) return;
+    setSelectedSlug(campaigns[0]?.campaign.slug ?? null);
+  }, [campaigns, selectedSlug, selected]);
 
   const plausibleUrl =
     selected?.plausibleUrl ?? campaigns[0]?.plausibleUrl ?? "https://plausible.io";

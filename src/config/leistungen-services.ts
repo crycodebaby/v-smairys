@@ -11,14 +11,14 @@ export type LeistungenNavItem = {
 export const LEISTUNGEN_NAV_ITEMS: LeistungenNavItem[] = [
   {
     id: "service-web",
-    label: "Website & Markendesign",
+    label: "Premium Webdesign",
     shortLabel: "Webdesign",
     icon: "layout",
   },
   {
     id: "service-jpp",
-    label: "JPP-Check (Performance)",
-    shortLabel: "JPP-Check",
+    label: "Geschwindigkeit & Performance",
+    shortLabel: "Performance",
     icon: "gauge",
   },
   {
@@ -29,7 +29,7 @@ export const LEISTUNGEN_NAV_ITEMS: LeistungenNavItem[] = [
   },
   {
     id: "service-hosting",
-    label: "Hosting & Instandhaltung",
+    label: "Hosting & Sicherheit",
     shortLabel: "Hosting",
     icon: "server",
   },
