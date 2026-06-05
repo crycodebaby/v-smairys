@@ -28,6 +28,7 @@ export async function GET(
 ): Promise<NextResponse> {
   const { slug } = await context.params;
   const style = resolveQrStyle(request.nextUrl.searchParams.get("style"));
+  const download = request.nextUrl.searchParams.get("download") === "1";
   const preset = QR_STYLE_PRESETS[style];
   const campaign = isSupabaseServerConfigured()
     ? await loadDbCampaign(slug)
@@ -69,7 +70,11 @@ export async function GET(
       "Content-Type": "image/png",
       "Cache-Control": "private, no-store, max-age=0",
       "X-Robots-Tag": "noindex, nofollow",
-      "Content-Disposition": `inline; filename="qr-${slug}-standard.png"`,
+      "Content-Disposition": `${download ? "attachment" : "inline"}; filename="${safeQrFilename(
+        slug,
+        style,
+        "png"
+      )}"`,
     },
   });
 }
@@ -89,4 +94,10 @@ async function loadDbCampaign(slug: string) {
     }
     return undefined;
   }
+}
+
+function safeQrFilename(slug: string, style: string, extension: "png"): string {
+  const safeSlug = slug.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  const safeStyle = style.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  return `${safeSlug}-${safeStyle}.${extension}`;
 }

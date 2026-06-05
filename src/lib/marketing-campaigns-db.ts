@@ -80,16 +80,18 @@ type CampaignMutationRow = {
   version?: string;
   notes?: string;
   archived_at?: string | null;
+  deleted_at?: string | null;
 };
 
 const CAMPAIGN_SELECT =
-  "id, slug, internal_name, external_title, status, destination_path, utm_source, utm_medium, utm_campaign, utm_content, utm_term, medium_label, region, city, year, version, notes, archived_at, created_at, updated_at";
+  "id, slug, internal_name, external_title, status, destination_path, utm_source, utm_medium, utm_campaign, utm_content, utm_term, medium_label, region, city, year, version, notes, archived_at, deleted_at, created_at, updated_at";
 
 export async function listMarketingCampaigns(): Promise<MarketingCampaign[]> {
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("marketing_campaigns")
     .select(CAMPAIGN_SELECT)
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -107,6 +109,7 @@ export async function getMarketingCampaignBySlug(
     .from("marketing_campaigns")
     .select(CAMPAIGN_SELECT)
     .eq("slug", slug)
+    .is("deleted_at", null)
     .maybeSingle();
 
   if (error) {
@@ -175,6 +178,30 @@ export async function archiveMarketingCampaign(id: string): Promise<void> {
 
   if (error) {
     throw new Error(`Kampagne konnte nicht archiviert werden: ${error.message}`);
+  }
+}
+
+export async function softDeleteMarketingCampaign(id: string): Promise<void> {
+  const supabase = createSupabaseServerClient();
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("marketing_campaigns")
+    .update({
+      deleted_at: now,
+      updated_at: now,
+    })
+    .eq("id", id)
+    .eq("status", "archived")
+    .is("deleted_at", null)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Kampagne konnte nicht gelöscht werden: ${error.message}`);
+  }
+
+  if (!data) {
+    throw new Error("Nur archivierte Kampagnen können gelöscht werden.");
   }
 }
 

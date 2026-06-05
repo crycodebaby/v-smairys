@@ -21,6 +21,8 @@ import {
   archiveCampaignAction,
   createBuilderPresetAction,
   createCampaignAction,
+  deactivateBuilderPresetAction,
+  softDeleteCampaignAction,
   updateCampaignAction,
 } from "./actions";
 
@@ -117,7 +119,9 @@ export default async function InternMarketingPage() {
       createAction={createCampaignAction}
       updateAction={updateCampaignAction}
       archiveAction={archiveCampaignAction}
+      deleteAction={softDeleteCampaignAction}
       createPresetAction={createBuilderPresetAction}
+      deactivatePresetAction={deactivateBuilderPresetAction}
       dbState={{
         configured: supabaseConfigured,
         source: loadResult.source,

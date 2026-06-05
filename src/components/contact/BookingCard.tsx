@@ -1,97 +1,135 @@
 // src/components/contact/BookingCard.tsx
 "use client";
 
-import { motion } from "framer-motion";
+import { CalendarClock, Clock3, ShieldCheck, Video } from "lucide-react";
 import { CalendarBookingButton } from "./ContactActions";
 
-/** Minimalistisches Google-Calendar-Icon als Inline-SVG (Markenfarben angedeutet) */
-function GoogleCalendarIcon({ className }: { className?: string }) {
+type BookingCardVariant = "inline" | "sidebar" | "footer";
+
+type BookingCardProps = {
+  /** Layout-Kontext auf /leistungen – beeinflusst Dichte, nicht die CTA-Logik. */
+  variant?: BookingCardVariant;
+  className?: string;
+};
+
+const META_POINTS = [
+  { icon: ShieldCheck, label: "Kostenlos & unverbindlich" },
+  { icon: Video, label: "Online via Google Meet" },
+  { icon: Clock3, label: "20–25 Minuten" },
+] as const;
+
+export default function BookingCard({
+  variant = "inline",
+  className = "",
+}: BookingCardProps) {
+  const isSidebar = variant === "sidebar";
+  const isFooter = variant === "footer";
+
   return (
-    <svg
-      viewBox="0 0 48 48"
-      aria-hidden="true"
-      className={className}
-      role="img"
+    <aside
+      className={[
+        "relative overflow-hidden rounded-xl border border-white/10",
+        "glass-surface ambient-glow-amber",
+        isSidebar ? "p-5 xl:p-6" : isFooter ? "p-6 sm:p-7" : "p-5 sm:p-6",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-label="Erstgespräch per Google Kalender buchen"
     >
-      {/* Rahmen */}
-      <rect x="4" y="6" width="40" height="38" rx="8" fill="#1a73e8" />
-      {/* oberer Reiter mit Google-Farben */}
-      <rect x="4" y="6" width="40" height="10" rx="8" fill="#e8f0fe" />
-      <rect x="8" y="6" width="8" height="10" fill="#ea4335" />
-      <rect x="16" y="6" width="8" height="10" fill="#fbbc05" />
-      <rect x="24" y="6" width="8" height="10" fill="#34a853" />
-      <rect x="32" y="6" width="12" height="10" rx="8" fill="#4285f4" />
-      {/* Blatt */}
-      <rect x="8" y="18" width="32" height="22" rx="4" fill="#ffffff" />
-      {/* dezente Zahl / Terminfläche */}
-      <rect x="12" y="22" width="24" height="14" rx="3" fill="#e8f0fe" />
-    </svg>
-  );
-}
+      {/* Feine Oberkante – Premium-Hairline */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent"
+      />
 
-export default function BookingCard() {
-  return (
-    <motion.aside
-      initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: 0.35 }}
-      transition={{ duration: 0.55, ease: "easeOut" }}
-      className="relative p-6 overflow-hidden border shadow-sm  rounded-2xl border-border/60 bg-card/80 backdrop-blur-xl sm:p-7"
-      aria-label="Schnelltermin per Google Kalender buchen"
-    >
-      {/* weiche Brand-Glows */}
-      <div aria-hidden className="absolute inset-0 pointer-events-none -z-10">
-        <div className="absolute -left-10 top-[-30%] h-[16rem] w-[16rem] rounded-full blur-3xl bg-[radial-gradient(closest-side,hsl(var(--primary)/0.18),transparent_70%)]" />
-        <div className="absolute -right-8 bottom-[-30%] h-[14rem] w-[14rem] rounded-full blur-3xl bg-[radial-gradient(closest-side,hsl(var(--primary)/0.12),transparent_70%)]" />
-      </div>
+      <div className="flex flex-col gap-4">
+        {/* Icon + Kicker */}
+        <div className="flex items-start gap-3.5">
+          <span
+            className={[
+              "inline-flex shrink-0 items-center justify-center rounded-md border border-white/12",
+              "bg-white/[0.04] text-brand",
+              isSidebar ? "h-10 w-10" : "h-11 w-11",
+            ].join(" ")}
+            aria-hidden="true"
+          >
+            <CalendarClock
+              className={isSidebar ? "h-[1.15rem] w-[1.15rem]" : "h-5 w-5"}
+              strokeWidth={1.5}
+            />
+          </span>
 
-      <div className="flex items-start gap-4">
-        <div className="shrink-0">
-          <GoogleCalendarIcon className="w-12 h-12" />
-        </div>
-
-        <div className="min-w-0">
-          <h2 className="text-xl font-semibold tracking-tight font-heading">
-            Termin sofort buchen
-          </h2>
-          <p className="mt-1 text-sm leading-relaxed text-foreground/75">
-            20-minütiges Erstgespräch: Ziele klären, Machbarkeit prüfen,
-            nächster Schritt. Direkt im Kalender reservieren.
-          </p>
-
-          {/* kleine „Meta“-Badges */}
-          <ul className="mt-3 flex flex-wrap gap-2 text-[11px] text-foreground/70">
-            <li className="rounded-full border border-border/60 bg-background/60 px-2 py-0.5">
-              Kostenlos & unverbindlich
-            </li>
-            <li className="rounded-full border border-border/60 bg-background/60 px-2 py-0.5">
-              Online via Google Meet
-            </li>
-            <li className="rounded-full border border-border/60 bg-background/60 px-2 py-0.5">
-              20–25&nbsp;Minuten
-            </li>
-          </ul>
-
-          <div className="mt-5">
-            <CalendarBookingButton
-              location="booking"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold transition rounded-md  bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Erstgespräch
+            </p>
+            <h2
+              className={[
+                "font-heading font-semibold tracking-tight text-foreground",
+                isSidebar
+                  ? "mt-1 text-lg leading-snug"
+                  : "mt-1 text-xl leading-snug sm:text-[1.35rem]",
+              ].join(" ")}
             >
-              Im Google Kalender buchen
-              <span
-                aria-hidden
-                className="inline-block h-[1.15em] w-[1.15em] rounded-[4px] bg-white/20"
-              />
-            </CalendarBookingButton>
+              Termin vereinbaren
+            </h2>
           </div>
         </div>
+
+        {/* Explanatory copy */}
+        <p
+          className={[
+            "leading-relaxed text-muted-foreground",
+            isSidebar ? "text-[13px]" : "text-sm",
+          ].join(" ")}
+        >
+          20-minütiges Erstgespräch: Ziele klären, Machbarkeit prüfen, nächster
+          Schritt. Direkt im Kalender reservieren.
+        </p>
+
+        {/* Trust / meta – refined list, not playful pills */}
+        <ul
+          className={[
+            "grid gap-2",
+            isFooter ? "sm:grid-cols-3" : "grid-cols-1",
+          ].join(" ")}
+          aria-label="Termin-Details"
+        >
+          {META_POINTS.map(({ icon: Icon, label }) => (
+            <li
+              key={label}
+              className="flex items-center gap-2.5 text-[12px] text-foreground/75"
+            >
+              <Icon
+                className="h-3.5 w-3.5 shrink-0 text-brand/80"
+                strokeWidth={1.6}
+                aria-hidden="true"
+              />
+              <span>{label}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Primary CTA – canonical booking URL via CalendarBookingButton */}
+        <div className={isSidebar ? "pt-1" : "pt-0.5"}>
+          <CalendarBookingButton
+            location="booking"
+            className={[
+              "w-full rounded-sm text-sm",
+              isSidebar ? "min-h-10 px-4" : "min-h-11 px-5",
+            ].join(" ")}
+          >
+            Im Google Kalender buchen
+          </CalendarBookingButton>
+        </div>
       </div>
 
-      {/* zartes Lichtband unten */}
-      <div
-        aria-hidden
-        className="w-full h-px mt-6 bg-gradient-to-r from-transparent via-primary/40 to-transparent"
+      {/* Untere Brand-Linie */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-6 bottom-0 h-px bg-gradient-to-r from-transparent via-brand/35 to-transparent"
       />
-    </motion.aside>
+    </aside>
   );
 }

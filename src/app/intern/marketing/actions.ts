@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import {
   archiveMarketingCampaign,
   createMarketingCampaign,
+  softDeleteMarketingCampaign,
   updateMarketingCampaign,
   SupabaseServerConfigError,
   type MarketingCampaignInput,
@@ -21,7 +22,8 @@ import {
   type UtmMedium,
 } from "@/lib/marketing-campaigns";
 import {
-  createCampaignBuilderPreset,
+  deactivateCampaignBuilderPreset,
+  findOrCreateCampaignBuilderPreset,
   type CampaignBuilderPreset,
   type PresetCategory,
 } from "@/lib/campaign-builder-presets-db";
@@ -35,11 +37,13 @@ export type PresetActionState = {
   ok: boolean;
   message: string;
   preset?: CampaignBuilderPreset;
+  removedPresetId?: string;
 };
 
 const OK_CREATE = "Kampagne wurde erstellt.";
 const OK_UPDATE = "Kampagne wurde gespeichert.";
 const OK_ARCHIVE = "Kampagne wurde archiviert.";
+const OK_DELETE = "Kampagne wurde gelöscht.";
 
 export async function createCampaignAction(
   _prevState: CampaignActionState,
@@ -89,9 +93,36 @@ export async function createBuilderPresetAction(
   const label = readRequired(formData, "label");
 
   try {
-    const preset = await createCampaignBuilderPreset({ category, label });
+    const result = await findOrCreateCampaignBuilderPreset({ category, label });
     revalidatePath("/intern/marketing");
-    return { ok: true, message: "Preset gespeichert.", preset };
+    return {
+      ok: true,
+      message:
+        result.status === "created"
+          ? "Gespeichert"
+          : result.status === "reactivated"
+            ? "Reaktiviert"
+            : "Bereits vorhanden – ausgewählt",
+      preset: result.preset,
+    };
+  } catch (error) {
+    return presetActionError(error);
+  }
+}
+
+export async function deactivateBuilderPresetAction(
+  _prevState: PresetActionState,
+  formData: FormData
+): Promise<PresetActionState> {
+  const auth = await requireInternSession();
+  if (!auth.ok) return { ok: false, message: auth.message };
+
+  const id = readRequired(formData, "id");
+
+  try {
+    await deactivateCampaignBuilderPreset(id);
+    revalidatePath("/intern/marketing");
+    return { ok: true, message: "Entfernt", removedPresetId: id };
   } catch (error) {
     return presetActionError(error);
   }
@@ -113,6 +144,27 @@ export async function archiveCampaignAction(
     await archiveMarketingCampaign(id);
     revalidatePath("/intern/marketing");
     return { ok: true, message: OK_ARCHIVE };
+  } catch (error) {
+    return actionError(error);
+  }
+}
+
+export async function softDeleteCampaignAction(
+  _prevState: CampaignActionState,
+  formData: FormData
+): Promise<CampaignActionState> {
+  const auth = await requireInternSession();
+  if (!auth.ok) return auth;
+
+  const id = readRequired(formData, "id");
+  if (!id) {
+    return { ok: false, message: "Kampagnen-ID fehlt." };
+  }
+
+  try {
+    await softDeleteMarketingCampaign(id);
+    revalidatePath("/intern/marketing");
+    return { ok: true, message: OK_DELETE };
   } catch (error) {
     return actionError(error);
   }

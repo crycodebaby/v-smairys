@@ -29,7 +29,11 @@ export default function ServiceSection({
   variant,
 }: Props) {
   return (
-    <section id={id} className="relative py-12 sm:py-16">
+    <section
+      id={id}
+      className="relative py-12 sm:py-16"
+      style={{ scrollMarginTop: "var(--leistungen-scroll-offset, 8.5rem)" }}
+    >
       <div className="container">
         <div className="grid grid-cols-1 gap-6 p-6 border shadow-sm  rounded-2xl border-border/60 bg-card/80 sm:p-8 md:grid-cols-2 md:gap-8">
           {/* 3D oben auf Mobile, rechts auf Desktop */}

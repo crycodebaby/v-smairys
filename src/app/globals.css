@@ -448,6 +448,33 @@
     );
   }
 
+  /* Confirm-Dialog Varianten: ruhig, nicht alarmistisch. */
+  .dash-btn--confirm-success {
+    background: hsl(150 55% 38% / 0.14);
+    border-color: hsl(150 55% 52% / 0.32);
+    color: hsl(145 75% 90%);
+  }
+  .dash-btn--confirm-success:hover {
+    background: hsl(150 55% 38% / 0.2);
+    border-color: hsl(150 55% 58% / 0.45);
+  }
+  .dash-btn--confirm-success::before {
+    background: radial-gradient(
+      75% 130% at 50% -15%,
+      hsl(150 60% 52% / 0.28),
+      transparent 70%
+    );
+  }
+  .dash-btn--confirm-neutral {
+    background: hsl(0 0% 100% / 0.07);
+    border-color: hsl(0 0% 100% / 0.16);
+    color: hsl(var(--foreground) / 0.88);
+  }
+  .dash-btn--confirm-neutral:hover {
+    background: hsl(0 0% 100% / 0.11);
+    border-color: hsl(0 0% 100% / 0.28);
+  }
+
   /* Selected-Zustand (z. B. aktive Toggle-Buttons). */
   .dash-btn--selected {
     background: hsl(var(--brand) / 0.16);
@@ -732,6 +759,17 @@
      Paragraphen (z. B. Impressum, Datenschutz). */
   .prose-container {
     max-width: 65ch;
+  }
+
+  /* /leistungen – horizontale Sticky-Nav auf kleinen Screens (kein sichtbarer
+     Scrollbar, Touch-Scroll bleibt nativ). */
+  .leistungen-toc-scroll {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .leistungen-toc-scroll::-webkit-scrollbar {
+    display: none;
   }
 }
 

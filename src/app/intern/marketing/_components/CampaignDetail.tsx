@@ -5,6 +5,7 @@ import { GlassCard } from "@/components/ui/glass/GlassCard";
 import { StatusChip, type StatusChipVariant } from "@/components/ui/glass/StatusChip";
 import { DashButton } from "@/components/intern/DashButton";
 import { CopyField } from "@/components/intern/CopyField";
+import { ActionConfirmDialog } from "@/components/intern/ActionConfirmDialog";
 import { QrSheet } from "./QrSheet";
 import type { CampaignDetail as CampaignDetailVM } from "./types";
 import type { CampaignActionState } from "../actions";
@@ -20,6 +21,7 @@ type CampaignDetailProps = {
   onEdit?: () => void;
   onDuplicate?: () => void;
   archiveAction?: CampaignFormAction;
+  deleteAction?: CampaignFormAction;
   canEdit?: boolean;
 };
 
@@ -42,6 +44,7 @@ export function CampaignDetail({
   onEdit,
   onDuplicate,
   archiveAction,
+  deleteAction,
   canEdit = false,
 }: CampaignDetailProps) {
   const {
@@ -56,6 +59,7 @@ export function CampaignDetail({
   const warnings = issues.filter((i) => i.severity === "warning");
 
   const [qrOpen, setQrOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState<"archive" | "delete" | null>(null);
 
   return (
     <div key={campaign.slug} className="animate-panel-in flex flex-col gap-4">
@@ -100,12 +104,27 @@ export function CampaignDetail({
             <DashButton variant="utility" size="sm" onClick={() => setQrOpen(true)} leadingIcon={<QrIcon />}>
               QR anzeigen
             </DashButton>
-            {archiveAction && campaign.id && (
-              <ArchiveButton
-                action={archiveAction}
-                id={campaign.id}
-                disabled={!canEdit || campaign.status === "archived"}
-              />
+            {archiveAction && campaign.id && campaign.status !== "archived" && (
+              <DashButton
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={!canEdit}
+                onClick={() => setConfirmOpen("archive")}
+              >
+                Archivieren
+              </DashButton>
+            )}
+            {deleteAction && campaign.id && campaign.status === "archived" && (
+              <DashButton
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={!canEdit}
+                onClick={() => setConfirmOpen("delete")}
+              >
+                Löschen
+              </DashButton>
             )}
           </div>
 
@@ -148,38 +167,35 @@ export function CampaignDetail({
         qrPngUrl={qrPngUrl}
         shortLink={shortLink}
       />
+
+      {campaign.id && archiveAction && (
+        <ActionConfirmDialog
+          open={confirmOpen === "archive"}
+          onClose={() => setConfirmOpen(null)}
+          title="Kampagne archivieren?"
+          description="Archivierte Kampagnen leiten über /go nicht mehr weiter. Die Kampagne bleibt im Archiv erhalten."
+          statusLine="Kann später nachvollzogen werden."
+          confirmLabel="Archivieren"
+          action={archiveAction}
+          id={campaign.id}
+          tone="success"
+        />
+      )}
+
+      {campaign.id && deleteAction && (
+        <ActionConfirmDialog
+          open={confirmOpen === "delete"}
+          onClose={() => setConfirmOpen(null)}
+          title="Kampagne löschen?"
+          description="Die Kampagne wird aus der normalen Übersicht entfernt. Historische Daten bleiben intern erhalten."
+          statusLine="Nur archivierte Kampagnen können gelöscht werden."
+          confirmLabel="Löschen"
+          action={deleteAction}
+          id={campaign.id}
+          tone="neutral"
+        />
+      )}
     </div>
-  );
-}
-
-function ArchiveButton({
-  action,
-  id,
-  disabled,
-}: {
-  action: CampaignFormAction;
-  id: string;
-  disabled: boolean;
-}) {
-  const [, formAction, isPending] = React.useActionState(action, {
-    ok: false,
-    message: "",
-  });
-
-  return (
-    <form
-      action={formAction}
-      onSubmit={(e) => {
-        if (!window.confirm("Kampagne archivieren? Sie leitet danach nicht mehr weiter.")) {
-          e.preventDefault();
-        }
-      }}
-    >
-      <input type="hidden" name="id" value={id} />
-      <DashButton type="submit" variant="danger" size="sm" disabled={disabled || isPending}>
-        {isPending ? "Archiviert…" : "Archivieren"}
-      </DashButton>
-    </form>
   );
 }
 

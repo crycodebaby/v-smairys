@@ -42,7 +42,9 @@ type MarketingDashboardProps = {
   createAction: CampaignFormAction;
   updateAction: CampaignFormAction;
   archiveAction: CampaignFormAction;
+  deleteAction: CampaignFormAction;
   createPresetAction: PresetFormAction;
+  deactivatePresetAction: PresetFormAction;
   dbState: {
     configured: boolean;
     source: "supabase" | "static";
@@ -67,7 +69,9 @@ export function MarketingDashboard({
   createAction,
   updateAction,
   archiveAction,
+  deleteAction,
   createPresetAction,
+  deactivatePresetAction,
   dbState,
 }: MarketingDashboardProps) {
   const canWrite = dbState.source === "supabase";
@@ -202,6 +206,7 @@ export function MarketingDashboard({
                 vm={selected}
                 canEdit={canWrite && Boolean(selected.campaign.id)}
                 archiveAction={archiveAction}
+                deleteAction={deleteAction}
                 onEdit={() => setSheet({ open: true, mode: "edit", campaign: selected.campaign })}
                 onDuplicate={() =>
                   setSheet({ open: true, mode: "duplicate", campaign: selected.campaign })
@@ -236,6 +241,7 @@ export function MarketingDashboard({
           action={sheet.mode === "edit" ? updateAction : createAction}
           presets={presets}
           createPresetAction={createPresetAction}
+          deactivatePresetAction={deactivatePresetAction}
           onClose={closeSheet}
           disabled={!canWrite}
           disabledReason={

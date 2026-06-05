@@ -23,6 +23,7 @@ create table if not exists public.marketing_campaigns (
   version text,
   notes text,
   archived_at timestamptz,
+  deleted_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
 
@@ -72,6 +73,10 @@ create index if not exists marketing_campaigns_status_idx
 
 create index if not exists marketing_campaigns_utm_campaign_idx
   on public.marketing_campaigns (utm_campaign);
+
+create index if not exists marketing_campaigns_not_deleted_created_at_idx
+  on public.marketing_campaigns (created_at desc)
+  where deleted_at is null;
 
 create or replace function public.set_updated_at()
 returns trigger

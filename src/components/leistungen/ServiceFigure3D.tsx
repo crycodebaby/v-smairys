@@ -3,18 +3,22 @@
 import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import { EffectComposer, SMAA, Bloom } from "@react-three/postprocessing";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { useTheme } from "next-themes";
 import useInView from "@/components/leistungen/useInView";
 
 type Variant = "web" | "jpp" | "seo" | "hosting";
 
+/** Smairys Brand – warmes Amber/Kupfer (#d47115 Familie) */
+const BRAND_AMBER = "#d47115";
+const BRAND_GLOW = "#ffdcb8";
+const BRAND_DEEP = "#6b3a12";
+
 /** Smooth damping */
 const damp = (v: number, t: number, k: number, dt: number) =>
   v + (t - v) * (1 - Math.exp(-k * dt));
 
-/** Reduced-motion Hook: SSR-safe + reacts to OS change */
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -28,37 +32,90 @@ function useReducedMotion(): boolean {
   return reduced;
 }
 
-/** Reusable glassy material tuned for your theme tokens */
-function useGlassMaterial(theme?: string): THREE.MeshPhysicalMaterial {
-  const tint = useMemo(
-    () => new THREE.Color(theme === "light" ? "#2b2f35" : "#eaf0ff"),
-    [theme]
+/**
+ * Edles „Smoked Amber Glass“ – kein kaltes Grau mehr.
+ * Weniger Transmission (verhindert matschiges Durchscheinen auf True-Black),
+ * starker Clearcoat, warme Attenuation + dezentes Emissive.
+ */
+function usePremiumSculptureMaterial(
+  theme?: string
+): THREE.MeshPhysicalMaterial {
+  const isLight = theme === "light";
+
+  const palette = useMemo(
+    () => ({
+      base: new THREE.Color(isLight ? "#3d2e1f" : "#fff3e6"),
+      attenuation: new THREE.Color(isLight ? "#8b5a2b" : BRAND_AMBER),
+      emissive: new THREE.Color(BRAND_AMBER),
+      sheen: new THREE.Color(BRAND_GLOW),
+    }),
+    [isLight]
   );
 
   const mat = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
-        color: tint,
-        metalness: 0,
-        roughness: 0.46,
-        transmission: 0.6,
-        thickness: 0.5,
-        ior: 1.45,
-        attenuationColor: tint,
-        attenuationDistance: 1.2,
-        clearcoat: 0.1,
+        color: palette.base,
+        metalness: isLight ? 0.18 : 0.42,
+        roughness: 0.14,
+        clearcoat: 1,
+        clearcoatRoughness: 0.05,
+        transmission: isLight ? 0.22 : 0.1,
+        thickness: 1.4,
+        ior: 1.52,
+        attenuationColor: palette.attenuation,
+        attenuationDistance: 2.8,
+        emissive: palette.emissive,
+        emissiveIntensity: isLight ? 0.025 : 0.07,
+        sheen: 0.55,
+        sheenRoughness: 0.28,
+        sheenColor: palette.sheen,
         transparent: true,
-        opacity: 0.85,
-        envMapIntensity: theme === "light" ? 0.9 : 1.1,
+        opacity: 1,
+        envMapIntensity: isLight ? 1.15 : 1.75,
+        reflectivity: 0.92,
       }),
-    [tint, theme]
+    [palette, isLight]
   );
 
-  useEffect(() => () => mat.dispose(), [mat]); // tidy up GPU memory on unmount
+  useEffect(() => () => mat.dispose(), [mat]);
   return mat;
 }
 
-/** Element-Typ mit Pointer-Capture-APIs */
+/** Warmer Hintergrund-Glow – gibt Transmission etwas Edles zum Brechern. */
+function WarmBackdrop() {
+  return (
+    <mesh position={[0, 0, -1.8]} scale={[4.5, 4.5, 1]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial color={BRAND_DEEP} transparent opacity={0.35} />
+    </mesh>
+  );
+}
+
+/** Dezente Rand-Aura (Backside) – Kupfer-Kante statt grauer Silhouette. */
+function EdgeAura({ variant }: { variant: Variant }) {
+  const scale = variant === "hosting" ? 1.06 : 1.04;
+  const mat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color(BRAND_AMBER),
+        transparent: true,
+        opacity: 0.07,
+        side: THREE.BackSide,
+        depthWrite: false,
+      }),
+    []
+  );
+
+  useEffect(() => () => mat.dispose(), [mat]);
+
+  return (
+    <mesh scale={scale} material={mat}>
+      <icosahedronGeometry args={[1.05, 1]} />
+    </mesh>
+  );
+}
+
 type PointerCaptureElement = Element & {
   setPointerCapture(id: number): void;
   releasePointerCapture(id: number): void;
@@ -79,8 +136,6 @@ type SculptureProps = {
 
 function Sculpture({ variant, mat, active, reduced }: SculptureProps) {
   const groupRef = useRef<THREE.Group>(null);
-
-  // drag state
   const [dragging, setDragging] = useState(false);
   const target = useRef<{ rx: number; ry: number }>({ rx: -0.2, ry: 0.0 });
   const lerped = useRef<{ rx: number; ry: number }>({ rx: -0.2, ry: 0.0 });
@@ -89,20 +144,17 @@ function Sculpture({ variant, mat, active, reduced }: SculptureProps) {
     const g = groupRef.current;
     if (!g) return;
 
-    // subtle autorotation only when visible & not dragging & not reduced
     if (active && !reduced && !dragging) target.current.ry += dt * 0.25;
 
-    // smooth follow
     lerped.current.rx = damp(lerped.current.rx, target.current.rx, 6, dt);
     lerped.current.ry = damp(lerped.current.ry, target.current.ry, 6, dt);
 
     g.rotation.set(lerped.current.rx, lerped.current.ry, 0);
   });
 
-  // Pointer handlers (typ-sicher, ohne any)
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
-    const el = e.target as unknown as Element | null; // ThreeEvent.target ist ein generisches EventTarget
+    const el = e.target as unknown as Element | null;
     if (isPointerCaptureElement(el)) {
       el.setPointerCapture(e.pointerId);
     }
@@ -142,6 +194,8 @@ function Sculpture({ variant, mat, active, reduced }: SculptureProps) {
       onPointerLeave={endDrag}
       onPointerMove={onPointerMove}
     >
+      <EdgeAura variant={variant} />
+
       {variant === "web" && (
         <>
           <mesh material={mat}>
@@ -203,20 +257,15 @@ export default function ServiceFigure3D({
   className?: string;
 }) {
   const { resolvedTheme } = useTheme();
-
-  // HTMLDivElement-Ref für DOM, aber Hook erwartet Element → sauber beim Aufruf casten
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(wrapperRef as unknown as React.RefObject<Element>, {
+  const inView = useInView(wrapperRef as unknown as RefObject<Element>, {
     threshold: 0.35,
   });
 
   const reduced = useReducedMotion();
-  const mat = useGlassMaterial(resolvedTheme);
-
-  // render only when visible
+  const mat = usePremiumSculptureMaterial(resolvedTheme);
   const frameloop: "always" | "demand" | "never" = inView ? "always" : "demand";
 
-  // safe DPR without hardcoding window at render-time
   const [dprMax, setDprMax] = useState(2);
   useEffect(() => {
     setDprMax(
@@ -227,11 +276,24 @@ export default function ServiceFigure3D({
   return (
     <div
       ref={wrapperRef}
-      className={
-        className ?? "relative h-[240px] sm:h-[280px] md:h-[320px] lg:h-[360px]"
-      }
+      className={[
+        "relative isolate overflow-hidden rounded-xl",
+        className ?? "h-[240px] sm:h-[280px] md:h-[320px] lg:h-[360px]",
+      ].join(" ")}
       aria-hidden
     >
+      {/* CSS-Ambient – warmes Licht hinter dem Canvas */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background: [
+            "radial-gradient(ellipse 70% 55% at 50% 42%, hsl(28 82% 46% / 0.14), transparent 72%)",
+            "radial-gradient(ellipse 50% 40% at 72% 68%, hsl(28 95% 55% / 0.08), transparent 70%)",
+          ].join(", "),
+        }}
+      />
+
       <Canvas
         dpr={[1, dprMax]}
         frameloop={frameloop}
@@ -245,38 +307,55 @@ export default function ServiceFigure3D({
         onCreated={(state) => {
           state.gl.setClearColor(0x000000, 0);
           state.gl.toneMapping = THREE.ACESFilmicToneMapping;
-          state.gl.toneMappingExposure = 1.05;
+          state.gl.toneMappingExposure = 1.12;
         }}
       >
-        {/* Light — warm key + cool fill */}
-        <ambientLight intensity={0.25} />
+        <ambientLight intensity={0.18} color="#fff0e0" />
+
         <directionalLight
-          position={[2, 2, 3]}
-          intensity={1.0}
-          color={"#ffdcb8"}
+          position={[2.5, 2.5, 3]}
+          intensity={1.15}
+          color={BRAND_GLOW}
         />
         <directionalLight
-          position={[-2, -1, -2]}
-          intensity={0.8}
-          color={"#a8c8ff"}
+          position={[-2, 0.5, 2]}
+          intensity={0.55}
+          color={BRAND_AMBER}
         />
+        <pointLight
+          position={[0, -1.5, 2]}
+          intensity={0.35}
+          color={BRAND_AMBER}
+          distance={8}
+        />
+
+        <WarmBackdrop />
 
         <Environment background={false} resolution={256}>
           <Lightformer
             form="rect"
-            intensity={0.8}
-            scale={[6, 1.2, 1]}
-            position={[0, 2, 3]}
-            rotation={[-0.18, 0, 0]}
+            intensity={1.1}
+            color={BRAND_GLOW}
+            scale={[5, 1.4, 1]}
+            position={[0, 2.2, 3]}
+            rotation={[-0.15, 0, 0]}
+          />
+          <Lightformer
+            form="ring"
+            intensity={0.45}
+            color={BRAND_AMBER}
+            scale={2.2}
+            position={[1.8, -0.5, 1.5]}
+            rotation={[0.4, 0.2, 0]}
           />
         </Environment>
 
         <EffectComposer>
           <SMAA />
           <Bloom
-            intensity={0.08}
-            luminanceThreshold={0.55}
-            luminanceSmoothing={0.9}
+            intensity={0.14}
+            luminanceThreshold={0.42}
+            luminanceSmoothing={0.85}
           />
         </EffectComposer>
 

@@ -20,7 +20,7 @@ import {
   deriveDuplicate,
   type BuilderSelection,
 } from "./builder-presets";
-import { PresetCategoryField } from "./PresetCategoryField";
+import { BuilderPresetField } from "./BuilderPresetField";
 import type { CampaignActionState, PresetActionState } from "../actions";
 
 type BuilderMode = "create" | "edit" | "duplicate";
@@ -41,6 +41,7 @@ type CampaignBuilderProps = {
   campaign?: MarketingCampaign;
   action: BuilderAction;
   createPresetAction: PresetAction;
+  deactivatePresetAction: PresetAction;
   presets: readonly CampaignBuilderPreset[];
   onClose: () => void;
   disabled?: boolean;
@@ -96,6 +97,7 @@ export function CampaignBuilder({
   campaign,
   action,
   createPresetAction,
+  deactivatePresetAction,
   presets: initialPresets,
   onClose,
   disabled = false,
@@ -252,6 +254,10 @@ export function CampaignBuilder({
     });
   };
 
+  const handlePresetRemoved = (presetId: string) => {
+    setLocalPresets((prev) => prev.filter((preset) => preset.id !== presetId));
+  };
+
   const yearOptions = [
     { value: String(currentYear), label: String(currentYear) },
     { value: String(currentYear + 1), label: String(currentYear + 1) },
@@ -350,34 +356,43 @@ export function CampaignBuilder({
         {/* 4–8: Dynamische Presets (nur Create) */}
         {isCreate && (
           <section className="grid grid-cols-1 gap-4">
-            <PresetCategoryField
+            <BuilderPresetField
               category="medium"
-              label="Medium"
+              title="Medium"
+              hint="Quelle des Print-Kontakts"
               presets={localPresets}
               value={mediumValue}
               onChange={setMediumValue}
               onPresetCreated={handlePresetCreated}
+              onPresetRemoved={handlePresetRemoved}
               createPresetAction={createPresetAction}
+              deactivatePresetAction={deactivatePresetAction}
               disabled={disabled}
             />
-            <PresetCategoryField
+            <BuilderPresetField
               category="region"
-              label="Region / Ort"
+              title="Region"
+              hint="Ort oder Gebiet der Verteilung"
               presets={localPresets}
               value={regionValue}
               onChange={setRegionValue}
               onPresetCreated={handlePresetCreated}
+              onPresetRemoved={handlePresetRemoved}
               createPresetAction={createPresetAction}
+              deactivatePresetAction={deactivatePresetAction}
               disabled={disabled}
             />
-            <PresetCategoryField
+            <BuilderPresetField
               category="topic"
-              label="Thema"
+              title="Thema"
+              hint="Saison, Angebot oder Kontext"
               presets={localPresets}
               value={topicValue}
               onChange={setTopicValue}
               onPresetCreated={handlePresetCreated}
+              onPresetRemoved={handlePresetRemoved}
               createPresetAction={createPresetAction}
+              deactivatePresetAction={deactivatePresetAction}
               disabled={disabled}
             />
 
@@ -401,14 +416,17 @@ export function CampaignBuilder({
                 </div>
               </FieldBlock>
 
-              <PresetCategoryField
+              <BuilderPresetField
                 category="version"
-                label="Version"
+                title="Version"
+                hint="z. B. v1, v2, test-a"
                 presets={localPresets}
                 value={version}
-                onChange={setVersion}
+                onChange={(next) => setVersion(next ?? "v1")}
                 onPresetCreated={handlePresetCreated}
+                onPresetRemoved={handlePresetRemoved}
                 createPresetAction={createPresetAction}
+                deactivatePresetAction={deactivatePresetAction}
                 disabled={disabled}
               />
             </div>

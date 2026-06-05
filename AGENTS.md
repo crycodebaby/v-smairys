@@ -25,10 +25,10 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 - `src/lib/attribution/attribution.ts` – First-Touch (localStorage) + Last-Touch (sessionStorage).
 - `src/components/ui/glass/` – wiederverwendbare Liquid-Glass-Primitive (`GlassPanel`, `GlassButton`, `GlassCard`, `StatusChip`, `Toolbar`, `ToolbarBrand`, `PinDots`, `PinKeypad`).
 - `src/components/ui/CopyButton.tsx` – Clipboard-Helper für Dashboard & intern.
-- `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`SystemStatusDialog`, `BrandMark`, `DashButton`, `CopyField`). `DashButton` = zentrales Dashboard-Button-System (Liquid Amber Glass, Klassen in `globals.css` unter `.dash-btn`), getrennt von `GlassButton` (öffentliche Website). `CopyField` = klickbares Copy-on-Click-Feld (ersetzt Copy-Buttons neben Shortlink/Ziel-URL/UTM).
+- `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`SystemStatusDialog`, `BrandMark`, `DashButton`, `CopyField`, `ActionConfirmDialog`). `DashButton` = zentrales Dashboard-Button-System (Liquid Amber Glass, Klassen in `globals.css` unter `.dash-btn`), getrennt von `GlassButton` (öffentliche Website). `CopyField` = klickbares Copy-on-Click-Feld (ersetzt Copy-Buttons neben Shortlink/Ziel-URL/UTM). `ActionConfirmDialog` ersetzt Browser-Confirm für gefährliche Aktionen.
 - `src/components/ui/glass/` zusätzlich: `GlassSheet` (Dialog/Sheet), `GlassSegmented`, `GlassListbox`, `ChipGroup` – ersetzen native Selects im Dashboard.
 - `src/components/layout/ConditionalFooter.tsx` – versteckt den Marketing-Footer auf `/intern/*` und `/kundenlogin`, wiederverwendet `analytics-config`-Liste.
-- `src/app/intern/marketing/_components/` – Master-Detail-Shell (`MarketingDashboard`, `CampaignList`, `CampaignDetail`, `CampaignBuilder`, `PresetCategoryField`, `QrSheet`). Presets aus Supabase, nicht hard-coded. Mobile-first: Sidebar als Bottom-Sheet (`<md`) bzw. sticky Sidebar (`md+`). Private Folder → nie als Route.
+- `src/app/intern/marketing/_components/` – Master-Detail-Shell (`MarketingDashboard`, `CampaignList`, `CampaignDetail`, `CampaignBuilder`, `BuilderPresetField`, `QrSheet`). Presets aus Supabase, nicht hard-coded. `BuilderPresetField` = Creatable Preset Chips mit Add/Enter/X und Soft-Delete (`is_active=false`). Mobile-first: Sidebar als Bottom-Sheet (`<md`) bzw. sticky Sidebar (`md+`). Private Folder → nie als Route.
 
 ## Interner Zugang
 
@@ -38,6 +38,7 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 - Dashboard (Marketing): `/intern/marketing` – Kampagnen in Supabase; Plausible für Zahlen/Conversions (kein Dashboard-Analytics).
 - Supabase Env (siehe `.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Service Role nur serverseitig).
 - QR-Kurzlinks: `/go/[slug]` (Supabase-first, nur `active`).
+- Kampagnen-Löschen ist Soft-Delete (`marketing_campaigns.deleted_at`), nur für archivierte Kampagnen. Keine Hard Deletes im Dashboard.
 - ENV-Variablen für den Login (siehe `.env.example`):
   - `ADMIN_DASHBOARD_PIN` – 4-stellige Ziffernfolge (PFLICHT).
   - `ADMIN_DASHBOARD_SECRET` – optional, ≥ 16 Zeichen. Wenn leer, wird das HMAC-Secret deterministisch aus dem PIN abgeleitet.

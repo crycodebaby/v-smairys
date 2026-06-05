@@ -31,6 +31,7 @@ export async function GET(
 ): Promise<NextResponse> {
   const { slug } = await context.params;
   const style = resolveQrStyle(request.nextUrl.searchParams.get("style"));
+  const download = request.nextUrl.searchParams.get("download") === "1";
   const campaign = isSupabaseServerConfigured()
     ? await loadDbCampaign(slug)
     : getCampaignBySlug(slug);
@@ -71,8 +72,11 @@ export async function GET(
       // Ziel auf einen anderen Slug umgeleitet wird.
       "Cache-Control": "private, no-store, max-age=0",
       "X-Robots-Tag": "noindex, nofollow",
-      // Hinweis für Browser, dass das SVG ggf. zum Download gedacht ist.
-      "Content-Disposition": `inline; filename="qr-${slug}-${style}.svg"`,
+      "Content-Disposition": `${download ? "attachment" : "inline"}; filename="${safeQrFilename(
+        slug,
+        style,
+        "svg"
+      )}"`,
     },
   });
 }
@@ -93,4 +97,10 @@ async function loadDbCampaign(slug: string) {
     }
     return undefined;
   }
+}
+
+function safeQrFilename(slug: string, style: string, extension: "svg"): string {
+  const safeSlug = slug.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  const safeStyle = style.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  return `${safeSlug}-${safeStyle}.${extension}`;
 }

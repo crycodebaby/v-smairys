@@ -167,8 +167,14 @@ als Hauptquelle im Code (`builder-presets.ts` enthält nur Ableitungslogik).
 - RLS aktiv, keine öffentlichen Policies
 - Presets werden **einmal serverseitig** in `page.tsx` geladen und an den
   Builder übergeben – nicht bei jedem Tastendruck
-- Neues Wort: Eingabe + `+` → Server Action `createBuilderPresetAction` →
-  Supabase Insert → `revalidatePath` → Chip erscheint sofort im Builder
+- UI-Pattern: `BuilderPresetField` / **Creatable Preset Chips**
+- Neues Wort: Eingabe + `+` oder `Enter` → Server Action
+  `createBuilderPresetAction` → Find-or-create → Chip erscheint sofort im
+  Builder und wird direkt ausgewählt
+- Duplikate erzeugen keinen Fehler: aktiver Treffer wird ausgewählt, inaktiver
+  Treffer wird reaktiviert
+- Entfernen per `X` im Chip → `deactivateBuilderPresetAction` setzt
+  `is_active = false` (Soft-Delete), kein Hard Delete
 - Leere Kategorie: Empty-State „Erstes Wort hinzufügen" (kein Code-Fallback)
 
 Zielseiten im Builder sind bewusst auf drei Optionen begrenzt:
@@ -188,10 +194,11 @@ nicht auf der öffentlichen Website.
   (`listMarketingCampaigns`) geladen – kein Client-Fetch, keine `useEffect`-Loops.
 - Builder-Presets werden **ebenfalls einmal** pro Request geladen
   (`listCampaignBuilderPresets`).
+- Preset-Actions laufen nur bei `+`/`Enter`/`X`, nicht während der Eingabe.
 - Suche und Status-Filter laufen **rein clientseitig** über die bereits
   geladene Liste (`useMemo`), also **keine DB-Abfrage pro Tastendruck**.
 - Server Actions (`actions.ts`) validieren Inputs serverseitig und prüfen die
-  PIN-Session (`requireInternSession`) bei Create/Edit/Archive/Preset-Anlage.
+  PIN-Session (`requireInternSession`) bei Create/Edit/Archive/Soft-Delete/Preset-Anlage.
 - Slug/`utm_campaign` werden serverseitig per `slugify` normalisiert
   (reparierend statt nur ablehnend).
 - Service Role bleibt server-only (`src/lib/supabase/server.ts`,
@@ -205,8 +212,16 @@ nicht auf der öffentlichen Website.
   Action-Bar, Suche, Status-Filter, Liste), rechts das Print-Asset-Kit.
 - Builder ist ein minimalistisches Glass-Sheet: Titel → Status → Zielseite →
   dynamische Preset-Chips (Supabase) → abgeleitete Werte → Advanced (zu) → Notizen.
+- Preset-Kategorien haben eine klare kleine Uppercase-Hierarchie mit dezenter
+  Brand-Markierung; Chips brechen um und enthalten ein touchfreundliches `X`.
 - Archivieren **nicht** im Edit-Sheet – nur als eigene Aktion im Asset-Kit
   mit Confirm-Dialog.
+- Browser-Confirm ist im Dashboard verboten. Gefährliche Aktionen nutzen
+  `ActionConfirmDialog` (mobile Sheet, Desktop Dialog).
+- Löschen ist Soft-Delete über `marketing_campaigns.deleted_at`; Slugs bleiben
+  belegt, gelöschte Kampagnen verschwinden aus der normalen Liste und `/go`.
+- QR-Downloads nutzen `download=1` und setzen `Content-Disposition: attachment`;
+  der QR-Druckhinweis bleibt in der Doku, nicht im täglichen Dashboard-UI.
 - Native Selects ersetzt durch Glass-Komponenten: Status = Segmented Control,
   Zielseite = Glass-Listbox (3 feste Optionen), Presets = Chip-Auswahl + Inline-Add.
 - Systemstatus liegt im Glass-Dialog (Button „Systemstatus"); ein dezenter
