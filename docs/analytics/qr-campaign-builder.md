@@ -23,11 +23,11 @@ Analytics-System und zeigt **keine** Besucherzahlen.
 
 ## Dashboard-Funktionen (MVP)
 
-1. Kampagne erstellen / bearbeiten / archivieren
+1. Kampagne erstellen / bearbeiten / duplizieren / archivieren
 2. Status: `draft`, `active`, `paused`, `archived`
-3. Shortlink `/go/<slug>`, UTM-Ziel-URL, QR-SVG, QR-PNG
+3. Shortlink `/go/<slug>`, UTM-Ziel-URL, QR-SVG (gebrandet), QR-PNG (Standard)
 4. Copy: Shortlink, UTM-Ziel, Plausible-Suchwerte (Text, keine API)
-5. Druck- und Test-Checkliste (localStorage, nur UI-Hilfe)
+5. QR-Style-Auswahl pro Kampagne (Clean Print / Smairys Brand / Premium Poster)
 6. Einfache Suche: Name, Slug, Region, Stadt
 7. Zielseite aus vordefinierten öffentlichen Pfaden wählen
 
@@ -99,6 +99,39 @@ deaktiviert.
 - Interne Ziele werden blockiert
 - Keine Redirect-Zählung im MVP (Plausible zählt Besuche)
 
+## QR-Branding (Style-Presets)
+
+Grundsatz: **Scan-Sicherheit vor Optik.** Immer dunkle Module auf weißem
+Grund, Quiet Zone bleibt erhalten, Finder-Ecken bleiben klar erkennbar.
+
+Presets (`src/lib/qr/qr-styles.ts`):
+
+| Preset | Module | Error Correction | Empfohlen für | Scan-Sicherheit |
+|--------|--------|------------------|---------------|-----------------|
+| `clean-print` (Clean Print) | eckig, schwarz/weiß | Q | **Visitenkarte** | Hoch |
+| `smairys-brand` (Smairys Brand) | abgerundet, warmes Near-Black, dunkler Amber-Finder | H | Flyer | Hoch |
+| `premium-poster` (Premium Poster) | runde Dots, gestylte Ecken, mehr Quiet Zone | H | Poster | Mittel |
+
+- **Empfehlung Visitenkarte:** `clean-print` (maximale Scanbarkeit, weniger
+  Module → größere Module auf kleiner Fläche).
+- **SVG ist für Druck zu bevorzugen** (vektoriell, beliebige Auflösung). Das
+  gebrandete Styling läuft ausschließlich über das SVG.
+- **PNG bleibt Standard** (schwarz/weiß, eckig): `qrcode` rendert PNG nur
+  klassisch; eine Rasterisierung des SVG würde eine zusätzliche Dependency
+  erfordern. PNG ist im UI klar als „Standard" markiert (schnelle Vorschau).
+- **Logo:** im MVP überall deaktiviert (kein passendes dunkles Logo-Asset für
+  weißen Grund, Scan-Sicherheit hat Vorrang). Renderer unterstützt es vorbereitet.
+
+Technik:
+
+- QR-Matrix weiterhin via `qrcode` (`QRCode.create`); eigener, scan-sicherer
+  SVG-Renderer in `src/lib/qr/render-qr-svg.ts` (keine neue Dependency).
+- Routen: `/intern/marketing/<slug>/qr.svg?style=<preset>` und `…/qr.png?style=<preset>`
+  (PNG nutzt `style` nur für Error-Correction/Quiet-Zone, bleibt optisch Standard).
+
+> **Vor Druck immer testen:** jeden finalen QR-Code mit **iPhone (Kamera)** und
+> **Android** scannen, bevor er in den Druck geht.
+
 ## Plausible
 
 - Keine Plausible-API im Dashboard
@@ -125,8 +158,8 @@ Details: `docs/analytics/plausible-setup.md`, `docs/analytics/plausible-goals.md
 
 ## UI / Builder
 
-- IA: linke Sidebar (Neue Kampagne, Suche, Status-Filter, Liste), rechts oben
-  das Print-Asset-Kit, darunter Druck-/Test-Checkliste.
+- IA: linke Sidebar (Info-Counts + Datenquelle, Neue Kampagne, Suche,
+  Status-Filter, Liste), rechts das Print-Asset-Kit als primärer Arbeitsbereich.
 - Builder ist ein Glass-Sheet (kein Dauerformular im Layout) mit Presets für
   Medium/Thema/Region/Jahr/Version; Slug + UTM werden automatisch abgeleitet
   und sind manuell überschreibbar.

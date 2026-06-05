@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useId, useMemo, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { StatusChip, type StatusChipVariant } from "@/components/ui/glass/StatusChip";
-import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { DashButton } from "@/components/intern/DashButton";
 import type { CampaignSummary } from "./types";
 
 type StatusFilter = "all" | CampaignSummary["status"];
@@ -13,6 +14,7 @@ type CampaignListProps = {
   onSelect: (slug: string) => void;
   onNew?: () => void;
   canCreate?: boolean;
+  source: "supabase" | "static";
 };
 
 const STATUS_VARIANT_MAP: Record<CampaignSummary["status"], StatusChipVariant> = {
@@ -38,9 +40,9 @@ const FILTER_OPTIONS: { id: StatusFilter; label: string }[] = [
 ];
 
 /**
- * Linke Spalte: + Neue Kampagne, clientseitige Suche (Name, Slug, Region,
- * Stadt) und Status-Filter über bereits geladene Kampagnen. Keine DB-Abfrage
- * pro Tastendruck – es wird ausschließlich die geladene Liste gefiltert.
+ * Linke Spalte: Info-Bereich (Counts + Datenquelle), + Neue Kampagne,
+ * clientseitige Suche (Name, Slug, Region, Stadt) und Status-Filter über
+ * bereits geladene Kampagnen. Keine DB-Abfrage pro Tastendruck.
  */
 export function CampaignList({
   campaigns,
@@ -48,9 +50,24 @@ export function CampaignList({
   onSelect,
   onNew,
   canCreate = false,
+  source,
 }: CampaignListProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<StatusFilter>("all");
+  const reduceMotion = useReducedMotion();
+  const pillId = useId();
+
+  const counts = useMemo(() => {
+    let active = 0;
+    let draft = 0;
+    let archived = 0;
+    for (const c of campaigns) {
+      if (c.status === "active") active += 1;
+      else if (c.status === "draft") draft += 1;
+      else if (c.status === "archived") archived += 1;
+    }
+    return { total: campaigns.length, active, draft, archived };
+  }, [campaigns]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -65,18 +82,41 @@ export function CampaignList({
   }, [campaigns, query, filter]);
 
   return (
-    <div className="flex h-full flex-col gap-3">
-      <GlassButton
-        type="button"
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      {/* Info-Bereich: kompakte Counts + Datenquelle */}
+      <div className="grid grid-cols-3 gap-1.5">
+        <Stat label="Gesamt" value={counts.total} tone="brand" />
+        <Stat label="Live" value={counts.active} tone="live" />
+        <Stat label="Entwurf" value={counts.draft} tone="muted" />
+      </div>
+      <div className="flex items-center justify-between gap-2 rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-foreground/45">
+          Archiv {counts.archived}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-[11px] text-foreground/65">
+          <span
+            aria-hidden="true"
+            className={
+              "inline-block h-1.5 w-1.5 rounded-full " +
+              (source === "supabase"
+                ? "bg-emerald-400 shadow-[0_0_8px_hsl(155_80%_50%/0.7)]"
+                : "bg-amber-400 shadow-[0_0_8px_hsl(38_92%_55%/0.7)]")
+            }
+          />
+          {source === "supabase" ? "Supabase" : "Static-Fallback"}
+        </span>
+      </div>
+
+      <DashButton
+        variant="primary"
         size="sm"
-        variant="solid"
         onClick={onNew}
         disabled={!canCreate}
         className="w-full"
         leadingIcon={<PlusIcon />}
       >
         Neue Kampagne
-      </GlassButton>
+      </DashButton>
 
       <div className="relative">
         <SearchIcon className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground/45" />
@@ -90,7 +130,7 @@ export function CampaignList({
             "block h-9 w-full rounded-full border border-white/10 bg-white/[0.05] pl-8 pr-3 " +
             "text-sm text-foreground placeholder:text-foreground/40 " +
             "backdrop-blur-xl transition-colors duration-200 " +
-            "focus:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+            "focus:border-[hsl(var(--brand)/0.5)] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-glow)/0.35)]"
           }
         />
       </div>
@@ -105,13 +145,21 @@ export function CampaignList({
               onClick={() => setFilter(opt.id)}
               aria-pressed={isActive}
               className={
-                "rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors duration-200 " +
+                "relative rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors duration-200 " +
                 (isActive
-                  ? "border-white/30 bg-white/15 text-foreground"
-                  : "border-white/10 bg-white/[0.04] text-foreground/65 hover:border-white/20 hover:text-foreground")
+                  ? "text-foreground"
+                  : "text-foreground/60 hover:text-foreground/90")
               }
             >
-              {opt.label}
+              {isActive && (
+                <motion.span
+                  aria-hidden="true"
+                  layoutId={reduceMotion ? undefined : `${pillId}-filter`}
+                  transition={{ type: "spring", stiffness: 520, damping: 40, mass: 0.7 }}
+                  className="absolute inset-0 rounded-full border border-[hsl(var(--brand)/0.45)] bg-[hsl(var(--brand)/0.16)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18)]"
+                />
+              )}
+              <span className="relative z-10">{opt.label}</span>
             </button>
           );
         })}
@@ -135,16 +183,16 @@ export function CampaignList({
                 className={
                   "group relative w-full overflow-hidden rounded-xl border px-3 py-3 text-left " +
                   "transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out " +
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 " +
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--brand-glow)/0.5)] " +
                   (isSelected
-                    ? "border-white/25 bg-white/[0.10] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_8px_28px_-12px_rgba(0,0,0,0.55)]"
+                    ? "border-[hsl(var(--brand)/0.45)] bg-[hsl(var(--brand)/0.1)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_8px_28px_-12px_hsl(var(--brand-glow)/0.5)]"
                     : "border-white/10 bg-white/[0.035] hover:border-white/20 hover:bg-white/[0.06]")
                 }
               >
                 {isSelected && (
                   <span
                     aria-hidden="true"
-                    className="absolute inset-y-2 left-0 w-[3px] rounded-r bg-gradient-to-b from-white/90 via-white/60 to-white/30"
+                    className="absolute inset-y-2 left-0 w-[3px] rounded-r bg-gradient-to-b from-[hsl(var(--brand))] via-[hsl(var(--brand-soft))] to-[hsl(var(--brand)/0.3)]"
                   />
                 )}
                 <div className="flex items-start justify-between gap-3">
@@ -194,6 +242,31 @@ export function CampaignList({
 
       <p className="text-[10px] text-foreground/40">
         {filtered.length} von {campaigns.length} Kampagnen
+      </p>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "brand" | "live" | "muted";
+}) {
+  const valueClass =
+    tone === "brand"
+      ? "brand-text"
+      : tone === "live"
+        ? "text-emerald-300"
+        : "text-foreground/85";
+  return (
+    <div className="rounded-xl border border-white/8 bg-white/[0.03] px-2.5 py-2 text-center">
+      <p className={"text-lg font-semibold leading-none " + valueClass}>{value}</p>
+      <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-foreground/45">
+        {label}
       </p>
     </div>
   );

@@ -1,20 +1,31 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { GlassPanel } from "@/components/ui/glass/GlassPanel";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
 import { StatusChip, type StatusChipVariant } from "@/components/ui/glass/StatusChip";
 import { CopyButton } from "@/components/ui/CopyButton";
-import { GlassButton } from "@/components/ui/glass/GlassButton";
-import { PrintChecklist } from "@/components/intern/PrintChecklist";
-import { TestChecklist } from "@/components/intern/TestChecklist";
+import { DashButton, dashButtonClasses } from "@/components/intern/DashButton";
+import {
+  DEFAULT_QR_STYLE,
+  QR_STYLE_ORDER,
+  QR_STYLE_PRESETS,
+  type QrStyleId,
+} from "@/lib/qr/qr-styles";
 import type { CampaignDetail as CampaignDetailVM } from "./types";
+import type { CampaignActionState } from "../actions";
 import type { CampaignStatus, CampaignIssue } from "@/lib/marketing-campaigns";
+
+type CampaignFormAction = (
+  prevState: CampaignActionState,
+  formData: FormData
+) => Promise<CampaignActionState>;
 
 type CampaignDetailProps = {
   vm: CampaignDetailVM;
   onEdit?: () => void;
   onDuplicate?: () => void;
+  archiveAction?: CampaignFormAction;
   canEdit?: boolean;
 };
 
@@ -39,7 +50,13 @@ const UTM_FIELDS: Array<{ key: "utm_source" | "utm_medium" | "utm_campaign" | "u
   { key: "utm_content", label: "Content" },
 ];
 
-export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: CampaignDetailProps) {
+export function CampaignDetail({
+  vm,
+  onEdit,
+  onDuplicate,
+  archiveAction,
+  canEdit = false,
+}: CampaignDetailProps) {
   const {
     campaign,
     shortLink,
@@ -54,6 +71,10 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
   const errors = issues.filter((i) => i.severity === "error");
   const warnings = issues.filter((i) => i.severity === "warning");
 
+  const [qrStyle, setQrStyle] = useState<QrStyleId>(DEFAULT_QR_STYLE);
+  const preset = QR_STYLE_PRESETS[qrStyle];
+  const withStyle = (url: string) => `${url}?style=${qrStyle}`;
+
   return (
     <div key={campaign.slug} className="animate-panel-in flex flex-col gap-5">
       <GlassCard
@@ -62,43 +83,30 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
         noPadding
       >
         <div className="grid grid-cols-1 gap-5 p-5 sm:p-7 md:grid-cols-[minmax(0,1fr)_15rem] lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-7">
-          <div className="flex flex-col gap-5">
+          <div className="flex min-w-0 flex-col gap-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusChip
-                variant={STATUS_VARIANT_MAP[campaign.status]}
-                withDot={campaign.status === "active"}
-              >
-                {STATUS_LABEL[campaign.status]}
-              </StatusChip>
-              {campaign.medium_label && (
-                <StatusChip variant="neutral">{campaign.medium_label}</StatusChip>
-              )}
-              {campaign.region && (
-                <StatusChip variant="neutral">{campaign.region}</StatusChip>
-              )}
-              {campaign.year && (
-                <StatusChip variant="neutral">{campaign.year}</StatusChip>
-              )}
-              {campaign.version && (
-                <StatusChip variant="neutral">{campaign.version}</StatusChip>
-              )}
-              <StatusChip variant={source === "supabase" ? "active" : "warning"}>
-                {source === "supabase" ? "Supabase" : "Static-Fallback"}
-              </StatusChip>
-            </div>
-              <div className="flex flex-none items-center gap-2">
-                <GlassButton type="button" size="sm" variant="solid" onClick={onEdit} disabled={!canEdit}>
-                  Bearbeiten
-                </GlassButton>
-                <GlassButton type="button" size="sm" variant="subtle" onClick={onDuplicate} disabled={!canEdit}>
-                  Duplizieren
-                </GlassButton>
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusChip
+                  variant={STATUS_VARIANT_MAP[campaign.status]}
+                  withDot={campaign.status === "active"}
+                >
+                  {STATUS_LABEL[campaign.status]}
+                </StatusChip>
+                {campaign.medium_label && (
+                  <StatusChip variant="neutral">{campaign.medium_label}</StatusChip>
+                )}
+                {(campaign.region || campaign.city) && (
+                  <StatusChip variant="neutral">
+                    {[campaign.region, campaign.city].filter(Boolean).join(" · ")}
+                  </StatusChip>
+                )}
+                {campaign.year && <StatusChip variant="neutral">{campaign.year}</StatusChip>}
+                {campaign.version && <StatusChip variant="neutral">{campaign.version}</StatusChip>}
               </div>
             </div>
 
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground/55">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] brand-text-soft">
                 Print-Asset-Kit
               </p>
               <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
@@ -109,6 +117,24 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
               </p>
             </div>
 
+            {/* Primäre Aktionen */}
+            <div className="flex flex-wrap items-center gap-2">
+              <DashButton variant="primary" size="sm" onClick={onEdit} disabled={!canEdit}>
+                Bearbeiten
+              </DashButton>
+              <DashButton variant="secondary" size="sm" onClick={onDuplicate} disabled={!canEdit}>
+                Duplizieren
+              </DashButton>
+              {archiveAction && campaign.id && (
+                <ArchiveButton
+                  action={archiveAction}
+                  id={campaign.id}
+                  disabled={!canEdit || campaign.status === "archived"}
+                />
+              )}
+            </div>
+
+            {/* Utility: kopieren + QR + Plausible */}
             <div className="flex flex-wrap items-center gap-2">
               <CopyButton
                 variant="tonal"
@@ -120,7 +146,7 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
               <CopyButton
                 variant="glass"
                 value={destinationUrl}
-                label="UTM-Ziel"
+                label="Ziel-URL"
                 ariaLabel="UTM-Ziel-URL kopieren"
               />
               <CopyButton
@@ -130,18 +156,20 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
                 ariaLabel="Plausible-Suchwerte kopieren"
               />
               <a
-                href={qrSvgUrl}
+                href={withStyle(qrSvgUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={assetLinkClassName}
+                title={`QR-SVG (${preset.name}) – druckfähig`}
+                className={dashButtonClasses("utility", "sm")}
               >
                 <ExternalIcon /> QR-SVG
               </a>
               <a
-                href={qrPngUrl}
+                href={withStyle(qrPngUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={assetLinkClassName}
+                title="QR-PNG – Standard (schwarz/weiß), für schnelle Vorschau"
+                className={dashButtonClasses("utility", "sm")}
               >
                 <ExternalIcon /> QR-PNG
               </a>
@@ -150,7 +178,7 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`Plausible: utm_campaign = ${campaign.utm_campaign}`}
-                className={assetLinkClassName}
+                className={dashButtonClasses("ghost", "sm")}
               >
                 <ExternalIcon /> Plausible
               </a>
@@ -162,13 +190,18 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
               <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(closest-side,rgba(255,255,255,0.85),rgba(255,255,255,0))]" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={qrSvgUrl}
-                alt={`QR-Code für ${campaign.internalName}`}
+                key={qrStyle}
+                src={withStyle(qrSvgUrl)}
+                alt={`QR-Code (${preset.name}) für ${campaign.internalName}`}
                 className="relative block aspect-square w-full"
                 width={288}
                 height={288}
               />
             </div>
+
+            <QrStyleSelector value={qrStyle} onChange={setQrStyle} />
+            <QrSafetyHints preset={preset} />
+
             <p className="text-center font-mono text-[11px] text-foreground/55">
               Codiert: <span className="break-all text-foreground/70">{shortLink}</span>
             </p>
@@ -195,7 +228,7 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
           />
           <LinkRow
             title="Ziel-URL (nach Redirect)"
-            description="Landing mit UTM-Parametern – Auswertung in Plausible."
+            description="Landing-Page inkl. UTM-Parameter."
             value={destinationUrl}
           />
         </div>
@@ -212,30 +245,144 @@ export function CampaignDetail({ vm, onEdit, onDuplicate, canEdit = false }: Cam
         </section>
       )}
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <GlassCard
-          label="Druck"
-          title="Druck-Checkliste"
-          description="Fortschritt wird nur lokal im Browser gespeichert."
-        >
-          <PrintChecklist campaignSlug={campaign.slug} />
-        </GlassCard>
-
-        <GlassCard
-          label="Test"
-          title="Test-Checkliste"
-          description="Vor Verteilung: Redirect, UTMs und Plausible-Goals prüfen."
-        >
-          <TestChecklist campaignSlug={campaign.slug} />
-        </GlassCard>
-      </div>
-
       {campaign.notes && (
         <GlassCard label="Interne Notiz" emphasis="subtle">
           <p className="text-sm leading-relaxed text-foreground/75">{campaign.notes}</p>
         </GlassCard>
       )}
     </div>
+  );
+}
+
+function ArchiveButton({
+  action,
+  id,
+  disabled,
+}: {
+  action: CampaignFormAction;
+  id: string;
+  disabled: boolean;
+}) {
+  const [state, formAction, isPending] = React.useActionState(action, {
+    ok: false,
+    message: "",
+  });
+  const formRef = React.useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (state.message && !state.ok) {
+      // eslint-disable-next-line no-console
+      console.warn("Archivieren fehlgeschlagen:", state.message);
+    }
+  }, [state]);
+
+  return (
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={(e) => {
+        if (!window.confirm("Kampagne archivieren? Sie leitet danach nicht mehr weiter.")) {
+          e.preventDefault();
+        }
+      }}
+    >
+      <input type="hidden" name="id" value={id} />
+      <DashButton type="submit" variant="danger" size="sm" disabled={disabled || isPending}>
+        {isPending ? "Archiviert…" : "Archivieren"}
+      </DashButton>
+    </form>
+  );
+}
+
+function QrStyleSelector({
+  value,
+  onChange,
+}: {
+  value: QrStyleId;
+  onChange: (value: QrStyleId) => void;
+}) {
+  const active = QR_STYLE_PRESETS[value];
+  return (
+    <div>
+      <div role="radiogroup" aria-label="QR-Stil" className="flex flex-col gap-1.5">
+        {QR_STYLE_ORDER.map((id) => {
+          const p = QR_STYLE_PRESETS[id];
+          const isActive = id === value;
+          return (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={isActive}
+              onClick={() => onChange(id)}
+              className={
+                "group flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left " +
+                "transition-[background-color,border-color,box-shadow] duration-200 " +
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--brand-glow)/0.5)] " +
+                (isActive
+                  ? "border-[hsl(var(--brand)/0.5)] bg-[hsl(var(--brand)/0.12)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.16)]"
+                  : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]")
+              }
+            >
+              <span
+                className={
+                  "text-xs font-medium " +
+                  (isActive ? "text-foreground" : "text-foreground/75")
+                }
+              >
+                {p.name}
+              </span>
+              <span
+                aria-hidden="true"
+                className={
+                  "h-2 w-2 flex-none rounded-full " +
+                  (isActive ? "bg-[hsl(var(--brand))]" : "bg-white/15")
+                }
+              />
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-2 px-1 text-[11px] leading-snug text-foreground/55">{active.tagline}</p>
+    </div>
+  );
+}
+
+function QrSafetyHints({
+  preset,
+}: {
+  preset: (typeof QR_STYLE_PRESETS)[QrStyleId];
+}) {
+  const scanLabel = preset.safety.scan === "high" ? "Hoch" : "Mittel";
+  const rows: Array<{ label: string; value: string; strong?: boolean }> = [
+    { label: "Scan-Sicherheit", value: scanLabel, strong: true },
+    { label: "Empfohlen für", value: preset.safety.recommendedFor },
+    { label: "Error Correction", value: preset.errorCorrection },
+    { label: "Quiet Zone", value: "OK" },
+    { label: "Logo", value: preset.safety.logoLabel },
+  ];
+  return (
+    <dl className="grid grid-cols-1 gap-1 rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2.5">
+      {rows.map((r) => (
+        <div key={r.label} className="flex items-center justify-between gap-2">
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/45">
+            {r.label}
+          </dt>
+          <dd
+            className={
+              "text-[11px] " +
+              (r.strong
+                ? preset.safety.scan === "high"
+                  ? "font-semibold text-emerald-300"
+                  : "font-semibold text-amber-300"
+                : "text-foreground/80")
+            }
+          >
+            {r.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -331,9 +478,6 @@ function IssueRow({ issue }: { issue: CampaignIssue }) {
     </li>
   );
 }
-
-const assetLinkClassName =
-  "inline-flex h-8 select-none items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 text-xs font-medium text-foreground/85 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/[0.12]";
 
 function LinkIcon() {
   return (

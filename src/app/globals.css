@@ -308,6 +308,152 @@
       0 6px 22px -12px hsl(var(--brand-glow) / 0.75);
   }
 
+  /* ─── Dashboard Button-System (Liquid Amber Glass) ──────────────────────
+     Nur im internen Dashboard genutzt. Bewusst getrennt von <GlassButton>,
+     damit die öffentliche Website unangetastet bleibt.
+
+     Zustände: default (ruhiges Glas) · hover (warme Amber-Lichtkante) ·
+     pressed (innerer Glow + Depth) · selected · focus-visible · disabled. */
+  .dash-btn {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    transition:
+      transform 0.18s cubic-bezier(.22,.61,.36,1),
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  /* Warme Amber-Lichtkante (Hover) – radial von oben. */
+  .dash-btn::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    background: radial-gradient(
+      75% 130% at 50% -15%,
+      hsl(var(--brand-glow) / 0.5),
+      transparent 70%
+    );
+  }
+  .dash-btn:hover::before { opacity: 1; }
+  /* Feine helle Oberkante (Glas-Spitzlicht). */
+  .dash-btn::after {
+    content: "";
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    top: 0;
+    height: 1px;
+    border-radius: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.35), transparent);
+  }
+  .dash-btn:active {
+    transform: translateY(1px) scale(0.985);
+    box-shadow: inset 0 0 18px -4px hsl(var(--brand-glow) / 0.55);
+  }
+  .dash-btn:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--brand-glow) / 0.65);
+  }
+  .dash-btn:disabled,
+  .dash-btn[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .dash-btn:disabled::before,
+  .dash-btn[aria-disabled="true"]::before { opacity: 0; }
+
+  /* Größen – touchfreundliche Mindesthöhen. */
+  .dash-btn--xs { height: 2rem;    padding: 0 0.75rem; font-size: 0.75rem; }
+  .dash-btn--sm { height: 2.25rem; padding: 0 1rem;    font-size: 0.8125rem; }
+  .dash-btn--md { height: 2.75rem; padding: 0 1.35rem; font-size: 0.875rem; }
+
+  /* Primary – Brand Amber Glass (stärkster Button). */
+  .dash-btn--primary {
+    background: hsl(var(--brand) / 0.20);
+    border-color: hsl(var(--brand) / 0.55);
+    color: hsl(0 0% 100%);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.22),
+      0 10px 30px -16px hsl(var(--brand-glow) / 0.9);
+  }
+  .dash-btn--primary:hover {
+    background: hsl(var(--brand) / 0.28);
+    border-color: hsl(var(--brand) / 0.7);
+  }
+
+  /* Secondary / Utility – neutrales Glas mit warmem Hover. */
+  .dash-btn--secondary,
+  .dash-btn--utility {
+    background: hsl(0 0% 100% / 0.06);
+    border-color: hsl(0 0% 100% / 0.12);
+    color: hsl(var(--foreground) / 0.9);
+  }
+  .dash-btn--secondary:hover,
+  .dash-btn--utility:hover {
+    background: hsl(0 0% 100% / 0.1);
+    border-color: hsl(var(--brand) / 0.45);
+    color: hsl(var(--foreground));
+  }
+
+  /* Ghost – flächenlos, nur Hover-Tönung. */
+  .dash-btn--ghost {
+    background: transparent;
+    border-color: transparent;
+    color: hsl(var(--foreground) / 0.78);
+  }
+  .dash-btn--ghost::after { display: none; }
+  .dash-btn--ghost:hover {
+    background: hsl(0 0% 100% / 0.06);
+    border-color: hsl(0 0% 100% / 0.1);
+    color: hsl(var(--foreground));
+  }
+
+  /* Destructive / Archive – gedämpft, nicht aggressiv. */
+  .dash-btn--danger {
+    background: hsl(2 70% 58% / 0.1);
+    border-color: hsl(2 70% 58% / 0.3);
+    color: hsl(6 90% 90%);
+  }
+  .dash-btn--danger:hover {
+    background: hsl(2 72% 60% / 0.16);
+    border-color: hsl(2 78% 64% / 0.45);
+  }
+  .dash-btn--danger::before {
+    background: radial-gradient(
+      75% 130% at 50% -15%,
+      hsl(2 80% 60% / 0.4),
+      transparent 70%
+    );
+  }
+
+  /* Selected-Zustand (z. B. aktive Toggle-Buttons). */
+  .dash-btn--selected {
+    background: hsl(var(--brand) / 0.16);
+    border-color: hsl(var(--brand) / 0.5);
+    color: hsl(0 0% 100%);
+  }
+
   /* Reduced Motion: alle dekorativen Animationen ruhigstellen. */
   @media (prefers-reduced-motion: reduce) {
     .animate-panel-in,
@@ -320,6 +466,11 @@
     .chroma-stage::after {
       animation: none !important;
     }
+    .dash-btn,
+    .dash-btn::before {
+      transition: none !important;
+    }
+    .dash-btn:active { transform: none; }
     * {
       scroll-behavior: auto !important;
     }

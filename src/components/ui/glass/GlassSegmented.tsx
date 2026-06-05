@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useId, useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
 export type SegmentedTone = "default" | "live" | "draft" | "pause" | "archiv";
 
@@ -11,18 +12,26 @@ export type SegmentedOption<T extends string> = {
   tone?: SegmentedTone;
 };
 
-/* Aktive Segment-Tönung: nur als Licht/Border/Tint, Text bleibt hell. */
-const ACTIVE_TONE: Record<SegmentedTone, string> = {
+/* Aktive Segment-Fläche (Hintergrund + Schatten) – Text bleibt hell. */
+const ACTIVE_BG: Record<SegmentedTone, string> = {
   default:
-    "bg-white/[0.14] text-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_6px_18px_-10px_rgba(0,0,0,0.6)]",
+    "bg-white/[0.14] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_6px_18px_-10px_rgba(0,0,0,0.6)]",
   live:
-    "bg-emerald-400/[0.16] text-emerald-50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_6px_18px_-10px_hsl(155_80%_50%/0.6)]",
+    "bg-emerald-400/[0.18] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_6px_18px_-10px_hsl(155_80%_50%/0.6)]",
   draft:
-    "bg-white/[0.12] text-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_6px_18px_-10px_rgba(0,0,0,0.6)]",
+    "bg-white/[0.12] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_6px_18px_-10px_rgba(0,0,0,0.6)]",
   pause:
-    "bg-amber-400/[0.16] text-amber-50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_6px_18px_-10px_hsl(38_92%_55%/0.6)]",
+    "bg-amber-400/[0.18] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_6px_18px_-10px_hsl(38_92%_55%/0.6)]",
   archiv:
-    "bg-violet-400/[0.14] text-violet-50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.16),0_6px_18px_-10px_hsl(265_60%_60%/0.5)]",
+    "bg-[hsl(var(--brand)/0.18)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.16),0_6px_18px_-10px_hsl(var(--brand-glow)/0.6)]",
+};
+
+const ACTIVE_TEXT: Record<SegmentedTone, string> = {
+  default: "text-foreground",
+  live: "text-emerald-50",
+  draft: "text-foreground",
+  pause: "text-amber-50",
+  archiv: "text-foreground",
 };
 
 type GlassSegmentedProps<T extends string> = {
@@ -37,8 +46,9 @@ type GlassSegmentedProps<T extends string> = {
  * iPadOS-inspiriertes Segmented Control auf Liquid-Glass-Basis.
  *
  * - role="radiogroup", Pfeiltasten navigieren, Home/End springen
- * - aktive Auswahl mit heller Glas-Pille + subtilem Chroma-Schimmer
- * - touchfreundliche Höhe, hoher Kontrast auf dunklem Grund
+ * - aktive Auswahl als animierte Glas-Kapsel (framer-motion `layoutId`),
+ *   die beim Wechsel weich zur neuen Option gleitet (~200ms)
+ * - `prefers-reduced-motion` deaktiviert die Layout-Animation
  */
 export function GlassSegmented<T extends string>({
   options,
@@ -48,6 +58,8 @@ export function GlassSegmented<T extends string>({
   className = "",
 }: GlassSegmentedProps<T>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const reduceMotion = useReducedMotion();
+  const layoutId = useId();
 
   const move = (delta: number) => {
     const idx = options.findIndex((o) => o.value === value);
@@ -86,6 +98,7 @@ export function GlassSegmented<T extends string>({
     >
       {options.map((option, i) => {
         const isActive = option.value === value;
+        const tone = option.tone ?? "default";
         return (
           <button
             key={option.value}
@@ -99,21 +112,25 @@ export function GlassSegmented<T extends string>({
             onClick={() => onChange(option.value)}
             className={
               "group relative inline-flex h-9 flex-1 select-none items-center justify-center " +
-              "overflow-hidden rounded-full px-3 text-xs font-medium tracking-tight " +
-              "transition-[color,background-color,box-shadow] duration-200 ease-out " +
+              "rounded-full px-3 text-xs font-medium tracking-tight " +
+              "transition-colors duration-200 ease-out " +
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 " +
-              (isActive
-                ? ACTIVE_TONE[option.tone ?? "default"]
-                : "text-foreground/60 hover:text-foreground/90")
+              (isActive ? ACTIVE_TEXT[tone] : "text-foreground/60 hover:text-foreground/90")
             }
           >
             {isActive && (
-              <span
+              <motion.span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"
-              />
+                layoutId={reduceMotion ? undefined : `${layoutId}-active`}
+                transition={{ type: "spring", stiffness: 520, damping: 40, mass: 0.7 }}
+                className={
+                  "pointer-events-none absolute inset-0 rounded-full " + ACTIVE_BG[tone]
+                }
+              >
+                <span className="pointer-events-none absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+              </motion.span>
             )}
-            <span className="relative">{option.label}</span>
+            <span className="relative z-10">{option.label}</span>
           </button>
         );
       })}

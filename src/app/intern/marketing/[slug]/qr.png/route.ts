@@ -8,17 +8,27 @@ import {
   getMarketingCampaignBySlug as getDbCampaignBySlug,
   isSupabaseServerConfigured,
 } from "@/lib/marketing-campaigns-db";
+import { QR_STYLE_PRESETS, resolveQrStyle } from "@/lib/qr/qr-styles";
 
 /**
- * GET /intern/marketing/[slug]/qr.png
+ * GET /intern/marketing/[slug]/qr.png?style=...
  *
- * Raster-QR für schnelle Vorschau/Download (SVG bleibt druckfähig).
+ * Raster-QR für schnelle Vorschau/Download.
+ *
+ * Bewusst **immer Standard** (schwarz auf weiß, eckige Module): Das
+ * `qrcode`-Paket rendert PNG nur klassisch, und eine Rasterisierung des
+ * gebrandeten SVG würde eine zusätzliche Dependency erfordern. Branding läuft
+ * deshalb ausschließlich über das druckwichtige SVG. Der `style`-Parameter
+ * steuert hier nur Error-Correction & Quiet Zone, damit die Datendichte zum
+ * SVG passt. Im UI ist die PNG-Aktion klar als „Standard" markiert.
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse> {
   const { slug } = await context.params;
+  const style = resolveQrStyle(request.nextUrl.searchParams.get("style"));
+  const preset = QR_STYLE_PRESETS[style];
   const campaign = isSupabaseServerConfigured()
     ? await loadDbCampaign(slug)
     : getCampaignBySlug(slug);
@@ -37,8 +47,8 @@ export async function GET(
   try {
     png = await QRCode.toBuffer(shortLink, {
       type: "png",
-      errorCorrectionLevel: "H",
-      margin: 2,
+      errorCorrectionLevel: preset.errorCorrection,
+      margin: preset.margin,
       width: 512,
       color: {
         dark: "#000000",
@@ -59,7 +69,7 @@ export async function GET(
       "Content-Type": "image/png",
       "Cache-Control": "private, no-store, max-age=0",
       "X-Robots-Tag": "noindex, nofollow",
-      "Content-Disposition": `inline; filename="qr-${slug}.png"`,
+      "Content-Disposition": `inline; filename="qr-${slug}-standard.png"`,
     },
   });
 }

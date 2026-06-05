@@ -17,13 +17,14 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 - `src/lib/auth/` – PIN-Session (HMAC-signiertes Cookie, Web-Crypto, Edge-kompatibel) + Rate-Limit.
 - `src/lib/marketing-campaigns.ts` – Kampagnen-Typen, URL-Builder, Validierung; statischer Notfall-Fallback.
 - `src/lib/marketing-campaigns-db.ts` – Supabase CRUD (Service Role, server-only).
+- `src/lib/qr/` – QR-Branding: `qr-styles.ts` (scan-sichere Presets clean-print/smairys-brand/premium-poster) + `render-qr-svg.ts` (eigener SVG-Renderer auf `qrcode`-Matrix, keine neue Dependency). PNG bleibt Standard.
 - `src/lib/supabase/server.ts` – serverseitiger Supabase-Client (niemals im Browser).
 - `src/lib/analytics.ts` – typisierter Plausible-Helper.
 - `src/lib/analytics-config.ts` – Liste der von Plausible auszuschließenden Pfade.
 - `src/lib/attribution/attribution.ts` – First-Touch (localStorage) + Last-Touch (sessionStorage).
 - `src/components/ui/glass/` – wiederverwendbare Liquid-Glass-Primitive (`GlassPanel`, `GlassButton`, `GlassCard`, `StatusChip`, `Toolbar`, `ToolbarBrand`, `PinDots`, `PinKeypad`).
 - `src/components/ui/CopyButton.tsx` – Clipboard-Helper für Dashboard & intern.
-- `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`SystemStatusDialog`, `PrintChecklist`, `TestChecklist`).
+- `src/components/intern/` – nur fürs interne Dashboard genutzte Komponenten (`SystemStatusDialog`, `BrandMark`, `DashButton`). `DashButton` = zentrales Dashboard-Button-System (Liquid Amber Glass, Klassen in `globals.css` unter `.dash-btn`), getrennt von `GlassButton` (öffentliche Website).
 - `src/components/ui/glass/` zusätzlich: `GlassSheet` (Dialog/Sheet), `GlassSegmented`, `GlassListbox`, `ChipGroup` – ersetzen native Selects im Dashboard.
 - `src/components/layout/ConditionalFooter.tsx` – versteckt den Marketing-Footer auf `/intern/*` und `/kundenlogin`, wiederverwendet `analytics-config`-Liste.
 - `src/app/intern/marketing/_components/` – Master-Detail-Shell des Dashboards (`MarketingDashboard`, `CampaignList`, `CampaignDetail`). Private Folder → nie als Route.

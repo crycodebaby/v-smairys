@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import QRCode from "qrcode";
 import {
   buildCampaignShortLink,
   getCampaignBySlug,
@@ -8,9 +7,11 @@ import {
   getMarketingCampaignBySlug as getDbCampaignBySlug,
   isSupabaseServerConfigured,
 } from "@/lib/marketing-campaigns-db";
+import { renderBrandedQrSvg } from "@/lib/qr/render-qr-svg";
+import { resolveQrStyle } from "@/lib/qr/qr-styles";
 
 /**
- * GET /intern/marketing/[slug]/qr.svg
+ * GET /intern/marketing/[slug]/qr.svg?style=clean-print|smairys-brand|premium-poster
  *
  * Druckfähiger QR-Code als reines SVG.
  *
@@ -18,18 +19,18 @@ import {
  *  - Codiert wird **immer** die kurze /go/[slug]-URL, nicht die UTM-URL.
  *    Begründung: der QR-Code muss redirect-fähig bleiben, damit UTMs noch
  *    nachträglich änderbar sind.
- *  - Höchster lesbarer Kontrast: schwarze Module auf weißem Hintergrund.
- *  - Kein Logo, kein Branding-Overlay – jedes Overlay reduziert die
- *    Fehlertoleranz und ist druckseitig kritisch.
- *  - Hohe Fehlerkorrektur (Level H = 30 %) → robust gegen Druckartefakte
- *    und kleine Beschädigungen.
- *  - SVG ist vektoriell, druckbar in beliebiger Auflösung.
+ *  - Höchster lesbarer Kontrast: dunkle Module auf weißem Hintergrund.
+ *  - Branding nur über scan-sichere Style-Presets (eckig/abgerundet/Dots),
+ *    Finder-Pattern bleiben immer klar erkennbar, Quiet Zone bleibt erhalten.
+ *  - Hohe Fehlerkorrektur (Level H, clean-print Q) → robust gegen
+ *    Druckartefakte. SVG ist vektoriell, druckbar in beliebiger Auflösung.
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse> {
   const { slug } = await context.params;
+  const style = resolveQrStyle(request.nextUrl.searchParams.get("style"));
   const campaign = isSupabaseServerConfigured()
     ? await loadDbCampaign(slug)
     : getCampaignBySlug(slug);
@@ -48,18 +49,11 @@ export async function GET(
 
   let svg: string;
   try {
-    svg = await QRCode.toString(shortLink, {
-      type: "svg",
-      errorCorrectionLevel: "H",
-      margin: 2,
-      color: {
-        dark: "#000000",
-        light: "#FFFFFF",
-      },
-    });
+    svg = renderBrandedQrSvg(shortLink, style);
   } catch (error) {
     console.error("[marketing-qr] Fehler beim QR-Code-Rendering", {
       slug,
+      style,
       error,
     });
     return new NextResponse("Internal Error", {
@@ -78,7 +72,7 @@ export async function GET(
       "Cache-Control": "private, no-store, max-age=0",
       "X-Robots-Tag": "noindex, nofollow",
       // Hinweis für Browser, dass das SVG ggf. zum Download gedacht ist.
-      "Content-Disposition": `inline; filename="qr-${slug}.svg"`,
+      "Content-Disposition": `inline; filename="qr-${slug}-${style}.svg"`,
     },
   });
 }

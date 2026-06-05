@@ -2,7 +2,7 @@
 
 import React, { useEffect, useId, useMemo, useState } from "react";
 import { GlassSheet } from "@/components/ui/glass/GlassSheet";
-import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { DashButton } from "@/components/intern/DashButton";
 import { GlassSegmented, type SegmentedOption } from "@/components/ui/glass/GlassSegmented";
 import { GlassListbox, type ListboxOption } from "@/components/ui/glass/GlassListbox";
 import { ChipGroup } from "@/components/ui/glass/ChipGroup";
@@ -256,24 +256,31 @@ export function CampaignBuilder({
       description={copy.description}
       footer={
         <>
-          <GlassButton type="button" variant="ghost" size="sm" onClick={onClose}>
+          <DashButton type="button" variant="ghost" size="sm" onClick={onClose}>
             Abbrechen
-          </GlassButton>
-          <GlassButton
+          </DashButton>
+          <DashButton
             type="submit"
             form={formId}
-            variant="accent"
+            variant="primary"
             size="sm"
             disabled={disabled || isPending}
           >
             {isPending ? "Speichert…" : copy.submit}
-          </GlassButton>
+          </DashButton>
         </>
       }
     >
       {disabled && disabledReason && (
         <p className="mb-5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-xs leading-relaxed text-amber-100">
           {disabledReason}
+        </p>
+      )}
+
+      {isDuplicate && (
+        <p className="mb-5 rounded-xl border border-[hsl(var(--brand)/0.35)] bg-[hsl(var(--brand)/0.1)] px-4 py-3 text-xs leading-relaxed text-foreground/85">
+          Erstellt eine <strong className="font-semibold">neue</strong> Kampagne – das Original
+          bleibt unverändert. Slug und UTM-Werte wurden für die neue Version automatisch angepasst.
         </p>
       )}
 
@@ -473,9 +480,9 @@ export function CampaignBuilder({
               <AdvancedField label="Medium-Label" value={effMediumLabel} onChange={(v) => setOv("medium_label", v)} />
               <AdvancedField label="Region" value={effRegion} onChange={(v) => setOv("region", v)} />
               <div className="sm:col-span-2">
-                <GlassButton type="button" variant="ghost" size="sm" onClick={resetOverrides}>
+                <DashButton type="button" variant="ghost" size="sm" onClick={resetOverrides}>
                   Aus Presets neu ableiten
-                </GlassButton>
+                </DashButton>
               </div>
             </div>
           )}
@@ -509,15 +516,14 @@ export function CampaignBuilder({
                 Archivierte Kampagnen leiten über <code className="font-mono">/go</code> nicht mehr weiter.
               </p>
             </div>
-            <GlassButton
+            <DashButton
               type="submit"
               size="sm"
-              variant="subtle"
-              className="border-rose-400/30 bg-rose-400/10 text-rose-100 hover:border-rose-300/50 hover:bg-rose-400/15"
+              variant="danger"
               disabled={disabled || isArchiving || campaign.status === "archived"}
             >
               {isArchiving ? "Archiviert…" : "Archivieren"}
-            </GlassButton>
+            </DashButton>
           </div>
           {archiveState.message && !archiveState.ok && (
             <p className="mt-2 text-xs text-rose-200">{archiveState.message}</p>
