@@ -10,5 +10,5 @@ export default function InternLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={internFontClass}>{children}</div>;
+  return <div className={`${internFontClass} intern-scrollbar`}>{children}</div>;
 }

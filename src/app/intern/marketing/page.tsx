@@ -16,8 +16,10 @@ import { logoutIntern } from "@/app/kundenlogin/actions";
 import { isInternAuthConfigured } from "@/lib/auth/intern-session";
 import { MarketingDashboard } from "./_components/MarketingDashboard";
 import type { CampaignDetail } from "./_components/types";
+import { listCampaignBuilderPresets } from "@/lib/campaign-builder-presets-db";
 import {
   archiveCampaignAction,
+  createBuilderPresetAction,
   createCampaignAction,
   updateCampaignAction,
 } from "./actions";
@@ -46,6 +48,7 @@ export default async function InternMarketingPage() {
   const origin = getSiteOrigin();
   const supabaseConfigured = isSupabaseServerConfigured();
   const loadResult = await loadCampaigns(supabaseConfigured);
+  const presets = await loadBuilderPresets(supabaseConfigured);
 
   const plausibleHost =
     process.env.NEXT_PUBLIC_PLAUSIBLE_API_HOST || "https://plausible.io";
@@ -102,6 +105,7 @@ export default async function InternMarketingPage() {
   return (
     <MarketingDashboard
       campaigns={campaigns}
+      presets={presets}
       env={env}
       deploy={deploy}
       totals={{
@@ -113,6 +117,7 @@ export default async function InternMarketingPage() {
       createAction={createCampaignAction}
       updateAction={updateCampaignAction}
       archiveAction={archiveCampaignAction}
+      createPresetAction={createBuilderPresetAction}
       dbState={{
         configured: supabaseConfigured,
         source: loadResult.source,
@@ -132,6 +137,15 @@ type LoadCampaignsResult = {
   source: "supabase" | "static";
   error?: string;
 };
+
+async function loadBuilderPresets(supabaseConfigured: boolean) {
+  if (!supabaseConfigured) return [];
+  try {
+    return await listCampaignBuilderPresets();
+  } catch {
+    return [];
+  }
+}
 
 async function loadCampaigns(
   supabaseConfigured: boolean

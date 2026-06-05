@@ -53,14 +53,14 @@ const VARIANT_STYLES: Record<
     dot: "bg-amber-300",
   },
   archived: {
-    wrap: "border-violet-400/25 bg-violet-400/[0.08]",
-    text: "text-violet-100/90",
-    dot: "bg-violet-300",
+    wrap: "border-white/12 bg-white/[0.05]",
+    text: "text-foreground/60",
+    dot: "bg-white/45",
   },
   info: {
-    wrap: "border-sky-400/30 bg-sky-400/10",
-    text: "text-sky-100",
-    dot: "bg-sky-300",
+    wrap: "border-[hsl(var(--brand)/0.35)] bg-[hsl(var(--brand)/0.1)]",
+    text: "text-[hsl(28_90%_82%)]",
+    dot: "bg-[hsl(var(--brand))]",
   },
   warning: {
     wrap: "border-amber-400/40 bg-amber-400/10",

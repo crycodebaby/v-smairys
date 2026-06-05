@@ -27,7 +27,7 @@ Analytics-System und zeigt **keine** Besucherzahlen.
 2. Status: `draft`, `active`, `paused`, `archived`
 3. Shortlink `/go/<slug>`, UTM-Ziel-URL, QR-SVG (gebrandet), QR-PNG (Standard)
 4. Copy: Shortlink, UTM-Ziel, Plausible-Suchwerte (Text, keine API)
-5. QR-Style-Auswahl pro Kampagne (Clean Print / Smairys Brand / Premium Poster)
+5. QR-Style-Auswahl pro Kampagne im QR-Sheet (6 sichere Presets)
 6. Einfache Suche: Name, Slug, Region, Stadt
 7. Zielseite aus vordefinierten öffentlichen Pfaden wählen
 
@@ -111,9 +111,12 @@ Presets (`src/lib/qr/qr-styles.ts`):
 | `clean-print` (Clean Print) | eckig, schwarz/weiß | Q | **Visitenkarte** | Hoch |
 | `smairys-brand` (Smairys Brand) | abgerundet, warmes Near-Black, dunkler Amber-Finder | H | Flyer | Hoch |
 | `premium-poster` (Premium Poster) | runde Dots, gestylte Ecken, mehr Quiet Zone | H | Poster | Mittel |
+| `rounded-classic` (Rounded Classic) | abgerundet, schwarz, runde Finder | H | Flyer | Hoch |
+| `dense-safe` (Dense Safe) | eckig, schwarz, extra Quiet Zone | H | Visitenkarte | Hoch |
+| `soft-amber` (Soft Amber) | abgerundet, Near-Black + Amber-Finder | H | Flyer | Hoch |
 
-- **Empfehlung Visitenkarte:** `clean-print` (maximale Scanbarkeit, weniger
-  Module → größere Module auf kleiner Fläche).
+- **Empfehlung Visitenkarte:** `clean-print` oder `dense-safe` (maximale
+  Scanbarkeit, robuste Quiet Zone auf kleiner Fläche).
 - **SVG ist für Druck zu bevorzugen** (vektoriell, beliebige Auflösung). Das
   gebrandete Styling läuft ausschließlich über das SVG.
 - **PNG bleibt Standard** (schwarz/weiß, eckig): `qrcode` rendert PNG nur
@@ -128,6 +131,18 @@ Technik:
   SVG-Renderer in `src/lib/qr/render-qr-svg.ts` (keine neue Dependency).
 - Routen: `/intern/marketing/<slug>/qr.svg?style=<preset>` und `…/qr.png?style=<preset>`
   (PNG nutzt `style` nur für Error-Correction/Quiet-Zone, bleibt optisch Standard).
+- QR-Vorschau + Style-Auswahl + Export liegen im **QR-Sheet** (`QrSheet`,
+  über „QR anzeigen" im Asset-Kit), nicht mehr dauerhaft im Hauptlayout.
+
+### Warum keine `qr-code-styling`-Library?
+
+Geprüft, aber **nicht** eingebaut. `qr-code-styling` ist eine DOM-/Browser-Lib:
+serverseitiges SVG braucht `jsdom`, PNG braucht zusätzlich natives `canvas`
+(cairo/pango). Unsere QR-Routen rendern serverseitig (Node-Runtime auf Vercel),
+wo native Canvas-Deps unzuverlässig/aufwändig sind. Der eigene Renderer liefert
+ohne jegliche Runtime-DOM-Abhängigkeit sauberes, scan-sicheres SVG. Daher:
+**keine neue Dependency**, stattdessen den bestehenden Renderer auf 6 Presets
+erweitert. Standard-Schwarz/Weiß (`clean-print`) bleibt als Fallback.
 
 > **Vor Druck immer testen:** jeden finalen QR-Code mit **iPhone (Kamera)** und
 > **Android** scannen, bevor er in den Druck geht.
@@ -141,14 +156,42 @@ Technik:
 
 Details: `docs/analytics/plausible-setup.md`, `docs/analytics/plausible-goals.md`
 
+## Builder-Presets (Supabase)
+
+Tabelle `campaign_builder_presets` speichert die dynamischen Chips für
+Medium, Region, Thema und Version. **Keine hard-coded Preset-Listen** mehr
+als Hauptquelle im Code (`builder-presets.ts` enthält nur Ableitungslogik).
+
+- Kategorien: `medium`, `region`, `topic`, `version`
+- Zugriff: server-only via Service Role (`src/lib/campaign-builder-presets-db.ts`)
+- RLS aktiv, keine öffentlichen Policies
+- Presets werden **einmal serverseitig** in `page.tsx` geladen und an den
+  Builder übergeben – nicht bei jedem Tastendruck
+- Neues Wort: Eingabe + `+` → Server Action `createBuilderPresetAction` →
+  Supabase Insert → `revalidatePath` → Chip erscheint sofort im Builder
+- Leere Kategorie: Empty-State „Erstes Wort hinzufügen" (kein Code-Fallback)
+
+Zielseiten im Builder sind bewusst auf drei Optionen begrenzt:
+
+- `/` Startseite
+- `/kontakt` Kontakt
+- `/leistungen/webseiten` Website erstellen
+
+Freie Zielseite nur im Advanced-Bereich (mit serverseitiger Validierung).
+
+Scrollbars: Klasse `.intern-scrollbar` nur auf `/intern/*` (Layout + Sheets),
+nicht auf der öffentlichen Website.
+
 ## Query-Schutz / Performance
 
 - Kampagnen werden **einmal serverseitig** pro Request in `page.tsx`
   (`listMarketingCampaigns`) geladen – kein Client-Fetch, keine `useEffect`-Loops.
+- Builder-Presets werden **ebenfalls einmal** pro Request geladen
+  (`listCampaignBuilderPresets`).
 - Suche und Status-Filter laufen **rein clientseitig** über die bereits
   geladene Liste (`useMemo`), also **keine DB-Abfrage pro Tastendruck**.
 - Server Actions (`actions.ts`) validieren Inputs serverseitig und prüfen die
-  PIN-Session (`requireInternSession`) bei Create/Edit/Archive.
+  PIN-Session (`requireInternSession`) bei Create/Edit/Archive/Preset-Anlage.
 - Slug/`utm_campaign` werden serverseitig per `slugify` normalisiert
   (reparierend statt nur ablehnend).
 - Service Role bleibt server-only (`src/lib/supabase/server.ts`,
@@ -158,13 +201,14 @@ Details: `docs/analytics/plausible-setup.md`, `docs/analytics/plausible-goals.md
 
 ## UI / Builder
 
-- IA: linke Sidebar (Info-Counts + Datenquelle, Neue Kampagne, Suche,
-  Status-Filter, Liste), rechts das Print-Asset-Kit als primärer Arbeitsbereich.
-- Builder ist ein Glass-Sheet (kein Dauerformular im Layout) mit Presets für
-  Medium/Thema/Region/Jahr/Version; Slug + UTM werden automatisch abgeleitet
-  und sind manuell überschreibbar.
+- IA: linke Sidebar (Info-Counts + Datenquelle, touchfreundliche „Neue Kampagne"
+  Action-Bar, Suche, Status-Filter, Liste), rechts das Print-Asset-Kit.
+- Builder ist ein minimalistisches Glass-Sheet: Titel → Status → Zielseite →
+  dynamische Preset-Chips (Supabase) → abgeleitete Werte → Advanced (zu) → Notizen.
+- Archivieren **nicht** im Edit-Sheet – nur als eigene Aktion im Asset-Kit
+  mit Confirm-Dialog.
 - Native Selects ersetzt durch Glass-Komponenten: Status = Segmented Control,
-  Zielseite/UTM-Medium = Glass-Listbox, Presets = Chip-Auswahl.
+  Zielseite = Glass-Listbox (3 feste Optionen), Presets = Chip-Auswahl + Inline-Add.
 - Systemstatus liegt im Glass-Dialog (Button „Systemstatus"); ein dezenter
   Deployment-/Versionshinweis steht im Footer (`VERCEL_ENV`,
   `VERCEL_GIT_COMMIT_REF`, `VERCEL_GIT_COMMIT_SHA`; Fallback `local`).

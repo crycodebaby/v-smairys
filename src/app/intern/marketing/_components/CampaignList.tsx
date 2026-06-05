@@ -3,7 +3,6 @@
 import React, { useId, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { StatusChip, type StatusChipVariant } from "@/components/ui/glass/StatusChip";
-import { DashButton } from "@/components/intern/DashButton";
 import type { CampaignSummary } from "./types";
 
 type StatusFilter = "all" | CampaignSummary["status"];
@@ -15,6 +14,8 @@ type CampaignListProps = {
   onNew?: () => void;
   canCreate?: boolean;
   source: "supabase" | "static";
+  /** Einziger Plausible-Aktionspunkt im Dashboard. */
+  plausibleUrl: string;
 };
 
 const STATUS_VARIANT_MAP: Record<CampaignSummary["status"], StatusChipVariant> = {
@@ -51,6 +52,7 @@ export function CampaignList({
   onNew,
   canCreate = false,
   source,
+  plausibleUrl,
 }: CampaignListProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<StatusFilter>("all");
@@ -107,16 +109,33 @@ export function CampaignList({
         </span>
       </div>
 
-      <DashButton
-        variant="primary"
-        size="sm"
+      {/* Einziger Plausible-Aktionspunkt im Dashboard */}
+      <a
+        href={plausibleUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={
+          "flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 " +
+          "text-[11px] font-medium text-foreground/70 transition-colors duration-200 " +
+          "hover:border-[hsl(var(--brand)/0.4)] hover:bg-white/[0.06] hover:text-foreground " +
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--brand-glow)/0.5)]"
+        }
+      >
+        <span>Auswertung in Plausible</span>
+        <span aria-hidden="true" className="text-foreground/40">↗</span>
+      </a>
+
+      <button
+        type="button"
         onClick={onNew}
         disabled={!canCreate}
-        className="w-full"
-        leadingIcon={<PlusIcon />}
+        className="dash-new-campaign"
       >
-        Neue Kampagne
-      </DashButton>
+        <span className="dash-new-campaign__icon" aria-hidden="true">
+          <PlusIcon />
+        </span>
+        <span className="dash-new-campaign__label">Neue Kampagne</span>
+      </button>
 
       <div className="relative">
         <SearchIcon className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground/45" />
@@ -165,7 +184,7 @@ export function CampaignList({
         })}
       </div>
 
-      <div className="-mx-1 flex flex-1 flex-col gap-1.5 overflow-y-auto px-1">
+      <div className="intern-scrollbar -mx-1 flex flex-1 flex-col gap-1.5 overflow-y-auto px-1">
         {filtered.length === 0 ? (
           <div className="mt-6 rounded-lg border border-dashed border-white/10 px-4 py-6 text-center">
             <p className="text-sm font-medium text-foreground/75">Keine Kampagne gefunden</p>

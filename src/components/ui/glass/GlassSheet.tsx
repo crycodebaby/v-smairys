@@ -63,7 +63,7 @@ export function GlassSheet({
         className={
           "animate-sheet-in relative flex max-h-[92svh] w-full max-w-2xl flex-col overflow-hidden " +
           "rounded-t-3xl border border-white/12 sm:rounded-3xl " +
-          "bg-[hsl(240_18%_9%/0.94)] shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)] backdrop-blur-2xl " +
+          "bg-[hsl(30_12%_7%/0.95)] shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)] backdrop-blur-2xl " +
           "focus:outline-none"
         }
       >
@@ -103,7 +103,7 @@ export function GlassSheet({
           </button>
         </header>
 
-        <div className="relative flex-1 overflow-y-auto px-5 py-5 sm:px-7">{children}</div>
+        <div className="intern-scrollbar relative flex-1 overflow-y-auto px-5 py-5 sm:px-7">{children}</div>
 
         {footer && (
           <footer className="relative flex items-center justify-end gap-3 border-t border-white/10 bg-white/[0.02] px-5 py-4 sm:px-7">

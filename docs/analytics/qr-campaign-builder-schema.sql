@@ -134,3 +134,46 @@ alter table public.marketing_campaigns enable row level security;
 alter table public.qr_redirect_daily_counts enable row level security;
 
 -- Keine öffentlichen Policies: Zugriff nur über serverseitigen Service Role.
+
+-- ─── Builder-Presets (dynamische Chips im Kampagnen-Builder) ───────────────
+
+create table if not exists public.campaign_builder_presets (
+  id uuid primary key default gen_random_uuid(),
+  category text not null,
+  label text not null,
+  value text not null,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+
+  constraint campaign_builder_presets_category_check
+    check (category in ('medium', 'region', 'topic', 'version')),
+  constraint campaign_builder_presets_label_nonempty_check
+    check (char_length(trim(label)) > 0),
+  constraint campaign_builder_presets_value_kebab_check
+    check (value ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
+  constraint campaign_builder_presets_category_value_unique
+    unique (category, value)
+);
+
+alter table public.campaign_builder_presets enable row level security;
+revoke all on public.campaign_builder_presets from anon, authenticated;
+
+create or replace function public.set_campaign_builder_preset_updated_at()
+returns trigger
+language plpgsql
+security invoker
+set search_path = public
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists campaign_builder_presets_updated_at on public.campaign_builder_presets;
+create trigger campaign_builder_presets_updated_at
+  before update on public.campaign_builder_presets
+  for each row
+  execute function public.set_campaign_builder_preset_updated_at();

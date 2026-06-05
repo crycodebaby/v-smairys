@@ -99,8 +99,12 @@ export const MARKETING_CAMPAIGNS = [
 export const CAMPAIGN_DESTINATION_PATHS = [
   { path: "/", label: "Startseite" },
   { path: "/kontakt", label: "Kontakt" },
-  { path: "/website-erstellen", label: "Website-Erstellung" },
+  { path: "/leistungen/webseiten", label: "Website erstellen" },
 ] as const;
+
+export const ALLOWED_CAMPAIGN_DESTINATION_PATHS = CAMPAIGN_DESTINATION_PATHS.map(
+  (e) => e.path
+);
 
 /**
  * Strikt-typisierter Lookup-Slug. Nützlich, wenn intern eine Kampagne

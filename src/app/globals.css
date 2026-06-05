@@ -200,20 +200,21 @@
     inset: -10%;
     z-index: -1;
     pointer-events: none;
-    filter: blur(80px);
-    opacity: 0.55;
+    filter: blur(90px);
+    opacity: 0.4;
   }
+  /* Ruhige, warme Smairys-Amber-Ambiance statt lila/blau-Neon. */
   .chroma-stage::before {
     background:
-      radial-gradient(40% 40% at 20% 30%, hsl(265 85% 55% / 0.45), transparent 70%),
-      radial-gradient(35% 35% at 80% 20%, hsl(195 90% 55% / 0.40), transparent 70%);
-    animation: chroma-drift-a 22s ease-in-out infinite alternate;
+      radial-gradient(40% 40% at 18% 26%, hsl(var(--brand-glow) / 0.30), transparent 70%),
+      radial-gradient(34% 34% at 82% 18%, hsl(28 90% 52% / 0.18), transparent 70%);
+    animation: chroma-drift-a 26s ease-in-out infinite alternate;
   }
   .chroma-stage::after {
     background:
-      radial-gradient(45% 45% at 70% 85%, hsl(330 85% 55% / 0.40), transparent 70%),
-      radial-gradient(30% 30% at 10% 90%, hsl(155 80% 50% / 0.30), transparent 70%);
-    animation: chroma-drift-b 28s ease-in-out infinite alternate;
+      radial-gradient(46% 46% at 72% 86%, hsl(20 85% 45% / 0.22), transparent 70%),
+      radial-gradient(28% 28% at 8% 88%, hsl(0 0% 100% / 0.05), transparent 70%);
+    animation: chroma-drift-b 32s ease-in-out infinite alternate;
   }
 
   @keyframes chroma-drift-a {
@@ -474,6 +475,99 @@
     * {
       scroll-behavior: auto !important;
     }
+  }
+
+  /* ─── Sidebar Primary: Neue Kampagne (touchfreundliche Action-Bar) ───── */
+  .dash-new-campaign {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: 1rem;
+    border: 1px solid hsl(var(--brand) / 0.38);
+    background: hsl(var(--brand) / 0.12);
+    color: hsl(var(--foreground));
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-align: left;
+    transition:
+      transform 0.18s cubic-bezier(.22,.61,.36,1),
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.14),
+      0 8px 28px -18px hsl(var(--brand-glow) / 0.75);
+  }
+  .dash-new-campaign:hover {
+    background: hsl(var(--brand) / 0.2);
+    border-color: hsl(var(--brand) / 0.55);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.18),
+      0 12px 36px -16px hsl(var(--brand-glow) / 0.85);
+  }
+  .dash-new-campaign:active {
+    transform: scale(0.985);
+    box-shadow:
+      inset 0 2px 8px 0 hsl(var(--brand) / 0.25),
+      0 4px 16px -12px hsl(var(--brand-glow) / 0.6);
+  }
+  .dash-new-campaign:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--brand-glow) / 0.55),
+      0 8px 28px -18px hsl(var(--brand-glow) / 0.75);
+  }
+  .dash-new-campaign:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .dash-new-campaign__icon {
+    display: inline-flex;
+    height: 2rem;
+    width: 2rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.625rem;
+    border: 1px solid hsl(0 0% 100% / 0.14);
+    background: hsl(0 0% 100% / 0.08);
+    color: hsl(var(--brand));
+    backdrop-filter: blur(12px);
+  }
+  .dash-new-campaign__label {
+    min-width: 0;
+    flex: 1;
+  }
+
+  /* ─── Intern-only Scrollbars (`/intern/*`, nicht öffentliche Website) ─── */
+  .intern-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--brand) / 0.35) hsl(0 0% 10% / 0.9);
+  }
+  .intern-scrollbar ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .intern-scrollbar ::-webkit-scrollbar-track {
+    background: hsl(0 0% 8% / 0.85);
+    border-radius: 9999px;
+  }
+  .intern-scrollbar ::-webkit-scrollbar-thumb {
+    background: hsl(0 0% 100% / 0.18);
+    border-radius: 9999px;
+    border: 1px solid hsl(0 0% 100% / 0.06);
+  }
+  .intern-scrollbar ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--brand) / 0.55);
+    border-color: hsl(var(--brand) / 0.35);
+  }
+  .intern-scrollbar ::-webkit-scrollbar-corner {
+    background: transparent;
   }
 
   /* ─── Brand-Akzent Utilities ────────────────────────────────────────────

@@ -12,7 +12,13 @@
  * Diese Datei ist server- und client-importierbar (keine Server-only-Imports).
  */
 
-export type QrStyleId = "clean-print" | "smairys-brand" | "premium-poster";
+export type QrStyleId =
+  | "clean-print"
+  | "smairys-brand"
+  | "premium-poster"
+  | "rounded-classic"
+  | "dense-safe"
+  | "soft-amber";
 
 export type QrModuleShape = "square" | "rounded" | "dots";
 export type QrFinderShape = "square" | "rounded";
@@ -111,12 +117,72 @@ export const QR_STYLE_PRESETS: Record<QrStyleId, QrStylePreset> = {
       logoLabel: "Kein Logo (MVP)",
     },
   },
+  "rounded-classic": {
+    id: "rounded-classic",
+    name: "Rounded Classic",
+    tagline: "Abgerundete Module, klassisch schwarz – freundlicher Look.",
+    module: "rounded",
+    finder: "rounded",
+    margin: 2,
+    dark: "#000000",
+    light: "#FFFFFF",
+    accent: "#000000",
+    errorCorrection: "H",
+    logo: false,
+    safety: {
+      scan: "high",
+      recommendedFor: "Flyer",
+      quietZoneOk: true,
+      logoLabel: "Kein Logo",
+    },
+  },
+  "dense-safe": {
+    id: "dense-safe",
+    name: "Dense Safe",
+    tagline: "Eckig + extra Quiet Zone – maximal robust für kleine Drucke.",
+    module: "square",
+    finder: "square",
+    margin: 4,
+    dark: "#000000",
+    light: "#FFFFFF",
+    accent: "#000000",
+    errorCorrection: "H",
+    logo: false,
+    safety: {
+      scan: "high",
+      recommendedFor: "Visitenkarte",
+      quietZoneOk: true,
+      logoLabel: "Kein Logo",
+    },
+  },
+  "soft-amber": {
+    id: "soft-amber",
+    name: "Soft Amber",
+    tagline: "Warmes Near-Black mit Amber-Augen – dezenter Brand-Touch.",
+    module: "rounded",
+    finder: "square",
+    margin: 2,
+    dark: "#1A130B",
+    light: "#FFFFFF",
+    accent: "#9A4F0F",
+    errorCorrection: "H",
+    logo: false,
+    safety: {
+      scan: "high",
+      recommendedFor: "Flyer",
+      quietZoneOk: true,
+      logoLabel: "Kein Logo",
+    },
+  },
 };
 
 export const QR_STYLE_ORDER: readonly QrStyleId[] = [
   "clean-print",
   "smairys-brand",
   "premium-poster",
+  "rounded-classic",
+  "dense-safe",
+  "soft-amber",
 ];
 
 export const DEFAULT_QR_STYLE: QrStyleId = "clean-print";

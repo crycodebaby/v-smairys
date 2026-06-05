@@ -33,7 +33,7 @@ const GLOW: Record<NonNullable<GlassPanelProps["glow"]>, string> = {
   success:
     "ring-1 ring-emerald-400/25 shadow-[0_0_0_1px_hsl(155_80%_55%/0.20),0_0_60px_-12px_hsl(155_70%_50%/0.30)]",
   accent:
-    "ring-1 ring-sky-400/25 shadow-[0_0_0_1px_hsl(210_90%_60%/0.20),0_0_60px_-12px_hsl(210_90%_55%/0.30)]",
+    "ring-1 ring-[hsl(var(--brand)/0.3)] shadow-[0_0_0_1px_hsl(var(--brand)/0.22),0_0_60px_-12px_hsl(var(--brand-glow)/0.35)]",
 };
 
 export function GlassPanel({

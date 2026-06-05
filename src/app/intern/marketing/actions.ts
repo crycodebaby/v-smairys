@@ -14,14 +14,27 @@ import {
   verifySessionToken,
 } from "@/lib/auth/intern-session";
 import {
+  ALLOWED_CAMPAIGN_DESTINATION_PATHS,
+  isInternalCampaignDestination,
   slugify,
   type CampaignStatus,
   type UtmMedium,
 } from "@/lib/marketing-campaigns";
+import {
+  createCampaignBuilderPreset,
+  type CampaignBuilderPreset,
+  type PresetCategory,
+} from "@/lib/campaign-builder-presets-db";
 
 export type CampaignActionState = {
   ok: boolean;
   message: string;
+};
+
+export type PresetActionState = {
+  ok: boolean;
+  message: string;
+  preset?: CampaignBuilderPreset;
 };
 
 const OK_CREATE = "Kampagne wurde erstellt.";
@@ -65,6 +78,25 @@ export async function updateCampaignAction(
   }
 }
 
+export async function createBuilderPresetAction(
+  _prevState: PresetActionState,
+  formData: FormData
+): Promise<PresetActionState> {
+  const auth = await requireInternSession();
+  if (!auth.ok) return { ok: false, message: auth.message };
+
+  const category = readPresetCategory(formData);
+  const label = readRequired(formData, "label");
+
+  try {
+    const preset = await createCampaignBuilderPreset({ category, label });
+    revalidatePath("/intern/marketing");
+    return { ok: true, message: "Preset gespeichert.", preset };
+  } catch (error) {
+    return presetActionError(error);
+  }
+}
+
 export async function archiveCampaignAction(
   _prevState: CampaignActionState,
   formData: FormData
@@ -105,6 +137,18 @@ function parseCampaignInput(formData: FormData): MarketingCampaignInput {
   const destination = readRequired(formData, "destination_path");
   if (!destination.startsWith("/")) {
     throw new Error("destination_path muss mit `/` beginnen.");
+  }
+  if (isInternalCampaignDestination(destination)) {
+    throw new Error("Interne Zielseiten sind nicht erlaubt.");
+  }
+  const allowCustom = formData.get("allow_custom_destination") === "true";
+  if (
+    !allowCustom &&
+    !ALLOWED_CAMPAIGN_DESTINATION_PATHS.includes(
+      destination as (typeof ALLOWED_CAMPAIGN_DESTINATION_PATHS)[number]
+    )
+  ) {
+    throw new Error("Zielseite ist nicht in der erlaubten Auswahl.");
   }
 
   const slug = slugify(readRequired(formData, "slug"));
@@ -188,6 +232,33 @@ function readUtmMedium(formData: FormData): UtmMedium {
     return value;
   }
   throw new Error("utm_medium ist ungültig.");
+}
+
+function readPresetCategory(formData: FormData): PresetCategory {
+  const value = readRequired(formData, "category");
+  if (
+    value === "medium" ||
+    value === "region" ||
+    value === "topic" ||
+    value === "version"
+  ) {
+    return value;
+  }
+  throw new Error("category ist ungültig.");
+}
+
+function presetActionError(error: unknown): PresetActionState {
+  if (error instanceof SupabaseServerConfigError) {
+    return {
+      ok: false,
+      message:
+        "Supabase ist serverseitig nicht konfiguriert. Presets können nicht gespeichert werden.",
+    };
+  }
+  if (error instanceof Error) {
+    return { ok: false, message: error.message };
+  }
+  return { ok: false, message: "Unbekannter Fehler beim Speichern des Presets." };
 }
 
 function actionError(error: unknown): CampaignActionState {
