@@ -1,9 +1,22 @@
 // src/components/leistungen/ServiceSection.tsx
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-import ServiceFigure3D from "@/components/leistungen/ServiceFigure3D";
+
+const ServiceFigure3D = dynamic(
+  () => import("@/components/leistungen/ServiceFigure3D"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="relative isolate overflow-hidden rounded-xl h-[240px] animate-pulse bg-muted/20 sm:h-[280px] md:h-[320px] lg:h-[360px]"
+        aria-hidden
+      />
+    ),
+  }
+);
 
 type Variant = "web" | "jpp" | "seo" | "hosting";
 
@@ -34,8 +47,8 @@ export default function ServiceSection({
       className="relative py-12 sm:py-16"
       style={{ scrollMarginTop: "var(--leistungen-scroll-offset, 8.5rem)" }}
     >
-      <div className="container">
-        <div className="grid grid-cols-1 gap-6 p-6 border shadow-sm  rounded-2xl border-border/60 bg-card/80 sm:p-8 md:grid-cols-2 md:gap-8">
+      <div className="w-full min-w-0">
+        <div className="grid grid-cols-1 gap-6 rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm sm:p-8 md:grid-cols-2 md:gap-8">
           {/* 3D oben auf Mobile, rechts auf Desktop */}
           <div className="order-1 md:order-2">
             <ServiceFigure3D variant={variant} />

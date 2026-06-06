@@ -17,6 +17,7 @@ Für Strategie/Frontend-Arbeit: **02 → 03 → 05** (Audit als Faktenbasis).
 | [04 · UI-Design-System](04-ui-design-system.md) | Glass-Komponenten, Tokens, Conventions | Referenz |
 | [05 · Frontend-Implementierungsplan](05-frontend-implementation-plan.md) | Priorisierte Phasen (Critical Fixes → QA) | **Plan** |
 | [06 · QA-Checkliste](06-qa-checklist.md) | Checks vor Deploy/Druck | Referenz |
+| [07 · Lokale Dev-Stabilität](07-local-development-stability.md) | `.next`-Cache, Recovery, Windows-Hinweise | Referenz |
 | [Audit · SEO/Conversion-Inventar](audits/seo-conversion-audit.md) | Technisches Bestands-Inventar | Audit (Bestand) |
 | [Audit · Next-Implementierungsplan](audits/next-implementation-plan.md) | Ergänzender Audit-Plan | Audit (Bestand) |
 

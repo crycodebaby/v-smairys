@@ -59,14 +59,22 @@ Diese Punkte blockieren saubere Umsetzung und sollten zuerst entschieden werden:
   | SEO „Reporting-Ansatz ansehen" | `#anfrage` (Form-Sektion derselben Seite) |
   | MobileNav „Erstgespräch buchen" | Booking (extern) |
   | MobileNav Telefon / „Anfrage schreiben" | `tel:` / `mailto:` |
-  | BookingCard (`/leistungen`) | `SITE.booking.calendarUrl` (extern) |
+  | BookingCard (`/leistungen`, **einmalig**) | `SITE.booking.calendarUrl` (extern) |
+  | `/leistungen` Abschluss-CTA primär | Booking (extern), Label „Erstgespräch buchen" |
+  | `/leistungen` Abschluss-CTA sekundär | `/projekte` |
+- **`/leistungen` CTA-Hierarchie (Premium, keine Duplikate):**
+  1. **Global:** Header/MobileNav „Erstgespräch buchen" (kompakt).
+  2. **Zentral:** genau **eine** `BookingCard` („Strategisches Erstgespräch" /
+     „Termin im Kalender reservieren") – Mobile/Tablet in-flow (`lg:hidden`),
+     Desktop sticky in der Sidebar (`lg:block`). Kein zweites BookingCard im
+     Footer.
+  3. **Abschluss:** `LeistungenFinalCta` – leichtere Sektion (Headline + zwei
+     Buttons), **kein** wiederholtes BookingCard-Modul.
+  4. **Service-Sections:** weiche CTAs → `/#kontakt` (Sekundärpfad Formular).
 - **Stabile Anker:** Kontakt-Sektion Startseite `#kontakt`
   (`ContactFormSection`, Default-`id`); Service-Detailseiten haben eine eigene
   Form-Sektion `#anfrage`. Keine toten Anker. Toter Anker `/#testimonials`
-  auf `/leistungen` (Komponente `TestimonialsSection` wird nicht gerendert) →
-  auf `/projekte` umgebogen. `/leistungen`-Service-Kacheln und „Erstgespräch
-  anfragen" zeigen weiterhin auf `/#kontakt` (gültig, neben der BookingCard als
-  Form-Alternative).
+  auf `/leistungen` → auf `/projekte` umgebogen.
 - **Externe Booking-Links:** `target="_blank"` + `rel="noopener noreferrer"`.
 - **Beibehalten:** `cta_click`-Tracking auf allen Button-CTAs; `CTA Click`/
   `Contact Intent` via `TrackedLink` (Footer, ContactInfoCard, MobileNav inkl.
@@ -135,31 +143,33 @@ Diese Punkte blockieren saubere Umsetzung und sollten zuerst entschieden werden:
 
 ## Phase 2 · Design-System & Homepage-Conversion
 
-- **Hero neu ausrichten** (`src/components/sections/Hero.tsx`): Website-Fokus +
-  Lokalbezug Saarland/Saarbrücken in H1; Rang-1-CTAs (Booking + Telefon)
-  above-the-fold; Sticky-Mobile-CTA-Bar.
-- **„Auf einen Blick"-Block** (semantische `<dl>`) direkt nach Hero – Wer/Was/
-  Für wen/Wie (siehe `docs/03` 8 & Audit 8.2).
-- **ServicesSection** (`src/components/sections/ServicesSection.tsx`): Website
-  visuell führend; SEO/Ads als Add-on-Zeile statt gleichrangig.
-- **Mobile-Navigation** (`src/components/layout/Header.tsx`,
-  `MobileNav.tsx`): alle Hauptlinks + Industrie-Seiten + Telefon/Booking
+- **Homepage Copy & Conversion** ✅ UMGESETZT:
+  - Zentrale Copy: `src/content/homepage.ts`
+  - Sektionen: `Hero`, `FilterSection`, `IndustriesSection`, `MethodSection`,
+    `TrustSection`, `ProcessSection`, `ContactFormSection` (mit BookingCard +
+    `primaryBookingLabel`)
+  - Metadata: Premium-Websites Saarland (kein Keyword-Stuffing)
+  - `ServicesSection` / `TeamSection` / `CtaSection` nicht mehr auf `/`
+  - CTA-Labels: siehe `docs/02-positioning-conversion.md` Abschnitt 6
+  - **Nicht geändert:** Pricing, neue Landingpages, `/api/contact`, Booking-URL
+- **Offen:** „Auf einen Blick"-Block (semantische `<dl>`, Audit 8.2).
+- **Mobile-Navigation** (`Header.tsx`, `MobileNav.tsx`): Booking + Telefon
   sichtbar.
-- **Design-Konsistenz** gemäß `docs/04-ui-design-system.md` (Brand-Amber sparsam,
-  Motion-Reduktion respektieren).
-- **`/leistungen` aufräumen** (`src/app/leistungen/page.tsx`): auf aktuelle
-  Design-System-Komponenten umstellen; Legacy/ungenutztes entfernen.
+- **Design-Konsistenz** gemäß `docs/04-ui-design-system.md`.
+- **`/leistungen` CTA-Hierarchie** ✅ UMGESETZT (separater Task; nicht erneut
+  anfassen).
 
 ---
 
 ## Phase 3 · Pricing-Sektion
 
-- Drei sichtbare Pakete (Goldilocks) gemäß `docs/02` Abschnitt 7.
-- Mittleres Paket optisch hervorgehoben („Empfohlen"-Badge, Brand-Amber).
-- Preise als Richtwerte; Add-ons (SEO/Ads/Wartung) als Erweiterungen.
-- CTA pro Paket → Erstgespräch buchen (nicht „kaufen").
-- Ort: neue `src/components/sections/PricingSection.tsx`, eingebunden auf `/`
-  und/oder `/leistungen/webseiten` (oder eigene `/preise`-Route – Phase 0).
+- **Homepage** ✅ UMGESETZT: `PricingSection.tsx` + `HOMEPAGE_PRICING` in
+  `src/content/homepage.ts`; Platzierung nach `ProcessSection`, vor
+  `ContactFormSection`; Anker `#preise`.
+- Drei Pakete (Goldilocks): Digitales Fundament · Performance-System (Meistgewählt)
+  · Branchen-Autorität; CTAs → `getPrimaryBookingTarget()` mit distinct
+  `cta_id` (`pricing-*`).
+- **Offen:** gleiche Sektion auf `/leistungen/webseiten` oder eigene `/preise`-Route.
 
 ---
 

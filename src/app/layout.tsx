@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import { Footer } from "@/components/layout/Footer"
+import { ConditionalFooter } from "@/components/layout/ConditionalFooter"
+import { PlausibleAnalytics } from "@/components/analytics/PlausibleAnalytics"
+import { AttributionCapture } from "@/components/analytics/AttributionCapture"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -81,11 +85,6 @@ export const metadata: Metadata = {
     // Twitter-Image leitet sich vom OpenGraph-Image ab.
   },
 }
-
-import { Footer } from "@/components/layout/Footer"
-import { ConditionalFooter } from "@/components/layout/ConditionalFooter"
-import { PlausibleAnalytics } from "@/components/analytics/PlausibleAnalytics"
-import { AttributionCapture } from "@/components/analytics/AttributionCapture"
 
 export default function RootLayout({
   children,

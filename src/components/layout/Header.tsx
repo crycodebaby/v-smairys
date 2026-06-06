@@ -6,6 +6,7 @@ import { Container } from '../ui/Container';
 import { Brandmark } from '@/components/brand/Brandmark';
 import { CalendarBookingButton } from '@/components/contact/ContactActions';
 import { SITE } from '@/config/site';
+import { HOMEPAGE_CTA } from '@/content/homepage';
 import { MobileNav } from './MobileNav';
 
 function LockIcon({ className = '' }: { className?: string }) {
@@ -118,7 +119,7 @@ export function Header() {
             location="header"
             className="hidden min-h-9 rounded-sm px-4 md:inline-flex"
           >
-            Kontakt aufnehmen
+            {HOMEPAGE_CTA.header}
           </CalendarBookingButton>
 
           {/* Mobile/Tablet (< md): Hamburger-Drawer. */}

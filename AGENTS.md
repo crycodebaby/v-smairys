@@ -60,6 +60,8 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 ## Build-Notizen
 
 - `npm run build` ist Pflichtchecks vor jedem Push. TypeScript-Errors blockieren den Build, ESLint nicht (bewusst entkoppelt in `next.config.ts`; `npm run lint` separat fahren).
+- **Lokaler Dev-Cache:** `.next` nicht löschen und **kein** `npm run build` ausführen, während `npm run dev` auf demselben Checkout läuft — führt zu fehlenden Chunks / `routes-manifest.json` ENOENT. Recovery: Dev stoppen → `npm run clean:next` → `npm run dev`. Details: `docs/07-local-development-stability.md`.
+- Bei Cache-Verdacht vor Push: `npm run build:clean` statt wiederholtem `build`.
 - Keine neuen Dependencies ohne Grund. Aktuell zugekauft: `qrcode` (server-side QR-SVG).
 
 ## Docs
@@ -71,6 +73,7 @@ Entwickler, der am Projekt arbeitet. **Bitte vor dem ersten Edit komplett lesen.
 - `docs/04-ui-design-system.md` – Glass-Komponenten & Conventions.
 - `docs/05-frontend-implementation-plan.md` – Priorisierter Umsetzungsplan (Phasen).
 - `docs/06-qa-checklist.md` – QA-Checkliste vor Deploy/Druck.
+- `docs/07-local-development-stability.md` – `.next`-Cache, Dev-Recovery, Agent-Build-Regeln.
 - `docs/audits/seo-conversion-audit.md` – Technisches Inventar / Audit (Bestand).
 
 ## Don'ts

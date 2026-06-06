@@ -5,54 +5,46 @@ import { Container } from '../ui/Container';
 import { Kicker } from '../ui/Kicker';
 import { Reveal } from '../motion/Reveal';
 import { SITE } from '@/config/site';
+import { HOMEPAGE_TRUST } from '@/content/homepage';
 
-const OWNER_PORTRAIT_ALT = `${SITE.owner.name}, ${SITE.owner.role} der ${SITE.legalName}`;
+const OWNER_PORTRAIT_ALT = `${SITE.owner.name}, Inhaber der ${SITE.legalName}`;
 
 export function TrustSection() {
-  return (
-    <Section className="relative bg-background border-y border-border/60 ambient-glow-amber">
-      <Container>
-        <div className="grid items-center gap-16 lg:grid-cols-2">
+  const { kicker, headline, paragraphs, stats } = HOMEPAGE_TRUST;
 
+  return (
+    <Section className="relative border-y border-border/60 bg-background ambient-glow-amber">
+      <Container>
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal as="div" className="order-2 flex flex-col gap-8 lg:order-1">
             <div>
-              <Kicker accent="brand">Die Manufaktur</Kicker>
-              <h2 className="mt-4 text-fluid-h2 font-bold leading-[1.15] text-foreground">
-                Radikale Transparenz und handwerkliche Tiefe.
+              <Kicker accent="brand">{kicker}</Kicker>
+              <h2 className="mt-4 text-fluid-h2 font-bold leading-[1.12] tracking-tight text-foreground">
+                {headline}
               </h2>
             </div>
 
-            <div className="space-y-6 text-fluid-p leading-relaxed text-muted-foreground">
-              <p>
-                Seit 6 Jahren entwickeln wir digitale Infrastrukturen für den
-                Mittelstand. Was im {SITE.address.region} mit einem klaren
-                Anspruch an Code-Qualität begann, ist heute eine
-                hochspezialisierte Agentur für messbaren B2B-Vertrieb.
-              </p>
-              <p>
-                {SITE.owner.name} und das Team der Netz-Manufaktur arbeiten
-                nicht mit Fließband-Lösungen. Jedes Projekt ist eine
-                maßgeschneiderte Architektur, die sich an harten KPIs messen
-                lassen muss. Wir versprechen keine Wunder. Wir liefern
-                Systematik.
-              </p>
+            <div className="max-w-2xl space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg sm:leading-[1.65]">
+              {paragraphs.map((p) => (
+                <p key={p.slice(0, 24)}>{p}</p>
+              ))}
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-8 border-t border-border/40 pt-6">
-              <Stat value="6+" label="Jahre Erfahrung" />
-              <Stat value="100 %" label="Inhabergeführt" />
+            <div className="mt-2 grid grid-cols-1 gap-6 border-t border-border/40 pt-8 sm:grid-cols-3 sm:gap-8">
+              {stats.map((stat) => (
+                <Stat key={stat.label} value={stat.value} label={stat.label} />
+              ))}
             </div>
           </Reveal>
 
           <Reveal as="div" delay={140} className="order-1 lg:order-2">
             <div className="relative">
-              {/* Brand-Glow im Hintergrund */}
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -inset-6 -z-10 rounded-3xl"
                 style={{
                   background:
-                    "radial-gradient(50% 60% at 30% 20%, hsl(var(--brand-glow) / 0.20), transparent 70%)",
+                    "radial-gradient(50% 60% at 30% 20%, hsl(var(--brand-glow) / 0.16), transparent 70%)",
                   filter: "blur(40px)",
                 }}
               />
@@ -71,7 +63,6 @@ export function TrustSection() {
               </div>
             </div>
           </Reveal>
-
         </div>
       </Container>
     </Section>
@@ -79,18 +70,28 @@ export function TrustSection() {
 }
 
 function Stat({ value, label }: { value: string; label: string }) {
+  const textOnly = !value;
+
   return (
     <div className="relative pl-4">
       <span
         aria-hidden="true"
         className="brand-line-vertical absolute left-0 top-1 bottom-1"
       />
-      <div className="text-3xl font-semibold tracking-tight text-foreground">
-        {value}
-      </div>
-      <div className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        {label}
-      </div>
+      {textOnly ? (
+        <div className="text-sm font-semibold leading-snug text-foreground sm:text-[15px]">
+          {label}
+        </div>
+      ) : (
+        <>
+          <div className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            {value}
+          </div>
+          <div className="mt-1 text-xs font-medium leading-snug text-muted-foreground sm:text-[13px]">
+            {label}
+          </div>
+        </>
+      )}
     </div>
   );
 }

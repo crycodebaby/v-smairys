@@ -111,6 +111,18 @@ Regeln:
   (Hero + Sticky-Mobile-Bar).
 - Telefon und Booking stehen visuell gleichwertig nebeneinander.
 - Das Formular ist nie der einzige Conversion-Pfad einer Seite.
+- **Keine CTA-Dichte:** nicht zwei gleichwertige Kalender-Module im selben
+  Viewport; BookingCard ist das Premium-Beratungsmodul, der Abschluss-CTA bleibt
+  visuell leichter.
+
+### `/leistungen` (Übersicht)
+
+| Ebene | Komponente | Label (Beispiel) | Ziel |
+|-------|------------|------------------|------|
+| Global | Header / MobileNav | Erstgespräch buchen | `SITE.booking.calendarUrl` |
+| Zentral (1×) | `BookingCard` | Termin im Kalender reservieren | Booking (extern) |
+| Abschluss | `LeistungenFinalCta` | Erstgespräch buchen · Ergebnisse ansehen | Booking · `/projekte` |
+| Service-Kacheln | `ServiceSection` | kontextabhängig | `/#kontakt` (Formular) |
 - **Bekanntes Problem (siehe Inventar):** Hero-/Service-CTAs sind aktuell reine
   `<button>`-Elemente ohne Navigation
   (`src/components/sections/Hero.tsx`, `src/components/ui/Button.tsx`). Fix ist
@@ -120,28 +132,43 @@ Regeln:
 
 ## 6. Homepage-Message-Hierarchie
 
-Empfohlene Reihenfolge (Top → Bottom). Führt mit Website-Erstellung, nicht mit
-SEO/Ads.
+**Umsetzungsstand:** Copy zentral in `src/content/homepage.ts`. Reihenfolge in
+`src/app/page.tsx`. Führt mit Premium-Website-Erstellung; SEO/Ads nur als
+unterstützende Mechanismen in der Methode-Sektion.
 
-1. **Hero** – „Unternehmenswebsites aus dem Saarland, die ernst genommen werden."
-   - H1 mit lokalem Bezug (Saarland/Saarbrücken) + Website-Fokus.
-   - Rang-1-CTAs: Erstgespräch buchen + Anrufen.
-2. **AI-/Klartext-Block „Smairys auf einen Blick"** – Wer / Was / Für wen / Wie
-   (semantische `<dl>`-Struktur, vgl. `docs/audits/seo-conversion-audit.md`
-   Abschnitt 8.2).
-3. **Social Proof** – Kundenlogos der drei Verticals (sobald freigegebene
-   Assets vorhanden, siehe `src/config/clients.ts`).
-4. **Für wen wir bauen** – drei Industrie-Kacheln: Handwerk, Immobilien,
-   Gastronomie (jeweils Link auf Industrie-Landingpage, siehe
-   `docs/03-seo-content-architecture.md`).
-5. **Leistungs-/Website-Nutzen** – was eine Smairys-Website leistet (Tempo,
-   Sicherheit, Vertrauen, Pflege). SEO/Ads nur als Add-on-Zeile.
-6. **Pakete & Preise** – drei sichtbare Pakete (Goldilocks, Abschnitt 7).
-7. **Prozess** – „Ein Prozess, der Fehler eliminiert" (bestehend,
-   `src/components/sections/ProcessSection.tsx`).
-8. **Case Studies** – belegbare Ergebnisse, nach Vertical sortierbar.
-9. **Kontakt / Erstgespräch** – Booking + Telefon zuerst, Formular als
-   Sekundär-Option.
+| # | Sektion | Komponente | Kernbotschaft |
+|---|---------|------------|---------------|
+| 1 | Hero | `Hero.tsx` | Digitale Vertriebsmaschinen · Saarland · Primär-CTA Projektanalyse |
+| 2 | Social Proof | `SocialProofSection` | Kundenlogos (bestehend) |
+| 3 | Qualifizierung | `FilterSection.tsx` | Anti-Cheap, ruhig, kein Massenmarkt |
+| 4 | Branchenfokus | `IndustriesSection.tsx` | Immobilien (Priorität), Handwerk, Gastronomie |
+| 5 | Methode | `MethodSection.tsx` | Strategie · Design · Sichtbarkeit; Service-CTAs → Booking |
+| 6 | Trust / Robin | `TrustSection.tsx` | Transparenz, Portrait, Trust-Stats |
+| 7 | Prozess | `ProcessSection.tsx` | Analyse → Optimierung (4 Schritte) |
+| 8 | Preise | `PricingSection.tsx` | Goldilocks-Pakete (`#preise`) |
+| 9 | Abschluss | `ContactFormSection.tsx` | Final-CTA + BookingCard-Rahmen + Formular |
+
+**Homepage-CTA-Labels** (`HOMEPAGE_CTA`):
+
+| Kontext | Label | Ziel |
+|---------|-------|------|
+| Hero primär | Kostenfreie Projektanalyse anfordern | `getPrimaryBookingTarget()` |
+| Hero sekundär | Leistungen ansehen | `/leistungen` |
+| Header / MobileNav | Erstgespräch buchen | Booking |
+| Methode (Web/SEO/Ads) | Website-Potenzial prüfen · Lokale Marktchancen prüfen · Werbe-ROI bewerten | Booking |
+| Pakete (`#preise`) | Einstieg prüfen · Projektanalyse anfordern · Manufaktur-Projekt besprechen | Booking (`pricing-*`) |
+| Abschluss primär | Kostenfreie Projektanalyse anfordern | Booking |
+| BookingCard (Rahmen) | Termin im Kalender reservieren | Booking (Button nur ohne `hideButton`) |
+| Formular | Kontaktformular | `/api/contact` → Formcarry |
+
+**Preise auf der Startseite:** `HOMEPAGE_PRICING` in `src/content/homepage.ts`,
+Sektion `#preise` nach Prozess, vor Abschluss-CTA.
+
+**Bewusst nicht geändert:** neue Branchen-Landingpages, `/leistungen`-Redesign,
+Booking-URL, Formcarry.
+
+**Offen (später):** AI-/Klartext-Block „Smairys auf einen Blick" (Audit 8.2),
+dedizierte Case-Study-Sektion auf der Startseite.
 
 ---
 
@@ -150,11 +177,14 @@ SEO/Ads.
 Drei **sichtbare** Pakete in Goldilocks-Struktur. Ziel: das mittlere Paket als
 „vernünftige" Wahl ankern.
 
-| Paket | Richtpreis | Rolle | Framing |
-|-------|-----------|-------|---------|
-| **Entry** | ~ 1.200 € | Anker unten | „Solider, professioneller Auftritt für den Start." Klein gehalten, damit Mitte attraktiver wirkt. |
-| **Empfohlen (Mitte)** | ~ 2.600–2.800 € | **Goldilocks-Held** | Visuell hervorgehoben (Brand-Akzent, „Empfohlen"-Badge). Bestes Verhältnis aus Umfang & Wirkung. |
-| **Premium** | ~ 3.600 € | Anker oben | „Maximale Wirkung, voller Umfang." Macht die Mitte vergleichsweise günstig. |
+| Paket | Preis (Orientierung) | Rolle | CTA → Booking |
+|-------|---------------------|-------|----------------|
+| **Digitales Fundament** | 1.299 € | Entry, kompakt aber seriös | `pricing-digitales-fundament` · Einstieg prüfen |
+| **Performance-System** | 2.850 € | **Meistgewählt** (Goldilocks) | `pricing-performance-system` · Projektanalyse anfordern |
+| **Branchen-Autorität** | 5.600 € | Premium-Anker | `pricing-branchen-autoritaet` · Manufaktur-Projekt besprechen |
+
+Umsetzung: `PricingSection.tsx` · Mittelkarte mit Badge, Brand-Border, stärkerem CTA.
+Preishinweis: Orientierung, Scope im Erstgespräch — keine Garantie-Claims.
 
 Framing-Regeln:
 - Preise als **ab-Werte** / Richtwerte kommunizieren, nicht als starre Tarife.

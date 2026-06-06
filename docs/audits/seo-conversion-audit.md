@@ -163,7 +163,7 @@ Render-Pattern: ein **`<JsonLd>`-Server-Component** rendert ein `<script type="a
   "logo": "https://smairys.de/logo/smairys-white.png",
   "image": "https://smairys.de/opengraph-image.png",
   "email": "robin@smairys.de",
-  "telephone": "+4916030055180",
+  "telephone": "+491603005518",
   "founder": { "@type": "Person", "name": "Robin Schmeiries" },
   "address": {
     "@type": "PostalAddress",
@@ -191,7 +191,7 @@ Render-Pattern: ein **`<JsonLd>`-Server-Component** rendert ein `<script type="a
     "@type": "ContactPoint",
     "contactType": "customer service",
     "email": "robin@smairys.de",
-    "telephone": "+4916030055180",
+    "telephone": "+491603005518",
     "availableLanguage": ["de","en"],
     "areaServed": "DE"
   }
@@ -254,7 +254,7 @@ KI-Crawler lieben semantische `<dl>`-Definitionslisten – sie geben kontextuell
 | Touchpoint | Bewertung | Maßnahme |
 |---|---|---|
 | Hero CTA | **kritisch defekt** (Button ohne `href`) | P0-1 |
-| Telefon-CTA im Hero | fehlt | P0 ergänzen (`+49 160 300 551 8` als sekundärer Link) |
+| Telefon-CTA im Hero | fehlt | P0 ergänzen (`+49 160 300 5518` als sekundärer Link) |
 | Social Proof | vorhanden (`SocialProofSection`) – stark | Logos austauschen, sobald freigegeben |
 | Trust (Persona Robin) | Placeholder-Portrait, schwach | echtes Portrait einfügen |
 | Service-Klarheit | gut auf Detail-Seiten | konsistent mit `/leistungen` ziehen |

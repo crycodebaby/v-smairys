@@ -103,8 +103,8 @@ export const SITE: SiteContact = {
   },
 
   phone: {
-    display: "+49 160 300 551 8",
-    tel: "tel:+4916030055180",
+    display: "+49 160 300 5518",
+    tel: "tel:+491603005518",
   },
 
   address: {

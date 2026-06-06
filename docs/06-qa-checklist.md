@@ -37,13 +37,18 @@ Jeder öffentliche CTA muss navigieren **und** weiterhin tracken.
 - [ ] **Booking-Link öffnet korrekt**: alle Primär-CTAs öffnen die Google-Calendar-URL in neuem Tab (`target="_blank"`, `rel="noopener noreferrer"`)
 - [ ] **Header primär „Kontakt aufnehmen"**: öffnet Booking-Link – bzw. `/#kontakt`, falls `booking.enabled = false`
 - [ ] **Header „Kundenlogin"-Pille**: routet weiterhin nach `/kundenlogin` (kein Tracking)
-- [ ] **Hero primär „Projektanfrage starten"**: öffnet Booking-Link
-- [ ] **Hero sekundär „Unsere Expertise"**: navigiert nach `/leistungen`
+- [ ] **Hero primär „Kostenfreie Projektanalyse anfordern"**: öffnet Booking-Link
+- [ ] **Hero sekundär „Leistungen ansehen"**: navigiert nach `/leistungen`
 - [ ] **Service-Detail-Hero** (`/leistungen/webseiten`, `/leistungen/seo`): Primär-CTA öffnet Booking-Link
 - [ ] **SEO „Reporting-Ansatz ansehen"**: scrollt zur seiteneigenen Form-Sektion `#anfrage` (kein toter Anker)
 - [ ] **Services-Karten** (Startseite): führen nach `/leistungen/webseiten` · `/leistungen/seo` · `/leistungen/google-ads`
 - [ ] **Kontakt-Sektion**: Anker `#kontakt` existiert auf der Startseite; Scroll-Ziel sichtbar
-- [ ] **`/leistungen`-Übersicht**: „Erstgespräch anfragen" + Service-Kacheln → `/#kontakt`; „Ergebnisse ansehen" → `/projekte` (kein toter `#testimonials`-Anker mehr); BookingCard → Booking-Link
+- [ ] **Homepage Abschluss-CTA**: „Kostenfreie Projektanalyse anfordern" (primär) + BookingCard-Rahmen ohne zweiten Kalender-Button; Formular rechts postet über `/api/contact`
+- [ ] **Homepage Methode-CTAs**: Website-Potenzial / Lokale Marktchancen / Werbe-ROI → Booking-Link
+- [ ] **Homepage Metadata**: Title „Premium-Websites für Unternehmen im Saarland | Smairys Netz-Manufaktur"
+- [ ] **`/leistungen`-Übersicht CTA-Hierarchie**: genau **eine** BookingCard sichtbar (Mobile in-flow unter TOC, Desktop sticky Sidebar); **kein** zweites BookingCard im Footer
+- [ ] **`/leistungen` Abschluss-CTA** (`LeistungenFinalCta`): „Erstgespräch buchen" → Booking-Link; „Ergebnisse ansehen" → `/projekte`
+- [ ] **`/leistungen` Service-Kacheln**: weiche CTAs → `/#kontakt` (gültiger Formular-Anker auf Startseite)
 - [ ] **Keine toten Anker**: jedes `#`-Ziel (`#kontakt`, `#anfrage`) existiert auf der jeweiligen Seite
 - [ ] **Footer-CTAs**: `mailto:`/`tel:` aus Footer + `ContactInfoCard` funktionieren (Contact-Intent-Event feuert)
 - [ ] **Mobile-CTA**: Drawer zeigt „Erstgespräch buchen" (Booking, neuer Tab) als Primär-CTA + Telefon (`tel:`) + „Anfrage schreiben" (`mailto:`)
@@ -85,6 +90,28 @@ Jeder öffentliche CTA muss navigieren **und** weiterhin tracken.
 - [ ] Master-Detail: Klick auf eine Kampagne in der Liste lädt das Detail mit `animate-panel-in`-Transition
 
 ## Responsive QA
+
+### `/leistungen`
+
+- [ ] **320 / 375 / 390 / 430 px**: kein horizontaler Seiten-Scroll; TOC horizontal scrollbar nur innerhalb der Nav (`overscroll-behavior-x: contain`)
+- [ ] **Mobile**: Header-CTA + eine in-flow BookingCard – keine doppelte BookingCard im Footer
+- [ ] **768 / 834 px (iPad Portrait)**: BookingCard in-flow, Final-CTA gestapelt, TOC-Tabs zentriert ab `md`
+- [ ] **1024 px (Landscape)**: Sticky Booking-Sidebar aktiv (`lg+`), Final-CTA unterhalb des Grids
+- [ ] **1366 / 1440 px+**: Sticky Sidebar kollidiert nicht mit Final-CTA; Anchor-Scroll landet unter TOC (`--leistungen-scroll-offset`)
+- [ ] Service-Sections: `min-w-0` im Grid, keine Überbreite durch 3D-Figuren
+
+### Homepage (`/`)
+
+- [ ] **Pricing `#preise`**: drei Karten lesbar; Performance-System mit „Meistgewählt"-Badge visuell hervorgehoben; Branchen-Autorität als glaubwürdiger Preisanker
+- [ ] **Pricing-CTAs**: Einstieg prüfen / Projektanalyse anfordern / Manufaktur-Projekt besprechen → Google Calendar; `cta_click` mit `pricing-digitales-fundament` · `pricing-performance-system` · `pricing-branchen-autoritaet`
+- [ ] **320 / 375 / 390 / 430 px**: H1 mit `text-balance`, kein horizontaler Scroll; Pricing-Karten gestapelt, kein Overflow
+- [ ] **iPad / Desktop**: Pricing 3-spaltig ab `lg`; mittlere Karte leicht angehoben (`-translate-y-1`)
+- [ ] **Tablet (768 / 834 px)**: Branchen-Karten 1→3 Spalten; Prozess sticky links
+- [ ] **Desktop (1366 / 1440 px+)**: klare Typo-Hierarchie (Kicker → H2 → Body); copper-Akzent sparsam
+- [ ] **Keine Emojis, keine ROI-Garantien** in sichtbarer Copy
+- [ ] Robin-Portrait: Alt-Text „Robin Schmeiries, Inhaber der Smairys Netz-Manufaktur"
+
+### Allgemein
 
 - [ ] Mobile (~390 px): `/kundenlogin` PIN-Tastatur passt ohne horizontalen Scroll
 - [ ] Mobile (~390 px): `/intern/marketing` zeigt Liste über Detail, QR-Code skaliert proportional

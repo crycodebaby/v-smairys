@@ -3,24 +3,23 @@
 
 import { CalendarClock, Clock3, ShieldCheck, Video } from "lucide-react";
 import { CalendarBookingButton } from "./ContactActions";
+import { HOMEPAGE_BOOKING, HOMEPAGE_CTA } from "@/content/homepage";
 
 type BookingCardVariant = "inline" | "sidebar" | "footer";
 
 type BookingCardProps = {
-  /** Layout-Kontext auf /leistungen – beeinflusst Dichte, nicht die CTA-Logik. */
   variant?: BookingCardVariant;
   className?: string;
+  /** Button ausblenden, wenn ein primärer CTA bereits oberhalb steht. */
+  hideButton?: boolean;
 };
 
-const META_POINTS = [
-  { icon: ShieldCheck, label: "Kostenlos & unverbindlich" },
-  { icon: Video, label: "Online via Google Meet" },
-  { icon: Clock3, label: "20–25 Minuten" },
-] as const;
+const META_ICONS = [ShieldCheck, Video, Clock3] as const;
 
 export default function BookingCard({
   variant = "inline",
   className = "",
+  hideButton = false,
 }: BookingCardProps) {
   const isSidebar = variant === "sidebar";
   const isFooter = variant === "footer";
@@ -35,16 +34,14 @@ export default function BookingCard({
       ]
         .filter(Boolean)
         .join(" ")}
-      aria-label="Erstgespräch per Google Kalender buchen"
+      aria-label="Strategisches Erstgespräch per Google Kalender buchen"
     >
-      {/* Feine Oberkante – Premium-Hairline */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent"
       />
 
       <div className="flex flex-col gap-4">
-        {/* Icon + Kicker */}
         <div className="flex items-start gap-3.5">
           <span
             className={[
@@ -62,7 +59,7 @@ export default function BookingCard({
 
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Erstgespräch
+              Beratung
             </p>
             <h2
               className={[
@@ -72,23 +69,22 @@ export default function BookingCard({
                   : "mt-1 text-xl leading-snug sm:text-[1.35rem]",
               ].join(" ")}
             >
-              Termin vereinbaren
+              {HOMEPAGE_BOOKING.headline}
             </h2>
           </div>
         </div>
 
-        {/* Explanatory copy */}
-        <p
+        <div
           className={[
-            "leading-relaxed text-muted-foreground",
+            "space-y-3 leading-relaxed text-muted-foreground",
             isSidebar ? "text-[13px]" : "text-sm",
           ].join(" ")}
         >
-          20-minütiges Erstgespräch: Ziele klären, Machbarkeit prüfen, nächster
-          Schritt. Direkt im Kalender reservieren.
-        </p>
+          {HOMEPAGE_BOOKING.copy.map((paragraph) => (
+            <p key={paragraph.slice(0, 20)}>{paragraph}</p>
+          ))}
+        </div>
 
-        {/* Trust / meta – refined list, not playful pills */}
         <ul
           className={[
             "grid gap-2",
@@ -96,36 +92,39 @@ export default function BookingCard({
           ].join(" ")}
           aria-label="Termin-Details"
         >
-          {META_POINTS.map(({ icon: Icon, label }) => (
-            <li
-              key={label}
-              className="flex items-center gap-2.5 text-[12px] text-foreground/75"
-            >
-              <Icon
-                className="h-3.5 w-3.5 shrink-0 text-brand/80"
-                strokeWidth={1.6}
-                aria-hidden="true"
-              />
-              <span>{label}</span>
-            </li>
-          ))}
+          {HOMEPAGE_BOOKING.meta.map((label, i) => {
+            const Icon = META_ICONS[i] ?? ShieldCheck;
+            return (
+              <li
+                key={label}
+                className="flex items-center gap-2.5 text-[12px] text-foreground/75"
+              >
+                <Icon
+                  className="h-3.5 w-3.5 shrink-0 text-brand/80"
+                  strokeWidth={1.6}
+                  aria-hidden="true"
+                />
+                <span>{label}</span>
+              </li>
+            );
+          })}
         </ul>
 
-        {/* Primary CTA – canonical booking URL via CalendarBookingButton */}
-        <div className={isSidebar ? "pt-1" : "pt-0.5"}>
-          <CalendarBookingButton
-            location="booking"
-            className={[
-              "w-full rounded-sm text-sm",
-              isSidebar ? "min-h-10 px-4" : "min-h-11 px-5",
-            ].join(" ")}
-          >
-            Im Google Kalender buchen
-          </CalendarBookingButton>
-        </div>
+        {!hideButton && (
+          <div className={isSidebar ? "pt-1" : "pt-0.5"}>
+            <CalendarBookingButton
+              location="booking"
+              className={[
+                "w-full rounded-sm text-sm",
+                isSidebar ? "min-h-10 px-4" : "min-h-11 px-5",
+              ].join(" ")}
+            >
+              {HOMEPAGE_CTA.bookingCard}
+            </CalendarBookingButton>
+          </div>
+        )}
       </div>
 
-      {/* Untere Brand-Linie */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-6 bottom-0 h-px bg-gradient-to-r from-transparent via-brand/35 to-transparent"

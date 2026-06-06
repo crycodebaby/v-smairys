@@ -8,7 +8,11 @@ import { Reveal } from "@/components/motion/Reveal";
 import { BackdropIcons } from "@/components/backdrop/BackdropIcons";
 import { ContactInfoCard } from "./ContactInfoCard";
 import { ContactFormCard } from "./ContactFormCard";
-import { ContactActionBar } from "./ContactActions";
+import {
+  CalendarBookingButton,
+  ContactActionBar,
+} from "./ContactActions";
+import BookingCard from "./BookingCard";
 
 type ContactFormSectionProps = {
   /** Tracking-Kontext (z. B. "homepage_invert_cta", "contact_page"). */
@@ -23,6 +27,12 @@ type ContactFormSectionProps = {
   withStandards?: boolean;
   /** Ob unter der Adresse ein „Kein Live-Chat"-Hinweis erscheint. */
   withAvailabilityNote?: boolean;
+  /** Booking-Card oberhalb der Kontaktaktionen (Startseite). */
+  showBookingCard?: boolean;
+  /** Label für den primären Kalender-CTA in der Action-Bar. */
+  calendarCtaLabel?: string;
+  /** Prominenter Primär-CTA oberhalb der BookingCard (Startseite Abschluss). */
+  primaryBookingLabel?: string;
   className?: string;
   id?: string;
 };
@@ -49,6 +59,9 @@ export function ContactFormSection({
   description = "Füllen Sie das Formular aus, um eine unverbindliche Projektbewertung zu erhalten. Wir prüfen Ihre Anfrage und melden uns mit einer Ersteinschätzung.",
   withStandards = true,
   withAvailabilityNote = true,
+  showBookingCard = false,
+  calendarCtaLabel,
+  primaryBookingLabel,
   className = "",
   id = "kontakt",
 }: ContactFormSectionProps) {
@@ -67,12 +80,54 @@ export function ContactFormSection({
               {title}
             </h2>
             {description && (
-              <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg">
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg sm:leading-[1.65]">
                 {description}
               </p>
             )}
 
-            <ContactActionBar location={contactLocation} className="mt-6" />
+            {primaryBookingLabel && (
+              <div className="mt-8">
+                <CalendarBookingButton
+                  location={contactLocation}
+                  className="w-full min-h-11 rounded-sm px-6 sm:w-auto"
+                >
+                  {primaryBookingLabel}
+                </CalendarBookingButton>
+              </div>
+            )}
+
+            {showBookingCard && (
+              <div className={primaryBookingLabel ? "mt-6" : "mt-8"}>
+                <BookingCard
+                  variant="inline"
+                  hideButton={Boolean(primaryBookingLabel)}
+                />
+              </div>
+            )}
+
+            <div className="mt-6">
+              {calendarCtaLabel && !showBookingCard && !primaryBookingLabel ? (
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <CalendarBookingButton
+                    location={contactLocation}
+                    className="w-full sm:w-auto"
+                  >
+                    {calendarCtaLabel}
+                  </CalendarBookingButton>
+                  <ContactActionBar
+                    location={contactLocation}
+                    showCalendar={false}
+                    className="w-full sm:w-auto"
+                  />
+                </div>
+              ) : (
+                <ContactActionBar
+                  location={contactLocation}
+                  showCalendar={!showBookingCard && !primaryBookingLabel}
+                  className="w-full"
+                />
+              )}
+            </div>
 
             <div className="mt-8 border-t border-border/40 pt-6 sm:mt-10 sm:pt-8">
               <ContactInfoCard location={contactLocation} />

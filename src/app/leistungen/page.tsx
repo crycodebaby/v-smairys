@@ -1,13 +1,19 @@
 // src/app/leistungen/page.tsx
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import ServicesTOC from "@/components/leistungen/ServicesTOC";
-import ServiceSection from "@/components/leistungen/ServiceSection";
+import { ServiceSectionPlaceholder } from "@/components/leistungen/ServiceSectionPlaceholder";
 import BookingCard from "@/components/contact/BookingCard";
-import Link from "next/link";
+import LeistungenFinalCta from "@/components/leistungen/LeistungenFinalCta";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/ui/Container";
 import { BackdropIcons } from "@/components/backdrop/BackdropIcons";
 import { LEISTUNGEN_NAV_ITEMS } from "@/config/leistungen-services";
+
+const ServiceSection = dynamic(
+  () => import("@/components/leistungen/ServiceSection"),
+  { loading: () => <ServiceSectionPlaceholder /> }
+);
 
 export const metadata: Metadata = {
   title: "Leistungen – SMAIRYS Netz-Manufaktur",
@@ -20,7 +26,7 @@ export default function LeistungenPage() {
   return (
     <>
       <Header />
-      <main className="relative">
+      <div className="relative overflow-x-clip">
         {/* Hero */}
         <section className="relative isolate overflow-hidden pt-24 pb-8 sm:pt-32 sm:pb-12">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
@@ -50,10 +56,13 @@ export default function LeistungenPage() {
         {/* Sticky Capabilities-Bar – alle Breakpoints */}
         <ServicesTOC items={LEISTUNGEN_NAV_ITEMS} />
 
-        {/* Mobile / Tablet: kompakte Booking-Card in-flow (kein Sticky) */}
-        <section className="border-b border-white/6 pb-8 pt-6 sm:pb-10 sm:pt-8 lg:hidden">
+        {/* Mobile / Tablet: eine BookingCard in-flow (Desktop: Sticky-Sidebar) */}
+        <section
+          className="border-b border-white/6 pb-8 pt-6 sm:pb-10 sm:pt-8 lg:hidden"
+          aria-label="Strategisches Erstgespräch"
+        >
           <Container size="wide">
-            <div className="mx-auto max-w-lg">
+            <div className="mx-auto w-full max-w-md min-w-0">
               <BookingCard variant="inline" />
             </div>
           </Container>
@@ -129,53 +138,17 @@ export default function LeistungenPage() {
               />
             </div>
 
-            {/* Desktop: Sticky Booking-Sidebar */}
-            <aside className="relative hidden lg:block">
-              <div className="sticky top-[calc(4.25rem+3.75rem+0.75rem)] pt-2">
+            {/* Desktop: eine Sticky Booking-Sidebar (endet mit dem Grid, kein Footer-Duplikat) */}
+            <aside className="relative hidden min-w-0 lg:block">
+              <div className="sticky top-[calc(4.25rem+3.75rem+0.75rem)] self-start pt-2 pb-6">
                 <BookingCard variant="sidebar" />
               </div>
             </aside>
           </div>
         </Container>
 
-        {/* Abschluss-CTA */}
-        <section className="border-t border-white/6 py-12 sm:py-20 lg:py-24">
-          <Container size="wide">
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
-              <BookingCard variant="footer" />
-
-              <div className="glass-surface-subtle glass-hairline rounded-xl p-6 text-center sm:p-8">
-                <h2 className="font-heading text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
-                  Ihre Marke verdient mehr als eine Website
-                </h2>
-                <p className="mx-auto mt-3 max-w-xl text-sm text-foreground/80 sm:text-base">
-                  Premium-Websites, schnelle Performance und sicheres deutsches
-                  Hosting – aus einer Hand.
-                </p>
-
-                <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-                  <Link
-                    href="/#kontakt"
-                    className="inline-flex min-h-11 items-center justify-center rounded-sm bg-brand px-6 py-3 text-sm font-semibold text-brand-foreground shadow-[0_10px_28px_-12px_hsl(var(--brand-glow)/0.7)] transition hover:bg-brand-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-glow"
-                  >
-                    Erstgespräch anfragen
-                  </Link>
-                  <Link
-                    href="/projekte"
-                    className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border/60 bg-background/70 px-6 py-3 text-sm font-semibold text-foreground transition hover:border-foreground/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-glow"
-                  >
-                    Ergebnisse ansehen
-                  </Link>
-                </div>
-
-                <p className="mx-auto mt-3 max-w-xs text-[11px] leading-snug text-foreground/65">
-                  100&nbsp;% strategisch · 0&nbsp;% Verkaufsdruck
-                </p>
-              </div>
-            </div>
-          </Container>
-        </section>
-      </main>
+        <LeistungenFinalCta />
+      </div>
     </>
   );
 }
