@@ -12,18 +12,15 @@ export function Hero() {
   const booking = getPrimaryBookingTarget();
 
   return (
-    <Section
-      isHero
-      className="relative flex items-center overflow-hidden bg-background min-h-[100svh] sm:min-h-[88svh] lg:min-h-[92vh]"
-    >
+    <Section variant="hero" className="relative overflow-hidden bg-background">
       <ThreeLogoWrapper />
       <BackdropIcons preset="tech" showFrom="sm" />
 
       <Container
         size="wide"
-        className="relative z-10 grid items-center gap-8 pt-24 sm:pt-28 md:grid-cols-12 md:pt-20"
+        className="relative z-10 grid items-center gap-8 md:grid-cols-12"
       >
-        <div className="flex flex-col items-start gap-5 sm:gap-7 md:col-span-10 lg:col-span-9">
+        <div className="flex min-w-0 flex-col items-start gap-3 sm:gap-5 md:gap-7 md:col-span-10 lg:col-span-9">
           <Kicker>{HOMEPAGE_HERO.kicker}</Kicker>
 
           <h1 className="max-w-3xl text-balance text-fluid-h1 font-bold leading-[1.08] tracking-tight text-foreground">
@@ -34,7 +31,7 @@ export function Hero() {
             {HOMEPAGE_HERO.subheadline}
           </p>
 
-          <div className="flex w-full flex-col items-stretch gap-3 pt-1 sm:w-auto sm:flex-row sm:items-center sm:gap-4 sm:pt-3">
+          <div className="flex w-full min-w-0 flex-col items-stretch gap-2.5 pt-0 sm:w-auto sm:flex-row sm:items-center sm:gap-4 sm:pt-2">
             <Button
               variant="brand"
               size="lg"

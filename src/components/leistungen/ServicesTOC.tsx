@@ -21,6 +21,10 @@ import type {
   LeistungenNavIcon,
   LeistungenNavItem,
 } from "@/config/leistungen-services";
+import {
+  SCROLL_PADDING_GAP_PX,
+  SITE_LAYOUT_CSS_VARS,
+} from "@/lib/layout/site-layout";
 
 const NAV_ICONS: Record<LeistungenNavIcon, LucideIcon> = {
   layout: LayoutTemplate,
@@ -54,7 +58,10 @@ function useScrollOffset(railRef: RefObject<HTMLElement | null>) {
       const railH = rail.getBoundingClientRect().height;
       const offset = Math.ceil(headerH + railH + 10);
       root.style.setProperty("--leistungen-scroll-offset", `${offset}px`);
-      root.style.scrollPaddingTop = `${offset}px`;
+      root.style.setProperty(
+        SITE_LAYOUT_CSS_VARS.scrollPaddingTop,
+        `${offset}px`,
+      );
     };
 
     sync();
@@ -69,7 +76,12 @@ function useScrollOffset(railRef: RefObject<HTMLElement | null>) {
       ro.disconnect();
       window.removeEventListener("resize", sync);
       root.style.removeProperty("--leistungen-scroll-offset");
-      root.style.scrollPaddingTop = "";
+      const headerEl = document.querySelector("#site-header");
+      const headerH = headerEl?.getBoundingClientRect().height ?? 68;
+      root.style.setProperty(
+        SITE_LAYOUT_CSS_VARS.scrollPaddingTop,
+        `${Math.ceil(headerH) + SCROLL_PADDING_GAP_PX}px`,
+      );
     };
   }, [railRef]);
 }

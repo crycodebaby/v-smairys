@@ -6,6 +6,7 @@ import { ServiceSectionPlaceholder } from "@/components/leistungen/ServiceSectio
 import BookingCard from "@/components/contact/BookingCard";
 import LeistungenFinalCta from "@/components/leistungen/LeistungenFinalCta";
 import { Header } from "@/components/layout/Header";
+import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { BackdropIcons } from "@/components/backdrop/BackdropIcons";
 import { LEISTUNGEN_NAV_ITEMS } from "@/config/leistungen-services";
@@ -28,7 +29,7 @@ export default function LeistungenPage() {
       <Header />
       <div className="relative overflow-x-clip">
         {/* Hero */}
-        <section className="relative isolate overflow-hidden pt-24 pb-8 sm:pt-32 sm:pb-12">
+        <Section variant="page-header" className="relative isolate overflow-hidden">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
             <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.03),transparent_18%,transparent_82%,rgba(0,0,0,0.04))]" />
             <div className="absolute left-1/2 top-[-5rem] h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--brand-glow)/0.16),transparent_70%)] blur-3xl" />
@@ -51,7 +52,7 @@ export default function LeistungenPage() {
               </p>
             </div>
           </Container>
-        </section>
+        </Section>
 
         {/* Sticky Capabilities-Bar – alle Breakpoints */}
         <ServicesTOC items={LEISTUNGEN_NAV_ITEMS} />

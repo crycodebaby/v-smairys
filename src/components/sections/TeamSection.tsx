@@ -23,7 +23,7 @@ const ROLES: { label: string; description: string }[] = [
  */
 export function TeamSection() {
   return (
-    <Section className="relative bg-background border-b border-border/60 ambient-glow-amber">
+    <Section className="relative overflow-hidden border-b border-border/60 bg-background ambient-glow-amber">
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
           <Reveal as="div" className="order-2 flex flex-col gap-8 lg:order-1">

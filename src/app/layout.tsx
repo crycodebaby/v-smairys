@@ -98,7 +98,7 @@ export default function RootLayout({
   return (
     <html lang="de" className="scroll-smooth">
       <body className={`${inter.className} min-h-screen antialiased flex flex-col`}>
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 min-w-0 overflow-x-clip">{children}</main>
         <ConditionalFooter>
           <Footer />
         </ConditionalFooter>

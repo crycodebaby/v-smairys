@@ -13,7 +13,7 @@ export function TrustSection() {
   const { kicker, headline, paragraphs, stats } = HOMEPAGE_TRUST;
 
   return (
-    <Section className="relative border-y border-border/60 bg-background ambient-glow-amber">
+    <Section className="relative overflow-hidden border-y border-border/60 bg-background ambient-glow-amber">
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal as="div" className="order-2 flex flex-col gap-8 lg:order-1">
@@ -38,7 +38,7 @@ export function TrustSection() {
           </Reveal>
 
           <Reveal as="div" delay={140} className="order-1 lg:order-2">
-            <div className="relative">
+            <div className="relative overflow-hidden">
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -inset-6 -z-10 rounded-3xl"

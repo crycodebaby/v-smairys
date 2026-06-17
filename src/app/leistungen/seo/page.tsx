@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Kicker } from '@/components/ui/Kicker';
 import { Button } from '@/components/ui/Button';
 import { Header } from '@/components/layout/Header';
+import { PublicPageBody } from '@/components/layout/PublicPageBody';
 import { ContactFormBase } from '@/components/forms/ContactFormBase';
 import { BackdropIcons } from '@/components/backdrop/BackdropIcons';
 import { getPrimaryBookingTarget } from '@/config/site';
@@ -82,12 +83,12 @@ export default function SEOPage() {
   return (
     <>
       <Header />
-      <main className="flex flex-col w-full">
+      <PublicPageBody>
 
         {/* ── 1. HERO ────────────────────────────────────────────────────────── */}
         <Section
-          isHero
-          className="relative flex items-center overflow-hidden border-b border-border bg-background pt-24 sm:pt-28 md:pt-20"
+          variant="page-header"
+          className="relative flex items-center overflow-hidden border-b border-border bg-background"
         >
           <div
             aria-hidden="true"
@@ -335,7 +336,7 @@ export default function SEOPage() {
           </Container>
         </Section>
 
-      </main>
+      </PublicPageBody>
     </>
   );
 }

@@ -113,6 +113,9 @@ Jeder öffentliche CTA muss navigieren **und** weiterhin tracken.
 
 ### Allgemein
 
+- [ ] **Kein horizontaler Overflow** auf öffentlichen Routen (siehe `npm run test:responsive`)
+- [ ] **Hero** füllt genau einen Viewport (`100dvh`), Header-Offset via `--scroll-padding-top`
+- [ ] **Anker-Links** (`#kontakt`, `#preise`) landen unter dem fixed Header
 - [ ] Mobile (~390 px): `/kundenlogin` PIN-Tastatur passt ohne horizontalen Scroll
 - [ ] Mobile (~390 px): `/intern/marketing` zeigt Liste über Detail, QR-Code skaliert proportional
 - [ ] iPad Portrait (768 px): Master-Detail steht in 2 Spalten, QR liegt unter dem Hero

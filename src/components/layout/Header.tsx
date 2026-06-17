@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Container } from '../ui/Container';
 import { Brandmark } from '@/components/brand/Brandmark';
@@ -8,6 +8,7 @@ import { CalendarBookingButton } from '@/components/contact/ContactActions';
 import { SITE } from '@/config/site';
 import { HOMEPAGE_CTA } from '@/content/homepage';
 import { MobileNav } from './MobileNav';
+import { useSiteHeaderMetrics } from './SiteHeaderMetrics';
 
 function LockIcon({ className = '' }: { className?: string }) {
   return (
@@ -26,6 +27,8 @@ function LockIcon({ className = '' }: { className?: string }) {
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  useSiteHeaderMetrics(headerRef);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,6 +40,8 @@ export function Header() {
 
   return (
     <header
+      ref={headerRef}
+      id="site-header"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled ? 'glass-header py-4' : 'bg-transparent py-6'
       }`}

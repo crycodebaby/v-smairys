@@ -18,7 +18,7 @@ export default function LegalLayout({
   peerLink?: Crumb;
 }) {
   return (
-    <section className="relative py-16 isolate sm:py-24">
+    <section className="relative isolate overflow-hidden py-16 sm:py-24">
       {/* Atmosphärischer Hintergrund */}
       <div aria-hidden className="absolute inset-0 pointer-events-none -z-10">
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.03),transparent_18%,transparent_82%,rgba(0,0,0,0.04))]" />

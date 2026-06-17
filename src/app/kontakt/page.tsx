@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
+import { PublicPageBody } from "@/components/layout/PublicPageBody";
 import { ContactFormSection } from "@/components/contact/ContactFormSection";
 
 export const metadata: Metadata = {
@@ -12,9 +13,10 @@ export default function KontaktPage() {
   return (
     <>
       <Header />
-      <main className="bg-background pt-24">
+      <PublicPageBody className="bg-background">
         <ContactFormSection
           pageType="contact_page"
+          sectionVariant="page-header"
           contactLocation="kontakt"
           kicker="Initiative ergreifen"
           title="Lassen Sie uns über Ihre Architektur sprechen."
@@ -22,7 +24,7 @@ export default function KontaktPage() {
           withStandards
           withAvailabilityNote
         />
-      </main>
+      </PublicPageBody>
     </>
   );
 }

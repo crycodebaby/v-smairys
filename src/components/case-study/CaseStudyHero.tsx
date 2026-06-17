@@ -17,7 +17,7 @@ type CaseStudyHeroProps = {
  */
 export function CaseStudyHero({ caseStudy }: CaseStudyHeroProps) {
   return (
-    <Section isHero className="relative bg-background pt-32 pb-12 sm:pb-16">
+    <Section variant="page-header" className="relative bg-background">
       <Container>
         <div className="grid items-end gap-10 lg:grid-cols-12 lg:gap-12">
           <Reveal as="div" className="lg:col-span-6">

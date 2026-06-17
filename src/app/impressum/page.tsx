@@ -15,7 +15,7 @@ export default function ImpressumPage() {
   return (
     <>
       <Header />
-      <Section className="bg-background pt-32 pb-16">
+      <Section variant="page-header" className="bg-background pb-16">
         <Container className="max-w-3xl">
           <Kicker accent="brand">Rechtliches</Kicker>
           <h1 className="text-fluid-h1 font-bold leading-[1.05] tracking-tight">

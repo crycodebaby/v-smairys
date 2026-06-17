@@ -22,7 +22,7 @@ export default function ProjektePage() {
   return (
     <>
       <Header />
-      <Section isHero className="relative overflow-hidden bg-background pt-24 sm:pt-32">
+      <Section variant="page-header" className="relative overflow-hidden bg-background">
         <BackdropIcons preset="generic" showFrom="sm" />
         <Container className="relative z-10">
           <Reveal as="div" className="max-w-2xl">

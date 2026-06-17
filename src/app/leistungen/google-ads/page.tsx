@@ -2,6 +2,7 @@ import React from 'react';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Header } from '@/components/layout/Header';
+import { PublicPageBody } from '@/components/layout/PublicPageBody';
 import { Kicker } from '@/components/ui/Kicker';
 
 // 1. Seitenspezifische Metadata.
@@ -30,10 +31,10 @@ export default function GoogleAdsPage() {
   return (
     <>
       <Header />
-      <main className="flex flex-col w-full">
+      <PublicPageBody>
         
         {/* Hero/Intro-Slot */}
-        <Section className="bg-background pt-32 pb-16 min-h-[60vh] flex items-center border-b border-border">
+        <Section variant="page-header" className="flex min-h-[50dvh] items-center border-b border-border bg-background">
           <Container>
             <Kicker>Messbarer Vertrieb</Kicker>
             <h1 className="text-fluid-h1 font-bold mt-2 leading-[1.05] tracking-tight max-w-4xl">
@@ -63,7 +64,7 @@ export default function GoogleAdsPage() {
           </Container>
         </Section>
 
-      </main>
+      </PublicPageBody>
     </>
   );
 }

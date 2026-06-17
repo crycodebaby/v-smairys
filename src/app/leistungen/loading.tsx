@@ -6,7 +6,7 @@ import { Container } from "@/components/ui/Container";
  */
 export default function LeistungenLoading() {
   return (
-    <div className="relative overflow-x-clip pt-24 pb-16 sm:pt-32">
+    <div className="relative overflow-x-clip pt-[var(--scroll-padding-top,5.5rem)] pb-16 sm:pb-24">
       <Container size="wide">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto h-6 w-24 animate-pulse rounded-sm bg-muted/30" />

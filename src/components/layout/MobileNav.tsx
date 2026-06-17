@@ -95,7 +95,7 @@ export function MobileNav() {
         aria-modal="true"
         aria-label="Navigation"
         className={
-          "fixed inset-0 z-[60] md:hidden " +
+          "fixed inset-0 z-[60] overflow-hidden md:hidden " +
           (open ? "pointer-events-auto" : "pointer-events-none")
         }
       >
@@ -114,7 +114,7 @@ export function MobileNav() {
         {/* Panel */}
         <aside
           className={
-            "absolute right-0 top-0 flex h-[100svh] w-[min(92vw,420px)] flex-col " +
+            "absolute right-0 top-0 flex h-[100dvh] w-[min(92vw,420px)] max-w-full flex-col " +
             "border-l border-white/10 bg-background/95 text-foreground shadow-[0_30px_100px_-20px_hsl(0_0%_0%/0.8)] " +
             "transition-transform duration-300 ease-out " +
             (open ? "translate-x-0" : "translate-x-full")

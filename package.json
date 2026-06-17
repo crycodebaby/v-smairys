@@ -10,7 +10,8 @@
     "clean:next": "node scripts/clean-next.mjs",
     "dev:clean": "npm run clean:next && next dev",
     "build:clean": "npm run clean:next && next build",
-    "dev:turbo": "next dev --turbo"
+    "dev:turbo": "next dev --turbo",
+    "test:responsive": "playwright test tests/responsive-overflow.spec.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@gltf-transform/cli": "^4.2.1",
+    "@playwright/test": "^1.52.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/qrcode": "^1.5.6",

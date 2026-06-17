@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from '@/components/layout/Header';
+import { PublicPageBody } from '@/components/layout/PublicPageBody';
 import { Hero } from '@/components/sections/Hero';
 import { FilterSection } from '@/components/sections/FilterSection';
 import { IndustriesSection } from '@/components/sections/IndustriesSection';
@@ -25,7 +26,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="flex w-full flex-col">
+      <PublicPageBody>
         <Hero />
         <SocialProofSection />
         <FilterSection />
@@ -43,7 +44,7 @@ export default function Home() {
           showBookingCard
           primaryBookingLabel={HOMEPAGE_CTA.primary}
         />
-      </main>
+      </PublicPageBody>
     </>
   );
 }

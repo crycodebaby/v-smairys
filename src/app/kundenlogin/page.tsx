@@ -54,7 +54,7 @@ export default async function KundenloginPage({ searchParams }: PageProps) {
   const configured = isInternAuthConfigured();
 
   return (
-    <div className="chroma-stage relative min-h-[100svh] overflow-hidden bg-background text-foreground">
+    <div className="chroma-stage relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
       {/* Zusätzlicher statischer Light-Layer hinter den animierten Blobs.
           Sorgt dafür, dass auch bei prefers-reduced-motion ein vollwertiges
           Chroma-Hintergrundbild bleibt. */}
@@ -74,7 +74,7 @@ export default async function KundenloginPage({ searchParams }: PageProps) {
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(closest-side_at_50%_60%,transparent_50%,rgba(0,0,0,0.55)_100%)]"
       />
 
-      <main className="mx-auto flex min-h-[100svh] w-full max-w-md flex-col items-stretch justify-center px-5 py-12 sm:max-w-lg sm:px-6">
+      <main className="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col items-stretch justify-center px-5 py-12 sm:max-w-lg sm:px-6">
         <div className="mb-6 flex flex-col items-center gap-4">
           <ToolbarBrand label="Smairys · Intern" sublabel="Geschützter Bereich" />
           <div className="text-center">

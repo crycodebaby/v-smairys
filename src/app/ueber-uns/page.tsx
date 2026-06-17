@@ -20,13 +20,14 @@ export default function UeberUnsPage() {
     <>
       <Header />
       <Section
-        className="ambient-glow-amber relative min-h-[100svh] overflow-hidden bg-background pb-12 pt-28 sm:pb-16 sm:pt-32"
+        variant="hero"
+        className="ambient-glow-amber relative overflow-hidden bg-background"
       >
         <Container>
           <div className="grid items-center gap-10 sm:gap-14 lg:grid-cols-2 lg:gap-24">
 
             <Reveal as="div" className="order-2 flex justify-center lg:order-1 lg:justify-start">
-              <div className="relative w-full max-w-[420px] sm:max-w-[500px]">
+              <div className="relative w-full max-w-[420px] overflow-hidden sm:max-w-[500px]">
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute -inset-6 -z-10 rounded-3xl"

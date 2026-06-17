@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { Section } from "@/components/ui/Section";
+import { Section, type SectionVariant } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
@@ -33,6 +33,8 @@ type ContactFormSectionProps = {
   calendarCtaLabel?: string;
   /** Prominenter Primär-CTA oberhalb der BookingCard (Startseite Abschluss). */
   primaryBookingLabel?: string;
+  /** Section spacing preset – use `page-header` when this block is the first content below the fixed header. */
+  sectionVariant?: SectionVariant;
   className?: string;
   id?: string;
 };
@@ -62,12 +64,14 @@ export function ContactFormSection({
   showBookingCard = false,
   calendarCtaLabel,
   primaryBookingLabel,
+  sectionVariant = "default",
   className = "",
   id = "kontakt",
 }: ContactFormSectionProps) {
   return (
     <Section
       id={id}
+      variant={sectionVariant}
       className={`ambient-glow-amber ambient-glow-amber-bottom relative overflow-hidden bg-background ${className}`}
     >
       {/* Dezente Tiefenschärfe – auf Kontakt-Sections sehr ruhig */}

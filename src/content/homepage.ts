@@ -19,16 +19,16 @@ export const HOMEPAGE_HERO = {
   kicker: "Smairys Netz-Manufaktur",
   headline: "Wir bauen keine Webseiten. Wir bauen digitale Vertriebsmaschinen.",
   subheadline:
-    "Smairys Netz-Manufaktur entwickelt Premium-Websites für Unternehmen im Saarland, die nicht nur gut aussehen sollen — sondern Vertrauen aufbauen, Anfragen qualifizieren und den Vertrieb spürbar entlasten.",
+    "Wir entwickeln Premium-Websites für Unternehmen im Saarland, die nicht nur gut aussehen, sondern Vertrauen aufbauen, Anfragen qualifizieren und den Vertrieb spürbar entlasten.",
 } as const;
 
 export const HOMEPAGE_QUALIFICATION = {
-  kicker: "Für wen wir arbeiten",
+  kicker: "Mit wem wir arbeiten",
   headline: "Wir sind nicht die richtige Wahl für jeden.",
   paragraphs: [
-    "Wenn Sie nur die schnellste oder billigste Website suchen, sind wir vermutlich nicht der passende Partner.",
-    "Wir arbeiten mit Unternehmen, die verstanden haben: Eine Website ist kein digitaler Platzhalter. Sie ist ein Verkaufssystem. Sie baut Vertrauen auf, reduziert Einwände und führt Interessenten strukturiert zur Anfrage.",
-    "Unsere Arbeit beginnt nicht bei Farben und Animationen. Sie beginnt bei Ihrem Unternehmen, Ihren Kunden und der Frage, warum sich jemand genau für Sie entscheiden sollte.",
+    "Suchen Sie die schnellste oder billigste Website, sind wir vermutlich nicht der passende Partner.",
+    "Wir arbeiten mit Unternehmen, die verstanden haben dass eine Website kein digitaler Platzhalter ist, Sie ist ein Verkaufssystem. Sie baut Vertrauen auf, reduziert Einwände und führt Interessenten strukturiert zur Anfrage.",
+    "Unsere Arbeit beginnt bei Ihrem Unternehmen, Ihren Kunden und der Frage, warum sich jemand genau für Sie entscheiden sollte.",
   ],
 } as const;
 
@@ -138,33 +138,35 @@ export const HOMEPAGE_BOOKING = {
   meta: [
     "Kostenfreie, ehrliche Einschätzung",
     "Online via Google Meet",
-    "20–25 Minuten",
+    "20 Minuten",
   ],
 } as const;
 
 export const HOMEPAGE_PRICING = {
-  kicker: "Transparente Investition",
-  headline: "Drei Wege zu einer Website, die für Ihr Unternehmen arbeitet.",
+  kicker: "Transparente Preisgestaltung",
+  headline: "Drei Optionen um in eine Website zu investieren.",
   intro:
-    "Keine Baukasten-Lösung. Keine Vorlage von der Stange. Sie erhalten eine individuell entwickelte Website, die Strategie, Design und Technik verbindet — passend zu Ihrem Unternehmen, Ihrem Markt und Ihrem Vertriebsziel.",
+    "Keine Baukasten-Lösung, keine Standard-Anforderungen. Jede Website ist ein Unikat, Made-in-Saarland.",
   note:
-    "Alle Preise verstehen sich als Orientierung. Der konkrete Umfang wird im strategischen Erstgespräch geprüft — transparent, ehrlich und ohne Verkaufsdruck.",
+    "Alle Preise verstehen sich als Orientierung. Der konkrete Umfang wird transparent im strategischen Erstgespräch geprüft.",
   packages: [
     {
       id: "digitales-fundament",
       name: "Digitales Fundament",
-      price: "1.299 €",
+      price: "1.250 €",
       positioning:
         "Für lokale Betriebe, die eine hochprofessionelle Präsenz ohne Kompromisse bei Technik, Geschwindigkeit und sauberer Umsetzung suchen.",
       includes: [
-        "Next.js High-Speed Architektur",
-        "Gehostet auf Vercel für sehr schnelle Ladezeiten",
+        "High-Speed Architektur, vergleichbar mit Amazon",
+        "Server in Frankfurt für schnellste Ladezeiten",
         "Kompakte Seitenstruktur mit bis zu 3 strategisch aufgebauten Zielseiten",
         "Textliche und visuelle Basis-Gestaltung",
         "Einbindung vorhandener Logos, Bilder und Markenmaterialien",
         "Kontakt- oder Anfrageführung",
         "Domain-Einrichtung, SSL und technisches Basis-Setup",
         "DSGVO-bewusste technische Grundlage",
+        "Google reCAPTCHA-Integration gegen Spam-Anfragen",
+
       ],
       bestFor:
         "Ideal für Unternehmen, die endlich professionell auftreten und online ernst genommen werden wollen.",
@@ -176,19 +178,21 @@ export const HOMEPAGE_PRICING = {
       id: "performance-system",
       name: "Performance-System",
       badge: "Meistgewählt",
-      price: "2.850 €",
+      price: "2.960 €",
       positioning:
-        "Für Unternehmen, die ihre Website nicht nur als digitale Präsenz sehen, sondern als aktiven Vertriebs- und Vertrauenskanal.",
+        "Für Unternehmen, die ihre Website als aktiven Vertriebs- und Vertrauenskanal sehen.",
       includes: [
         "Alles aus dem Digitalen Fundament",
         "Erweiterte Website-Architektur mit bis zu 8 konversionsstarken Unterseiten",
-        "Verkaufspsychologisches Copywriting",
-        "Strukturierte Nutzerführung zur Anfrage",
+        "Verkaufspsychologische Nutzerführung zur Anfragensteigerung",
+        "Mit Google-abgestimmte Suchbegriff-Strukturierung",
         "Lokale SEO-Grundlage für relevante Suchbegriffe in Ihrer Region",
-        "Trust-Elemente, Referenzen und klare Angebotsdarstellung",
+        "Vertrauenswürdigkeit-Elemente, Referenzen und klare Angebotsdarstellung",
         "Integration von Kontakt-, Anfrage- oder Reservierungsstrecken",
         "Consent-gesteuertes Analytics-Fundament zur Messung wichtiger Nutzeraktionen",
         "Launch-Begleitung",
+        "Website-Performance-Monitoring ohne Cookies",
+        "Rechtssichere § 5 Digitale-Dienste-Gesetz (DDG) Compliance",
       ],
       bestFor:
         "Die beste Wahl für Unternehmen, die planbar hochwertiger auftreten, qualifizierte Anfragen gewinnen und ihren digitalen Auftritt als Vertriebssystem nutzen wollen.",
@@ -199,20 +203,22 @@ export const HOMEPAGE_PRICING = {
     {
       id: "branchen-autoritaet",
       name: "Branchen-Autorität",
-      price: "5.600 €",
+      price: "7.100 €",
       positioning:
         "Das umfangreiche Komplettsystem für Unternehmen mit höherem Anspruch, stärkerem Wettbewerb oder mehreren Zielgruppen, Leistungen und Standorten.",
       includes: [
         "Alles aus dem Performance-System",
         "Erweiterte Seitenarchitektur für mehrere Zielgruppen, Leistungen oder Standorte",
         "Aufbau zusätzlicher Landingpages, Leistungsseiten oder Pillar-Strukturen nach Bedarf",
-        "Premium Brand-Identity Feinschliff für ein exklusiveres digitales Erscheinungsbild",
-        "Tiefere lokale und überregionale SEO-Struktur",
-        "Case-Study- und Referenz-Integration",
-        "Erweiterte Lead-Qualifizierung oder Anfrageführung",
-        "Vorbereitung für Kampagnen, Google Ads oder laufende Betreuung",
+        "Marken-Identität Feinschliff für ein exklusiveres digitales Erscheinungsbild durch Hauseigenen Designer",
+        "Erweiterte überregionale SEO-Struktur",
+        "Bewertungs- und Referenzen-Integration mit Echtzeitdaten",
+        "Vorbereitung für Google Ads-Kampagnen oder laufende Betreuung",
         "CRM- oder Automatisierungs-Anbindung, sofern technisch sinnvoll",
         "Priority Support und strategische Auswertung der ersten 30 Tage nach Launch",
+        "Metadaten-Optimierung für Google, Bing und Yandex",
+        "Technisches Google Analytics-Setup (sofern ein bestätigter Google Business Account vorhanden ist)",
+
       ],
       bestFor:
         "Für Unternehmen, die ihren digitalen Auftritt als ernsthaften Wachstums- und Autoritätskanal aufbauen wollen.",
